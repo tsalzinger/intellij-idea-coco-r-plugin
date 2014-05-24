@@ -1,0 +1,124 @@
+ {
+    parserClass="at.jku.ssw.coco.intellij.parser.CocoParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Coco"
+    psiImplClassSuffix="Impl"
+    psiPackage="at.jku.ssw.coco.intellij.psi"
+    psiImplPackage="at.jku.ssw.coco.intellij.psi.impl"
+    
+    elementTypeHolderClass="at.jku.ssw.coco.intellij.psi.CocoTypes"
+    elementTypeClass="at.jku.ssw.coco.intellij.psi.CocoElementType"
+    tokenTypeClass="at.jku.ssw.coco.intellij.psi.CocoTokenType"
+ }
+
+
+//Cocol =
+// [Imports]
+// "COMPILER" ident
+// [GlobalFieldsAndMethods]
+// ScannerSpecification
+// ParserSpecification
+// "END" ident '.'
+// .
+
+Cocol ::=
+    Imports?
+    "COMPILER" ident
+    GlobalFieldsAndMethods?
+    ScannerSpecification
+    ParserSpecification
+    "END" ident '.'
+
+
+//ident = letter {letter | digit}.
+//number = digit {digit}.
+//string = '"' {anyButQuote} '"'.
+//char = '\'' anyButApostrophe '\''.
+
+ident ::= letter {letter | digit}
+number ::= digit {digit}
+string ::= '"' {anyButQuote} '"'
+char_ ::= "\'" anyButApostrophe "\'"
+
+private Imports ::= ("import" import";")*
+
+private GlobalFieldsAndMethods ::= javacode
+//number = digit {digit}
+//char = '\'' anyButApostrophe '\''
+
+
+//ScannerSpecification =
+// ["IGNORECASE"]
+// ["CHARACTERS" {SetDecl}]
+// ["TOKENS" {TokenDecl}]
+// ["PRAGMAS" {PragmaDecl}]
+// {CommentDecl}
+// {WhiteSpaceDecl}.
+
+private ScannerSpecification ::=
+    "IGNORECOASE"?
+    Characters?
+    Tokens?
+    Pragmas?
+    CommentDecl*
+    WhiteSpaceDecl*
+
+private Characters ::= "CHARACTERS" SetDecl*
+private SetDecl ::= ident '=' Set '.'
+private Set ::= BasicSet (('+'|'-') BasicSet)*
+private BasicSet ::= string | ident | char_ [".." char_] | "ANY"
+
+private Tokens ::= "TOKENS" TokenDecl*
+private TokenDecl ::= Symbol ['=' TokenExpr '.']
+private TokenExpr ::= TokenTerm {'|' TokenTerm}
+private TokenTerm ::= TokenFactor {TokenFactor} ["CONTEXT" '(' TokenExpr ')']
+private TokenFactor ::= Symbol
+    | '(' TokenExpr ')'
+    | '[' TokenExpr ']'
+    | '{' TokenExpr '}'
+private Symbol ::= ident | string | char_
+
+
+private Pragmas ::= TokenDecl [SemAction]
+private SemAction ::= "(." ArbitraryStatements ".)" // TODO ArbitraryStatements
+
+private CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"]
+
+private WhiteSpaceDecl ::= "IGNORE" Set
+
+//ParserSpecification = "PRODUCTIONS" {Production}. 
+//Production = ident [FormalAttributes] [LocalDecl] '=' Expression '.'. 
+//Expression = Term {'|' Term}. 
+//Term = [[Resolver] Factor {Factor}]. 
+//Factor = ["WEAK"] Symbol [ActualAttributes] 
+// | '(' Expression ')' 
+// | '[' Expression ']' 
+// | '{' Expression '}' 
+// | "ANY" 
+// | "SYNC" 
+// | SemAction. 
+//Symbol = ident | string | char. 
+//SemAction = "(." ArbitraryStatements ".)". 
+//LocalDecl = SemAction. 
+//FormalAttributes = '<' ArbitraryText '>'. 
+//ActualAttributes = '<' ArbitraryText '>'. 
+//Resolver = "IF" '(' {ANY} ')'. 
+
+
+private ParserSpecification ::= "PRODUCTIONS" {Production} 
+private Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression ''
+private Expression ::= Term {'|' Term} 
+private Term ::= [[Resolver] Factor {Factor}] 
+private Factor ::= ["WEAK"] Symbol [ActualAttributes] 
+    | '(' Expression ')' 
+    | '[' Expression ']' 
+    | '{' Expression '}' 
+    | "ANY" 
+    | "SYNC" 
+    | SemAction
+private LocalDecl ::= SemAction 
+private FormalAttributes ::= '<' ArbitraryText '>' 
+private ActualAttributes ::= '<' ArbitraryText '>' 
+private Resolver ::= "IF" '(' {ANY} ')' 
