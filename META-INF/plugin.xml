@@ -23,4 +23,8 @@
     </change-notes>
 
     <idea-version since-build="131"/>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="at.jku.ssw.coco.intellij.CocoFileTypeFactory"/>
+    </extensions>
 </idea-plugin>
