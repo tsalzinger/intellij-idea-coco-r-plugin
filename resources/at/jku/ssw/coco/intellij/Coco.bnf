@@ -37,10 +37,10 @@ Cocol ::=
 //string = '"' {anyButQuote} '"'.
 //char = '\'' anyButApostrophe '\''.
 
-ident ::= letter {letter | digit}
-number ::= digit {digit}
-string ::= '"' {anyButQuote} '"'
-char_ ::= "\'" anyButApostrophe "\'"
+//ident ::= letter {letter | digit} // handled in lexer
+//number ::= digit {digit} // handled in lexer
+//string ::= '"' {anyButQuote} '"'
+//char ::= "\'" anyButApostrophe "\'"
 
 private Imports ::= ("import" import";")*
 
@@ -68,7 +68,7 @@ private ScannerSpecification ::=
 private Characters ::= "CHARACTERS" SetDecl*
 private SetDecl ::= ident '=' Set '.'
 private Set ::= BasicSet (('+'|'-') BasicSet)*
-private BasicSet ::= string | ident | char_ [".." char_] | "ANY"
+BasicSet ::= string | ident | char [".." char] | "ANY"
 
 private Tokens ::= "TOKENS" TokenDecl*
 private TokenDecl ::= Symbol ['=' TokenExpr '.']
@@ -78,15 +78,16 @@ private TokenFactor ::= Symbol
     | '(' TokenExpr ')'
     | '[' TokenExpr ']'
     | '{' TokenExpr '}'
-private Symbol ::= ident | string | char_
+Symbol ::= ident | string | char
+
 
 
 private Pragmas ::= TokenDecl [SemAction]
 private SemAction ::= "(." ArbitraryStatements ".)" // TODO ArbitraryStatements
 
-private CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"]
+CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"]
 
-private WhiteSpaceDecl ::= "IGNORE" Set
+WhiteSpaceDecl ::= "IGNORE" Set
 
 //ParserSpecification = "PRODUCTIONS" {Production}. 
 //Production = ident [FormalAttributes] [LocalDecl] '=' Expression '.'. 
@@ -121,4 +122,4 @@ private Factor ::= ["WEAK"] Symbol [ActualAttributes]
 private LocalDecl ::= SemAction 
 private FormalAttributes ::= '<' ArbitraryText '>' 
 private ActualAttributes ::= '<' ArbitraryText '>' 
-private Resolver ::= "IF" '(' {ANY} ')' 
+Resolver ::= "IF" '(' {ANY} ')'
