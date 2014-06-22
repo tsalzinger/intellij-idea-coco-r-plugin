@@ -17,13 +17,14 @@ import com.intellij.psi.TokenType;
     StringBuffer blockComment = new StringBuffer();
     int blockCommentLevel = 0;
     int stateBeforeComment = 0;
+    int stateBeforeSemAction = 0;
 %}
 
 
 CRLF = (\n|\r|\r\n)
 WHITE_SPACE=[\ \t\f]
 END_OF_LINE_COMMENT=("//")[^\r\n]*
-//SEM_ACTION = "(." .*? ".)"
+//SEM_ACTION_SYMBOLS = "(." .*? ".)"
 
 ident = [:jletter:] [:jletterdigit:]*
 string="\""[^"\""]*"\""
@@ -53,8 +54,8 @@ SEM_ACTION= ([^"\.)"]|{CRLF})*?
 
 "/*" {blockCommentLevel++; if (blockCommentLevel == 1) {stateBeforeComment = yystate(); yybegin(BLOCK_COMMENT); return CocoTypes.BLOCK_COMMENT;}}
 <BLOCK_COMMENT> {
-  [^("/*"|"*/")]+ {}
-  "*/" {blockCommentLevel--; if (blockCommentLevel == 0) {yybegin(stateBeforeComment);}}
+  [^("/*"|"*/")]+ {return CocoTypes.BLOCK_COMMENT;}
+  "*/" {blockCommentLevel--; if (blockCommentLevel == 0) {yybegin(stateBeforeComment);} return CocoTypes.BLOCK_COMMENT;}
 }
 
 
@@ -76,12 +77,12 @@ SEM_ACTION= ([^"\.)"]|{CRLF})*?
 
 
 <PRAGMAS, PARSER> {
-    "(." {yybegin(SEM_ACTION); return CocoTypes.SEM_ACTION_START;  }
+    "(." {stateBeforeSemAction = yystate(); yybegin(SEM_ACTION); return CocoTypes.SEM_ACTION_START;  }
 }
 
 <SEM_ACTION> {
    {WHITE_SPACE}+ {return CocoTypes.SEM_ACTION_; }
-   ".)" {yybegin(PRAGMAS); return CocoTypes.SEM_ACTION_END; }
+   ".)" {yybegin(stateBeforeSemAction); return CocoTypes.SEM_ACTION_END; }
    {SEM_ACTION} { return CocoTypes.SEM_ACTION_; }
 }
 
@@ -89,7 +90,7 @@ SEM_ACTION= ([^"\.)"]|{CRLF})*?
     {javacode} { return CocoTypes.JAVACODE; }
 }
 
-<GLOBAL, SCANNER, PRAGMAS, COMMENTDECL> {
+<GLOBAL, SCANNER, TOKENS, PRAGMAS, COMMENTDECL> {
     "COMMENTS" {yybegin(COMMENTDECL); return CocoTypes.COMMENTS; }
     "IGNORE" {yybegin(WHITESPACEDECL); return CocoTypes.IGNORE; }
 }

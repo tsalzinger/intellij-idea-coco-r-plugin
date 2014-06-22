@@ -1,0 +1,48 @@
+// test
+
+/* ... */
+
+import
+    dddda.asdfd.asdf;
+import dddae.ass.*;
+import test.Easdl;
+import test.ad;
+
+COMPILER dfd2ks32l
+
+asfd
+
+IGNORECASE
+// SCANNER SPECIFICATION
+/*ddd*/
+CHARACTERS
+test = a + '\u0AF0' .
+somethingelse = a - 'c'.
+another = 'a'..'z'.
+
+TOKENS
+  number = daasdf.
+  "\0" =  'a' | de CONTEXT ("b\XXb\\b\X\vca").
+
+PRAGMAS
+ident = b . (. a a some st
+uff .)
+jident2 = a .
+jetonemore = a . (. ad .)
+
+COMMENTS FROM "a" TO "b" NESTED
+COMMENTS FROM "/**" TO eol
+
+IGNORE 'a'..'z'
+
+// PARSER SPECIFIATION
+
+PRODUCTIONS
+ident < arbitrary text > (. arbitrary statements .) =
+    WEAK eof < act attributes > | IF (ANY) { no } |
+    IF (ANY) [
+        IF (ANY) {
+            IF (ANY) WEAK t
+        }
+    ] .
+END ident .

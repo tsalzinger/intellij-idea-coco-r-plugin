@@ -27,5 +27,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="at.jku.ssw.coco.intellij.CocoFileTypeFactory"/>
         <lang.parserDefinition language="Cocol" implementationClass="at.jku.ssw.coco.intellij.CocoParserDefinition"/>
+        <lang.syntaxHighlighterFactory key="Cocol"
+                                       implementationClass="at.jku.ssw.coco.intellij.CocoSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="at.jku.ssw.coco.intellij.CocoColorSettingsPage"/>
     </extensions>
 </idea-plugin>
