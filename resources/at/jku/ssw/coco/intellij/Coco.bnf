@@ -11,6 +11,8 @@
     elementTypeHolderClass="at.jku.ssw.coco.intellij.psi.CocoTypes"
     elementTypeClass="at.jku.ssw.coco.intellij.psi.CocoElementType"
     tokenTypeClass="at.jku.ssw.coco.intellij.psi.CocoTokenType"
+
+    psiImplUtilClass="at.jku.ssw.coco.intellij.psi.impl.CocoPsiImplUtil"
  }
 
 
@@ -26,13 +28,15 @@
 Cocol ::=
     Comment?
     Imports?
-    COMPILER ident
+    Compiler
     GlobalFieldsAndMethods?
     ScannerSpecification
     ParserSpecification
-    END ident TERMINATOR
+    End
 
 //COMPILER ::= "COMPILER"
+
+Compiler ::= COMPILER_ ident {methods=[getCompilerName]}
 
 Imports ::= (import importpath)*
 //
@@ -136,3 +140,5 @@ FormalAttributes ::= Attributes
 ActualAttributes ::= Attributes
 private Attributes ::= SMALLER_THEN ARBITRARY_TEXT GREATER_THEN
 Resolver ::= IF PAR_OPEN ANY* PAR_CLOSE
+
+End ::= END_ ident TERMINATOR

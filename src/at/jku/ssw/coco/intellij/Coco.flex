@@ -67,14 +67,14 @@ SEM_ACTION_INCL_START_STOP = "(\." ~"\.)"
 <YYINITIAL> {WHITE_SPACE}+                                { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
 
 
-"COMPILER"                              { yybegin(COMPILER); return CocoTypes.COMPILER; }
+"COMPILER"                              { yybegin(COMPILER); return CocoTypes.COMPILER_; }
 "CHARACTERS"                              { yybegin(CHARACTERS); return CocoTypes.CHARACTERS_; }
 "TOKENS"                              { yybegin(TOKENS); return CocoTypes.TOKENS_; }
 "CONTEXT"                              { yybegin(CHARACTERS); return CocoTypes.CONTEXT; }
 "IGNORECASE" { yybegin(SCANNER); return CocoTypes.IGNORECASE; }
 "PRAGMAS"                              { yybegin(PRAGMAS); return CocoTypes.PRAGMAS_; }
 "PRODUCTIONS" {yybegin(PARSER); return CocoTypes.PRODUCTIONS;}
-"END"                              { yybegin(YYINITIAL); return CocoTypes.END; }
+"END"                              { yybegin(YYINITIAL); return CocoTypes.END_; }
 <COMPILER> {ident}                                { yybegin(GLOBAL); return CocoTypes.IDENT; }
 
 
