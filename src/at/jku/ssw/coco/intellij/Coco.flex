@@ -27,7 +27,7 @@ END_OF_LINE_COMMENT=("//")[^\r\n]*
 //SEM_ACTION_SYMBOLS = "(." .*? ".)"
 
 ident = [:jletter:] [:jletterdigit:]*
-string="\""[^"\""]*"\""
+string= "\"" ~"\""
 // TODO support escape characters in string
 char = "'" [^"'"] "'"
 hexValue = ([:digit:]|"A"|"B"|"C"|"D"|"E"|"F")
@@ -36,7 +36,9 @@ escapesequences = ('\\\\' | '\\r' | '\\\"' | '\\0' | '\\r' | '\\n' | '\\t' | '\\
 importpath=[:jletter:]+([\.][:jletter:]+)*[\.]([:jletter:]+|[\*])";"
 
 javacode=[^("IGNORECASE"|"CHARACTERS"|"TOKENS")]*?
-SEM_ACTION= ([^"\.)"]|{CRLF})*?
+SEM_ACTION= !([^]* "\.)" [^]*) "\.)"
+//([^"\.)"]|{CRLF})*?
+SEM_ACTION_INCL_START_STOP = "(\." ~"\.)"
 // make javacode regex not match any top level keywords... (IGNORECASE, TOKEN, PRAGMA, ...)
 
 //%state WAITING_VALUE
@@ -77,14 +79,15 @@ SEM_ACTION= ([^"\.)"]|{CRLF})*?
 
 
 <PRAGMAS, PARSER> {
-    "(." {stateBeforeSemAction = yystate(); yybegin(SEM_ACTION); return CocoTypes.SEM_ACTION_START;  }
+    {SEM_ACTION_INCL_START_STOP} { return CocoTypes.SEM_ACTION_; }
+//    "(." {stateBeforeSemAction = yystate(); yybegin(SEM_ACTION); return CocoTypes.SEM_ACTION_START;  }
 }
-
-<SEM_ACTION> {
-   {WHITE_SPACE}+ {return CocoTypes.SEM_ACTION_; }
-   ".)" {yybegin(stateBeforeSemAction); return CocoTypes.SEM_ACTION_END; }
-   {SEM_ACTION} { return CocoTypes.SEM_ACTION_; }
-}
+//
+//<SEM_ACTION> {
+//   {WHITE_SPACE}+ {return CocoTypes.SEM_ACTION_; }
+//   ".)" {yybegin(stateBeforeSemAction); return CocoTypes.SEM_ACTION_END; }
+//   {SEM_ACTION} { return CocoTypes.SEM_ACTION_; }
+//}
 
 <GLOBAL> {
     {javacode} { return CocoTypes.JAVACODE; }

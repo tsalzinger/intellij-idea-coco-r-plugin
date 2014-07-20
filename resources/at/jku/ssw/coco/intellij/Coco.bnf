@@ -91,7 +91,8 @@ Symbol ::= ident | string | char
 
 Pragmas ::= PRAGMAS_ PragmaDecl*
 PragmaDecl ::= TokenDecl SemAction?
-SemAction ::= SEM_ACTION_START SEM_ACTION_ SEM_ACTION_END
+//SemAction ::= SEM_ACTION_START SEM_ACTION_ SEM_ACTION_END
+SemAction ::= SEM_ACTION_
 
 //CommentDecl = "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"].
 CommentDecl ::= COMMENTS FROM TokenExpr TO TokenExpr NESTED?

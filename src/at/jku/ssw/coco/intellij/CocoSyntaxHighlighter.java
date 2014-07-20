@@ -77,8 +77,9 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
                 || tokenType.equals(CocoTypes.PIPE)
                 || tokenType.equals(CocoTypes.RANGE)) {
             return OPERATION_SIGN_KEYS;
-        } else if (tokenType.equals(CocoTypes.SEM_ACTION_START) ||
-                tokenType.equals(CocoTypes.SEM_ACTION_END) ||
+        } else if (
+//                tokenType.equals(CocoTypes.SEM_ACTION_START) ||
+//                tokenType.equals(CocoTypes.SEM_ACTION_END) ||
                 tokenType.equals(CocoTypes.GREATER_THEN) ||
                 tokenType.equals(CocoTypes.SMALLER_THEN)) {
             return MARKUP_TAG_KEYS;
