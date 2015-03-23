@@ -83,7 +83,7 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
                 tokenType.equals(CocoTypes.GREATER_THEN) ||
                 tokenType.equals(CocoTypes.SMALLER_THEN)) {
             return MARKUP_TAG_KEYS;
-        } else if (tokenType.equals(CocoTypes.COMPILER) ||
+        } else if (tokenType.equals(CocoTypes.COMPILER_) ||
                 tokenType.equals(CocoTypes.CHARACTERS_) ||
                 tokenType.equals(CocoTypes.PRAGMAS_) ||
                 tokenType.equals(CocoTypes.TOKENS_) ||
@@ -93,7 +93,7 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
                 tokenType.equals(CocoTypes.NESTED) ||
                 tokenType.equals(CocoTypes.IGNORE) ||
                 tokenType.equals(CocoTypes.PRODUCTIONS) ||
-                tokenType.equals(CocoTypes.END) ||
+                tokenType.equals(CocoTypes.END_) ||
                 tokenType.equals(CocoTypes.WEAK) ||
                 tokenType.equals(CocoTypes.IF) ||
                 tokenType.equals(CocoTypes.ANY) ||

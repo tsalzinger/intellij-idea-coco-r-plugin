@@ -31,4 +31,10 @@
                                        implementationClass="at.jku.ssw.coco.intellij.CocoSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="at.jku.ssw.coco.intellij.CocoColorSettingsPage"/>
     </extensions>
+    <actions>
+        <action id="at.jku.ssw.coco.intellij.RunCocoR" class="Coco.CocoRAction" text="Run _Coco/R"
+                description="Runs Coco/R on the given .ATG file">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+    </actions>
 </idea-plugin>
