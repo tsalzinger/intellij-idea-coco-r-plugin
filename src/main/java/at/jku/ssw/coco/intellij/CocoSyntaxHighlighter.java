@@ -35,8 +35,8 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey PARENTHESES = TextAttributesKey.createTextAttributesKey("PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
     private static final TextAttributesKey[] PARENTHESES_KEYS = new TextAttributesKey[]{PARENTHESES};
     public static final TextAttributesKey BRACKETS = TextAttributesKey.createTextAttributesKey("BRACKETS", DefaultLanguageHighlighterColors.BRACKETS);
+    private static final TextAttributesKey[] BRACKETS_KEYS = new TextAttributesKey[]{BRACKETS};
     public static final TextAttributesKey BRACES = TextAttributesKey.createTextAttributesKey("BRACES", DefaultLanguageHighlighterColors.BRACES);
-    private static final TextAttributesKey[] BRACKETS_KEYS = new TextAttributesKey[]{BRACES};
     private static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
 
     @NotNull
@@ -83,21 +83,21 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
                 tokenType.equals(CocoTypes.GREATER_THEN) ||
                 tokenType.equals(CocoTypes.SMALLER_THEN)) {
             return MARKUP_TAG_KEYS;
-        } else if (tokenType.equals(CocoTypes.COMPILER_) ||
-                tokenType.equals(CocoTypes.CHARACTERS_) ||
-                tokenType.equals(CocoTypes.PRAGMAS_) ||
-                tokenType.equals(CocoTypes.TOKENS_) ||
+        } else if (tokenType.equals(CocoTypes.TOKEN_COMPILER) ||
+                tokenType.equals(CocoTypes.TOKEN_CHARACTERS) ||
+                tokenType.equals(CocoTypes.TOKEN_PRAGMAS) ||
+                tokenType.equals(CocoTypes.TOKEN_TOKENS) ||
                 tokenType.equals(CocoTypes.COMMENTS) ||
                 tokenType.equals(CocoTypes.FROM) ||
                 tokenType.equals(CocoTypes.TO) ||
                 tokenType.equals(CocoTypes.NESTED) ||
                 tokenType.equals(CocoTypes.IGNORE) ||
-                tokenType.equals(CocoTypes.PRODUCTIONS) ||
-                tokenType.equals(CocoTypes.END_) ||
+                tokenType.equals(CocoTypes.TOKEN_PRODUCTIONS) ||
+                tokenType.equals(CocoTypes.TOKEN_END) ||
                 tokenType.equals(CocoTypes.WEAK) ||
                 tokenType.equals(CocoTypes.IF) ||
                 tokenType.equals(CocoTypes.ANY) ||
-                tokenType.equals(CocoTypes.IGNORECASE)) {
+                tokenType.equals(CocoTypes.TOKEN_IGNORECASE)) {
             return KEYWORD_KEYS;
         }
         return new TextAttributesKey[0];

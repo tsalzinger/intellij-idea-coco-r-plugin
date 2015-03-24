@@ -36,7 +36,7 @@ Cocol ::=
 
 //COMPILER ::= "COMPILER"
 
-Compiler ::= COMPILER_ ident {methods=[getCompilerName]}
+Compiler ::= TOKEN_COMPILER ident {methods=[getCompilerName]}
 
 Imports ::= (import importpath)*
 //
@@ -54,14 +54,14 @@ Comment ::= LINE_COMMENT | BLOCK_COMMENT
 // {WhiteSpaceDecl}.
 
 ScannerSpecification ::=
-    IGNORECASE?
+    TOKEN_IGNORECASE?
     Characters?
     Tokens?
     Pragmas?
     CommentDecl*
     WhiteSpaceDecl*
 
-Characters ::= CHARACTERS_ SetDecl*
+Characters ::= TOKEN_CHARACTERS SetDecl*
 
 //SetDecl = ident '=' Set '.'.
 //Set = BasicSet {('+'|'-') BasicSet}.
@@ -80,10 +80,10 @@ BasicSet ::= string | ident | char [RANGE char] | ANY
 // | '{' TokenExpr '}'.
 //Symbol = ident | string | char.
 
-Tokens ::= TOKENS_ TokenDecl*
+Tokens ::= TOKEN_TOKENS TokenDecl*
 TokenDecl ::= Symbol ('=' TokenExpr '.')?
 TokenExpr ::= TokenTerm ('|' TokenTerm)*
-TokenTerm ::= TokenFactor TokenFactor* (CONTEXT '(' TokenExpr ')')?
+TokenTerm ::= TokenFactor TokenFactor* (TOKEN_CONTEXT '(' TokenExpr ')')?
 TokenFactor ::= Symbol
     | PAR_OPEN TokenExpr PAR_CLOSE
     | BRACK_OPEN TokenExpr BRACK_CLOSE
@@ -93,7 +93,7 @@ Symbol ::= ident | string | char
 //PragmaDecl = TokenDecl [SemAction].
 //SemAction = "(." ArbitraryStatements ".)".
 
-Pragmas ::= PRAGMAS_ PragmaDecl*
+Pragmas ::= TOKEN_PRAGMAS PragmaDecl*
 PragmaDecl ::= TokenDecl SemAction?
 //SemAction ::= SEM_ACTION_START SEM_ACTION_ SEM_ACTION_END
 SemAction ::= SEM_ACTION_
@@ -123,7 +123,7 @@ WhiteSpaceDecl ::= IGNORE Set
 //ActualAttributes = '<' ArbitraryText '>'.
 //Resolver = "IF" '(' {ANY} ')'.
 
-ParserSpecification ::= PRODUCTIONS Production*
+ParserSpecification ::= TOKEN_PRODUCTIONS Production*
 Production ::= ident FormalAttributes? LocalDecl? ASSIGNMENT Expression TERMINATOR
 //Production ::= ident FormalAttributes? LocalDecl? ASSIGNEMENT Expression TERMINATOR
 Expression ::= Term (PIPE Term)*
@@ -141,4 +141,4 @@ ActualAttributes ::= Attributes
 private Attributes ::= SMALLER_THEN ARBITRARY_TEXT GREATER_THEN
 Resolver ::= IF PAR_OPEN ANY* PAR_CLOSE
 
-End ::= END_ ident TERMINATOR
+End ::= TOKEN_END ident TERMINATOR
