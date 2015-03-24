@@ -318,18 +318,6 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertTerminator();
     }
 
-    private void assertBrackClose() throws IOException {
-        assertElementType(CocoTypes.BRACK_CLOSE);
-    }
-
-    private void assertBrackOpen() throws IOException {
-        assertElementType(CocoTypes.BRACK_OPEN);
-    }
-
-    private void assertSemanticAction() throws IOException {
-        assertElementType(CocoTypes.SEM_ACTION_);
-    }
-
     private void checkBlock() throws IOException {
         assertBlockComment();
 
@@ -350,10 +338,6 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertCurlClose();
         assertChar();
         assertTerminator();
-    }
-
-    private void assertBlockComment() throws IOException {
-        assertElementType(CocoTypes.BLOCK_COMMENT);
     }
 
     private void checkProcDecl() throws IOException {
@@ -394,18 +378,6 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertTerminator();
     }
 
-    private void assertParClose() throws IOException {
-        assertElementType(CocoTypes.PAR_CLOSE);
-    }
-
-    private void assertParOpen() throws IOException {
-        assertElementType(CocoTypes.PAR_OPEN);
-    }
-
-    private void assertString() throws IOException {
-        assertElementType(CocoTypes.STRING);
-    }
-
     private void checkVarDecl() throws IOException {
         assertBlockComment();
 
@@ -426,25 +398,6 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertCurlClose();
         assertChar();
         assertTerminator();
-    }
-
-    private void assertChar() throws IOException {
-        assertElementType(CocoTypes.CHAR);
-    }
-
-    private void assertCurlOpen() throws IOException {
-        assertElementType(CocoTypes.CURL_OPEN);
-    }
-
-    private void assertIdentWithAttributes() throws IOException {
-        assertIdent();
-        assertElementType(CocoTypes.SMALLER_THEN);
-        assertElementType(CocoTypes.ARBITRARY_TEXT);
-        assertElementType(CocoTypes.GREATER_THEN);
-    }
-
-    private void assertIdent() throws IOException {
-        assertElementType(CocoTypes.IDENT);
     }
 
     private void checkTaste() throws IOException {
@@ -472,22 +425,6 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertTerminator();
     }
 
-    private void assertPipe() throws IOException {
-        assertElementType(CocoTypes.PIPE);
-    }
-
-    private void assertCurlClose() throws IOException {
-        assertElementType(CocoTypes.CURL_CLOSE);
-    }
-
-    private void assertTerminator() throws IOException {
-        assertElementType(CocoTypes.TERMINATOR);
-    }
-
-    private void assertAssignment() throws IOException {
-        assertElementType(CocoTypes.ASSIGNMENT);
-    }
-
     protected void assertCharacterDefinition(IElementType elementType) throws IOException {
         assertIdent();
         assertAssignment();
@@ -507,14 +444,4 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertElementTypeStrict(CocoTypes.TERMINATOR);
     }
 
-    protected void assertCommentDefinition(boolean nested) throws IOException {
-        assertElementType(CocoTypes.COMMENTS);
-        assertElementType(CocoTypes.FROM);
-        assertElementType(CocoTypes.STRING, CocoTypes.IDENT);
-        assertElementType(CocoTypes.TO);
-        assertElementType(CocoTypes.STRING, CocoTypes.IDENT);
-        if (nested) {
-            assertElementType(CocoTypes.NESTED);
-        }
-    }
 }

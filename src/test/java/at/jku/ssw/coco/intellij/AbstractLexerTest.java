@@ -108,4 +108,78 @@ public class AbstractLexerTest {
     public void checkInputHandled() throws IOException {
         Assert.assertNull(cocoLexer.advance());
     }
+
+    protected void assertBrackClose() throws IOException {
+        assertElementType(CocoTypes.BRACK_CLOSE);
+    }
+
+    protected void assertBrackOpen() throws IOException {
+        assertElementType(CocoTypes.BRACK_OPEN);
+    }
+
+    protected void assertSemanticAction() throws IOException {
+        assertElementType(CocoTypes.SEM_ACTION_);
+    }
+
+    protected void assertBlockComment() throws IOException {
+        assertElementType(CocoTypes.BLOCK_COMMENT);
+    }
+
+    protected void assertParClose() throws IOException {
+        assertElementType(CocoTypes.PAR_CLOSE);
+    }
+
+    protected void assertParOpen() throws IOException {
+        assertElementType(CocoTypes.PAR_OPEN);
+    }
+
+    protected void assertString() throws IOException {
+        assertElementType(CocoTypes.STRING);
+    }
+
+    protected void assertChar() throws IOException {
+        assertElementType(CocoTypes.CHAR);
+    }
+
+    protected void assertCurlOpen() throws IOException {
+        assertElementType(CocoTypes.CURL_OPEN);
+    }
+
+    protected void assertIdentWithAttributes() throws IOException {
+        assertIdent();
+        assertElementType(CocoTypes.SMALLER_THEN);
+        assertElementType(CocoTypes.ARBITRARY_TEXT);
+        assertElementType(CocoTypes.GREATER_THEN);
+    }
+
+    protected void assertIdent() throws IOException {
+        assertElementType(CocoTypes.IDENT);
+    }
+
+    protected void assertPipe() throws IOException {
+        assertElementType(CocoTypes.PIPE);
+    }
+
+    protected void assertCurlClose() throws IOException {
+        assertElementType(CocoTypes.CURL_CLOSE);
+    }
+
+    protected void assertTerminator() throws IOException {
+        assertElementType(CocoTypes.TERMINATOR);
+    }
+
+    protected void assertAssignment() throws IOException {
+        assertElementType(CocoTypes.ASSIGNMENT);
+    }
+
+    protected void assertCommentDefinition(boolean nested) throws IOException {
+        assertElementType(CocoTypes.COMMENTS);
+        assertElementType(CocoTypes.FROM);
+        assertElementType(CocoTypes.STRING, CocoTypes.IDENT);
+        assertElementType(CocoTypes.TO);
+        assertElementType(CocoTypes.STRING, CocoTypes.IDENT);
+        if (nested) {
+            assertElementType(CocoTypes.NESTED);
+        }
+    }
 }
