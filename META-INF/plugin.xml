@@ -30,10 +30,16 @@
         <lang.syntaxHighlighterFactory key="Cocol"
                                        implementationClass="at.jku.ssw.coco.intellij.CocoSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="at.jku.ssw.coco.intellij.CocoColorSettingsPage"/>
+
+        <completion.contributor language="Cocol" implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
+        <psi.referenceContributor implementation="at.jku.ssw.coco.intellij.CocoReferenceContributor"/>
+
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>
+        <annotator language="JAVA" implementationClass="at.jku.ssw.coco.intellij.CocoAnnotator"/>
     </extensions>
     <actions>
         <action id="at.jku.ssw.coco.intellij.RunCocoR" class="Coco.CocoRAction" text="Run _Coco/R"
-                description="Runs Coco/R on the given .ATG file">
+                description="Runs Coco/R on the given .ATG file" icon="/at/jku/ssw/coco/intellij/icons/coco-ico.gif">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
     </actions>

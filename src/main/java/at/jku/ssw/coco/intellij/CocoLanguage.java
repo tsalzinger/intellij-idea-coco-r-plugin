@@ -9,6 +9,6 @@ public class CocoLanguage extends Language {
     public static final CocoLanguage INSTANCE = new CocoLanguage();
 
     private CocoLanguage() {
-        super("Cocol");
+        super("Cocol/R");
     }
 }

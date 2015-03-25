@@ -9,24 +9,50 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Thomas Scheinecker <a href="mailto:tscheinecker@gmail.com">tscheinecker@gmail.com</a>
  */
 public class CocoUtil {
-    public static String getCompilerName(Project project) {
+
+    @NotNull
+    public static List<String> findCompilerNames(@Nullable Project project) {
+        return findCompilers(project)
+                .stream()
+                .map(CocoCompiler::getName)
+                .filter(it -> !Objects.isNull(it))
+                .collect(Collectors.toList());
+    }
+
+    public static List<CocoCompiler> findCompilers(@Nullable Project project, @NotNull String name) {
+        return findCompilers(project)
+                .stream()
+                .filter(compiler -> name.equals(compiler.getName()))
+                .collect(Collectors.toList());
+    }
+
+    @NotNull
+    public static List<CocoCompiler> findCompilers(@Nullable Project project) {
+        if (project == null) {
+            return Collections.emptyList();
+        }
+
         Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, CocoFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        List<CocoCompiler> compilers = new ArrayList<>();
         for (VirtualFile virtualFile : virtualFiles) {
             CocoFile cocoFile = (CocoFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (cocoFile != null) {
                 CocoCompiler[] cocoCompilers = PsiTreeUtil.getChildrenOfType(cocoFile, CocoCompiler.class);
-                if (cocoCompilers != null && cocoCompilers.length == 1) {
-                    return cocoCompilers[0].getCompilerName();
+                if (cocoCompilers != null) {
+                    compilers.addAll(Arrays.asList(cocoCompilers));
                 }
             }
         }
-        return null;
+        return compilers;
     }
 }

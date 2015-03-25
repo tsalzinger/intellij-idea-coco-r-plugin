@@ -1,35 +1,37 @@
 package Coco;
 
+import at.jku.ssw.coco.intellij.CocoLanguage;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataConstants;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.vfs.VirtualFile;
-
-import java.io.File;
+import com.intellij.psi.PsiFile;
 
 /**
  * Created by Thomas on 29/12/2014.
  */
 public class CocoRAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        e.getDataContext();
-        String nsName = null, frameDir = null, outDir = null, ddtString = null;
-        String srcName = "";
-        String srcDir = new File(srcName).getParent();
+        VirtualFile file = e.getData(PlatformDataKeys.VIRTUAL_FILE);
+        String path = file.getParent().getPath();
+        String fileContent = e.getData(PlatformDataKeys.FILE_TEXT);
+        String filePath = file.getPath();
 
-        Scanner scanner = new Scanner(srcName);
+        String nsName = null, frameDir = null, outDir = null, ddtString = null;
+
+        Scanner scanner = new Scanner(filePath);
         Parser parser = new Parser(scanner);
 
-        parser.trace = new Trace(srcDir);
+        parser.trace = new Trace(path);
         parser.tab = new Tab(parser);
         parser.dfa = new DFA(parser);
         parser.pgen = new ParserGen(parser);
 
-        parser.tab.srcName = srcName;
-        parser.tab.srcDir = srcDir;
+        parser.tab.srcName = filePath;
+        parser.tab.srcDir = path;
         parser.tab.nsName = nsName;
-        parser.tab.frameDir = frameDir;
-        parser.tab.outDir = (outDir != null) ? outDir : srcDir;
+        parser.tab.frameDir = (frameDir != null) ? frameDir : path;
+        parser.tab.outDir = (outDir != null) ? outDir : path;
         if (ddtString != null) parser.tab.SetDDT(ddtString);
 
         parser.Parse();
@@ -43,6 +45,8 @@ public class CocoRAction extends AnAction {
 
     @Override
     public void update(AnActionEvent e) {
-        VirtualFile file = (VirtualFile) e.getDataContext().getData(DataConstants.VIRTUAL_FILE);
+        PsiFile data = e.getData(PlatformDataKeys.PSI_FILE);
+        if (data != null && data.getLanguage() == CocoLanguage.INSTANCE) {
+        }
     }
 }

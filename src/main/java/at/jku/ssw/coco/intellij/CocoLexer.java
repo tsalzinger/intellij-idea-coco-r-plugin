@@ -2,10 +2,10 @@
 
 package at.jku.ssw.coco.intellij;
 
-import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.tree.IElementType;
 import at.jku.ssw.coco.intellij.psi.CocoTypes;
+import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 
 
 /**

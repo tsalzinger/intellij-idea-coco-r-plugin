@@ -7,9 +7,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Thomas Scheinecker <a href="mailto:tscheinecker@gmail.com">tscheinecker@gmail.com</a>
  */
-public class CocoFileTypeFactory extends FileTypeFactory{
+public class CocoFileTypeFactory extends FileTypeFactory {
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
-        fileTypeConsumer.consume(CocoFileType.INSTANCE, "ATG");
+        fileTypeConsumer.consume(CocoFileType.INSTANCE, CocoFileType.INSTANCE.getDefaultExtension());
     }
 }
