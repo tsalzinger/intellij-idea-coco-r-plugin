@@ -1,7 +1,7 @@
- {
+{
     parserClass="at.jku.ssw.coco.intellij.parser.CocoParser"
 
-  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
     psiClassPrefix="Coco"
     psiImplClassSuffix="Impl"
@@ -13,7 +13,48 @@
     tokenTypeClass="at.jku.ssw.coco.intellij.psi.CocoTokenType"
 
     psiImplUtilClass="at.jku.ssw.coco.intellij.psi.impl.CocoPsiImplUtil"
- }
+
+//    name("Symbols")="Symbols"
+
+    tokens=[
+//        string='regexp:"[^\"\n]+"|".+'
+        string='regexp:"([^\"\n]|\\"|)*"'
+        WHITE_SPACE='regexp:\s+'
+        LINE_COMMENT='regexp://.*'
+        BLOCK_COMMENT='regexp:/\*([^\*]|\*+[^/\*])*\*/'
+        TOKEN_COMPILER='COMPILER'
+        TOKEN_PRODUCTIONS='PRODUCTIONS'
+        TOKEN_END='END'
+        TOKEN_CHARACTERS='CHARACTERS'
+        TOKEN_CONTEXT='CONTEXT'
+        TOKEN_TOKENS='TOKENS'
+        TOKEN_PRAGMAS='PRAGMAS'
+        COMMENTS='COMMENTS'
+        TERMINATOR='.'
+        PLUS='+'
+        MINUS='-'
+        RANGE='..'
+        ASSIGNMENT='='
+        char="regexp:'(\\u....|\\.|.)'"
+        CURL_OPEN='{'
+        CURL_CLOSE='}'
+        PAR_OPEN='('
+        PAR_CLOSE=')'
+        BRACK_OPEN='['
+        BRACK_CLOSE=']'
+        SMALLER_THEN='<'
+        SEM_ACTION_START='(.'
+        SEM_ACTION_END='.)'
+        PIPE='|'
+        GREATER_THEN='>'
+//        ARBITRARY_TEXT='regexp:(out [^>]+)'
+//        SEM_ACTION_='regexp:(\(\..+\.\)|\(\..+\n.+\n.+\.\))'
+        digit='regexp:\p{Numeric}'
+        ident='regexp:\p{Alpha}\p{Alnum}*'
+        ANY_CHAR='regexp:.'
+//        anything='regexp:[^\s\n]+' // This is just here for usage with the Taste.ATG in live preview, the actual flex implementation looks different
+    ]
+}
 
 
 //Cocol =
@@ -26,7 +67,6 @@
 // .
 
 Cocol ::=
-    Comment?
     Imports?
     Compiler
     GlobalFieldsAndMethods?
@@ -36,14 +76,25 @@ Cocol ::=
 
 //COMPILER ::= "COMPILER"
 
-Compiler ::= TOKEN_COMPILER ident {methods=[getCompilerName]}
+Compiler ::= !<<EOF>> "COMPILER" ident {
+    mixin="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
+    implements="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
+    methods=[getName setName getNameIdentifier getPresentation]
+    pin=1
+}
 
-Imports ::= (import importpath)*
+Imports ::= JavaCode
 //
-GlobalFieldsAndMethods ::= javacode
+GlobalFieldsAndMethods ::= JavaCode
+
+private JavaCode ::= JavaSymbols*
+ANY ::= JavaSymbols
+private ArbitraryText ::= (ident | string | char | digit | ANY_CHAR | '.')*
+private ArbitraryStatements ::= JavaSymbols*
+private JavaSymbols ::= (ident | string | char | digit | ANY_CHAR | Symbols | '.' | '||') {name = "Java Code"}
 //
 //
-Comment ::= LINE_COMMENT | BLOCK_COMMENT
+//Comment ::= LINE_COMMENT | BLOCK_COMMENT
 //
 //ScannerSpecification =
 // ["IGNORECASE"]
@@ -61,14 +112,17 @@ ScannerSpecification ::=
     CommentDecl*
     WhiteSpaceDecl*
 
-Characters ::= TOKEN_CHARACTERS SetDecl*
+Characters ::= !<<EOF>> TOKEN_CHARACTERS SetDecl*
 
 //SetDecl = ident '=' Set '.'.
 //Set = BasicSet {('+'|'-') BasicSet}.
 //BasicSet = string | ident | char [".." char] | "ANY".
 
-SetDecl ::= ident ASSIGNMENT Set TERMINATOR
-Set ::= BasicSet ((PLUS|MINUS) BasicSet)*
+SetDecl ::= ident ASSIGNMENT Set TERMINATOR {pin=1}
+
+private recoverSetDecl ::= !(ident | ASSIGNMENT | TERMINATOR)
+
+Set ::= BasicSet ((PLUS|MINUS) BasicSet)* {pin=1}
 BasicSet ::= string | ident | char [RANGE char] | ANY
 
 //TokenDecl = Symbol ['=' TokenExpr '.'].
@@ -81,9 +135,9 @@ BasicSet ::= string | ident | char [RANGE char] | ANY
 //Symbol = ident | string | char.
 
 Tokens ::= TOKEN_TOKENS TokenDecl*
-TokenDecl ::= Symbol ('=' TokenExpr '.')?
-TokenExpr ::= TokenTerm ('|' TokenTerm)*
-TokenTerm ::= TokenFactor TokenFactor* (TOKEN_CONTEXT '(' TokenExpr ')')?
+TokenDecl ::= Symbol (ASSIGNMENT TokenExpr TERMINATOR)?
+TokenExpr ::= TokenTerm (PIPE TokenTerm)*
+TokenTerm ::= TokenFactor TokenFactor* (TOKEN_CONTEXT PAR_OPEN TokenExpr PAR_CLOSE)?
 TokenFactor ::= Symbol
     | PAR_OPEN TokenExpr PAR_CLOSE
     | BRACK_OPEN TokenExpr BRACK_CLOSE
@@ -95,8 +149,8 @@ Symbol ::= ident | string | char
 
 Pragmas ::= TOKEN_PRAGMAS PragmaDecl*
 PragmaDecl ::= TokenDecl SemAction?
-//SemAction ::= SEM_ACTION_START SEM_ACTION_ SEM_ACTION_END
-SemAction ::= SEM_ACTION_
+SemAction ::= SEM_ACTION_START ArbitraryStatements SEM_ACTION_END
+//SemAction ::= SEM_ACTION_
 
 //CommentDecl = "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"].
 CommentDecl ::= COMMENTS FROM TokenExpr TO TokenExpr NESTED?
@@ -131,14 +185,16 @@ Term ::= (Resolver? Factor Factor*)?
 Factor ::= WEAK? Symbol ActualAttributes?
     | PAR_OPEN Expression PAR_CLOSE
     | BRACK_OPEN Expression BRACK_CLOSE
-    | CURL_OPEN Expression CURL_CLOSE
-| ANY
-| SYNC
+    | '{' Expression '}'
+| 'ANY'
+| 'SYNC'
 | SemAction
 LocalDecl ::= SemAction
 FormalAttributes ::= Attributes
 ActualAttributes ::= Attributes
-private Attributes ::= SMALLER_THEN ARBITRARY_TEXT GREATER_THEN
-Resolver ::= IF PAR_OPEN ANY* PAR_CLOSE
+private Attributes ::= '<' ArbitraryText '>'
+Resolver ::= IF '(' ANY* ')'
 
-End ::= TOKEN_END ident TERMINATOR
+End ::= 'END' ident '.'
+
+private Symbols ::= '+' | '-'  | '=' | '(' | ')' | '<' | '>' | '{' | '}' | '[' | ']' | '..' {name = "Symbols"}
