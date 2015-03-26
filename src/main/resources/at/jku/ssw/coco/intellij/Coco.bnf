@@ -17,25 +17,29 @@
 //    name("Symbols")="Symbols"
 
     tokens=[
-//        string='regexp:"[^\"\n]+"|".+'
         string='regexp:"([^\"\n]|\\"|)*"'
+        char="regexp:'(\\u....|\\.|.)'"
+
         WHITE_SPACE='regexp:\s+'
         LINE_COMMENT='regexp://.*'
         BLOCK_COMMENT='regexp:/\*([^\*]|\*+[^/\*])*\*/'
-        TOKEN_COMPILER='COMPILER'
-        TOKEN_PRODUCTIONS='PRODUCTIONS'
-        TOKEN_END='END'
-        TOKEN_CHARACTERS='CHARACTERS'
-        TOKEN_CONTEXT='CONTEXT'
-        TOKEN_TOKENS='TOKENS'
-        TOKEN_PRAGMAS='PRAGMAS'
-        COMMENTS='COMMENTS'
+
+        KEYWORD_COMPILER='COMPILER'
+        KEYWORD_PRODUCTIONS='PRODUCTIONS'
+        KEYWORD_END='END'
+        KEYWORD_NESTED='NESTED'
+        KEYWORD_TO='TO'
+        KEYWORD_FROM='FROM'
+        KEYWORD_CHARACTERS='CHARACTERS'
+        KEYWORD_CONTEXT='CONTEXT'
+        KEYWORD_TOKENS='TOKENS'
+        KEYWORD_PRAGMAS='PRAGMAS'
+
         TERMINATOR='.'
         PLUS='+'
         MINUS='-'
         RANGE='..'
         ASSIGNMENT='='
-        char="regexp:'(\\u....|\\.|.)'"
         CURL_OPEN='{'
         CURL_CLOSE='}'
         PAR_OPEN='('
@@ -47,29 +51,17 @@
         SEM_ACTION_END='.)'
         PIPE='|'
         GREATER_THEN='>'
-//        ARBITRARY_TEXT='regexp:(out [^>]+)'
-//        SEM_ACTION_='regexp:(\(\..+\.\)|\(\..+\n.+\n.+\.\))'
+
         digit='regexp:\p{Numeric}'
         ident='regexp:\p{Alpha}\p{Alnum}*'
         ANY_CHAR='regexp:.'
-//        anything='regexp:[^\s\n]+' // This is just here for usage with the Taste.ATG in live preview, the actual flex implementation looks different
     ]
 }
 
-
-//Cocol =
-// [Imports]
-// "COMPILER" ident
-// [GlobalFieldsAndMethods]
-// ScannerSpecification
-// ParserSpecification
-// "END" ident '.'
-// .
-
 Cocol ::=
-    Imports?
+    [Imports]
     Compiler
-    GlobalFieldsAndMethods?
+    [GlobalFieldsAndMethods]
     ScannerSpecification
     ParserSpecification
     End
@@ -87,15 +79,12 @@ Imports ::= JavaCode
 //
 GlobalFieldsAndMethods ::= JavaCode
 
-private JavaCode ::= JavaSymbols*
+private JavaCode ::= {JavaSymbols}*
 ANY ::= JavaSymbols
 private ArbitraryText ::= (ident | string | char | digit | ANY_CHAR | '.')*
-private ArbitraryStatements ::= JavaSymbols*
+private ArbitraryStatements ::= {JavaSymbols}*
 private JavaSymbols ::= (ident | string | char | digit | ANY_CHAR | Symbols | '.' | '||') {name = "Java Code"}
-//
-//
-//Comment ::= LINE_COMMENT | BLOCK_COMMENT
-//
+
 //ScannerSpecification =
 // ["IGNORECASE"]
 // ["CHARACTERS" {SetDecl}]
@@ -105,96 +94,56 @@ private JavaSymbols ::= (ident | string | char | digit | ANY_CHAR | Symbols | '.
 // {WhiteSpaceDecl}.
 
 ScannerSpecification ::=
-    TOKEN_IGNORECASE?
-    Characters?
-    Tokens?
-    Pragmas?
-    CommentDecl*
-    WhiteSpaceDecl*
+    ["IGNORECASE"]
+    [Characters]
+    [Tokens]
+    [Pragmas]
+    {CommentDecl}*
+    {WhiteSpaceDecl}*
 
-Characters ::= !<<EOF>> TOKEN_CHARACTERS SetDecl*
+Characters ::= !<<EOF>> "CHARACTERS" {SetDecl}*
 
-//SetDecl = ident '=' Set '.'.
-//Set = BasicSet {('+'|'-') BasicSet}.
-//BasicSet = string | ident | char [".." char] | "ANY".
+SetDecl ::= ident '=' Set '.' {pin=1}
 
-SetDecl ::= ident ASSIGNMENT Set TERMINATOR {pin=1}
+Set ::= BasicSet {('+'|'-') BasicSet}*
+BasicSet ::= string | ident | char [".." char] | "ANY"
 
-private recoverSetDecl ::= !(ident | ASSIGNMENT | TERMINATOR)
-
-Set ::= BasicSet ((PLUS|MINUS) BasicSet)* {pin=1}
-BasicSet ::= string | ident | char [RANGE char] | ANY
-
-//TokenDecl = Symbol ['=' TokenExpr '.'].
-//TokenExpr = TokenTerm {'|' TokenTerm}.
-//TokenTerm = TokenFactor {TokenFactor} ["CONTEXT" '(' TokenExpr ')'].
-//TokenFactor = Symbol
-// | '(' TokenExpr ')'
-// | '[' TokenExpr ']'
-// | '{' TokenExpr '}'.
-//Symbol = ident | string | char.
-
-Tokens ::= TOKEN_TOKENS TokenDecl*
-TokenDecl ::= Symbol (ASSIGNMENT TokenExpr TERMINATOR)?
-TokenExpr ::= TokenTerm (PIPE TokenTerm)*
-TokenTerm ::= TokenFactor TokenFactor* (TOKEN_CONTEXT PAR_OPEN TokenExpr PAR_CLOSE)?
+Tokens ::= "TOKENS" {TokenDecl}*
+TokenDecl ::= Symbol ['=' TokenExpr '.']
+TokenExpr ::= TokenTerm {'|' TokenTerm}*
+TokenTerm ::= TokenFactor {TokenFactor}* ["CONTEXT" '(' TokenExpr ')']
 TokenFactor ::= Symbol
-    | PAR_OPEN TokenExpr PAR_CLOSE
-    | BRACK_OPEN TokenExpr BRACK_CLOSE
-    | CURL_OPEN TokenExpr CURL_CLOSE
+    | '(' TokenExpr ')'
+    | '[' TokenExpr ']'
+    | '{' TokenExpr '}'
 Symbol ::= ident | string | char
 
-//PragmaDecl = TokenDecl [SemAction].
-//SemAction = "(." ArbitraryStatements ".)".
 
-Pragmas ::= TOKEN_PRAGMAS PragmaDecl*
-PragmaDecl ::= TokenDecl SemAction?
-SemAction ::= SEM_ACTION_START ArbitraryStatements SEM_ACTION_END
-//SemAction ::= SEM_ACTION_
+Pragmas ::= "PRAGMAS" {PragmaDecl}*
+PragmaDecl ::= TokenDecl [SemAction]
+SemAction ::= "(." ArbitraryStatements ".)"
 
-//CommentDecl = "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"].
-CommentDecl ::= COMMENTS FROM TokenExpr TO TokenExpr NESTED?
+CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"]
 
-//WhiteSpaceDecl = "IGNORE" Set.
 WhiteSpaceDecl ::= IGNORE Set
 
-
-//ParserSpecification = "PRODUCTIONS" {Production}.
-//Production = ident [FormalAttributes] [LocalDecl] '=' Expression '.'.
-//Expression = Term {'|' Term}.
-//Term = [[Resolver] Factor {Factor}].
-//Factor = ["WEAK"] Symbol [ActualAttributes]
-// | '(' Expression ')'
-// | '[' Expression ']'
-// | '{' Expression '}'
-// | "ANY"
-// | "SYNC"
-// | SemAction.
-//Symbol = ident | string | char.
-//SemAction = "(." ArbitraryStatements ".)".
-//LocalDecl = SemAction.
-//FormalAttributes = '<' ArbitraryText '>'.
-//ActualAttributes = '<' ArbitraryText '>'.
-//Resolver = "IF" '(' {ANY} ')'.
-
-ParserSpecification ::= TOKEN_PRODUCTIONS Production*
-Production ::= ident FormalAttributes? LocalDecl? ASSIGNMENT Expression TERMINATOR
-//Production ::= ident FormalAttributes? LocalDecl? ASSIGNEMENT Expression TERMINATOR
-Expression ::= Term (PIPE Term)*
-Term ::= (Resolver? Factor Factor*)?
-Factor ::= WEAK? Symbol ActualAttributes?
-    | PAR_OPEN Expression PAR_CLOSE
-    | BRACK_OPEN Expression BRACK_CLOSE
+ParserSpecification ::= "PRODUCTIONS" {Production}*
+Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.'
+Expression ::= Term {'|' Term}*
+Term ::= [[Resolver] Factor {Factor}*]
+Factor ::= ['WEAK'] Symbol [ActualAttributes]
+    | '(' Expression ')'
+    | '[' Expression ']'
     | '{' Expression '}'
-| 'ANY'
-| 'SYNC'
+| "ANY"
+| "SYNC"
 | SemAction
 LocalDecl ::= SemAction
 FormalAttributes ::= Attributes
 ActualAttributes ::= Attributes
 private Attributes ::= '<' ArbitraryText '>'
-Resolver ::= IF '(' ANY* ')'
+Resolver ::= "IF" '(' {ANY}* ')'
 
-End ::= 'END' ident '.'
+End ::= "END" ident '.'
 
 private Symbols ::= '+' | '-'  | '=' | '(' | ')' | '<' | '>' | '{' | '}' | '[' | ']' | '..' {name = "Symbols"}
