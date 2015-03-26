@@ -18,7 +18,7 @@
 
     tokens=[
         string='regexp:"([^\"\n]|\\"|)*"'
-        char="regexp:'(\\u....|\\.|.)'"
+        char="regexp:'(\\u(\p{XDigit}{4})|\\.|.)'"
 
         WHITE_SPACE='regexp:\s+'
         LINE_COMMENT='regexp://.*'
@@ -34,6 +34,8 @@
         KEYWORD_CONTEXT='CONTEXT'
         KEYWORD_TOKENS='TOKENS'
         KEYWORD_PRAGMAS='PRAGMAS'
+        KEYWORD_COMMENTS='COMMENTS'
+        KEYWORD_IGNORE='IGNORE'
 
         TERMINATOR='.'
         PLUS='+'
@@ -52,21 +54,20 @@
         PIPE='|'
         GREATER_THEN='>'
 
-        digit='regexp:\p{Numeric}'
+        number='regexp:\p{Digit}+'
         ident='regexp:\p{Alpha}\p{Alnum}*'
         ANY_CHAR='regexp:.'
     ]
 }
 
 Cocol ::=
+    !<<EOF>>
     [Imports]
     Compiler
     [GlobalFieldsAndMethods]
     ScannerSpecification
     ParserSpecification
-    End
-
-//COMPILER ::= "COMPILER"
+    End/ {pin=1}
 
 Compiler ::= !<<EOF>> "COMPILER" ident {
     mixin="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
@@ -81,9 +82,9 @@ GlobalFieldsAndMethods ::= JavaCode
 
 private JavaCode ::= {JavaSymbols}*
 ANY ::= JavaSymbols
-private ArbitraryText ::= (ident | string | char | digit | ANY_CHAR | '.')*
+private ArbitraryText ::= (ident | string | char | number | ANY_CHAR | '.')*
 private ArbitraryStatements ::= {JavaSymbols}*
-private JavaSymbols ::= (ident | string | char | digit | ANY_CHAR | Symbols | '.' | '||') {name = "Java Code"}
+private JavaSymbols ::= (ident | string | char | number | ANY_CHAR | Symbols | '.' | '||') {name = "Java Code"}
 
 //ScannerSpecification =
 // ["IGNORECASE"]
@@ -108,14 +109,23 @@ SetDecl ::= ident '=' Set '.' {pin=1}
 Set ::= BasicSet {('+'|'-') BasicSet}*
 BasicSet ::= string | ident | char [".." char] | "ANY"
 
-Tokens ::= "TOKENS" {TokenDecl}*
-TokenDecl ::= Symbol ['=' TokenExpr '.']
-TokenExpr ::= TokenTerm {'|' TokenTerm}*
-TokenTerm ::= TokenFactor {TokenFactor}* ["CONTEXT" '(' TokenExpr ')']
+Tokens ::= "TOKENS" {TokenDecl}* {pin=1}
+TokenDecl ::= Symbol [TokenAssignment]
+private recoverToNextKnown ::= !('.' | ident | Symbols | "PRODUCTIONS")
+private TokenAssignment ::= '=' TokenExpr '.' {pin=1}
+
+TokenExpr ::= TokenTerm {TokenTermOption}* {pin=1}
+private TokenTermOption ::= '|' TokenTerm {pin=1 recoverWhile=recoverToNextKnown}
+TokenTerm ::= TokenFactor {TokenFactor}* [TokenContext]
+private TokenContext ::= "CONTEXT" '(' TokenExpr ')' {pin=1}
 TokenFactor ::= Symbol
-    | '(' TokenExpr ')'
-    | '[' TokenExpr ']'
-    | '{' TokenExpr '}'
+    | TokenFactor_parenthesis
+    | TokenFactor_bracket
+    | TokenFactor_brace
+
+private TokenFactor_parenthesis ::= '(' TokenExpr ')' {pin=1}
+private TokenFactor_bracket ::= '[' TokenExpr ']' {pin=1}
+private TokenFactor_brace ::= '{' TokenExpr '}' {pin=1}
 Symbol ::= ident | string | char
 
 
@@ -125,7 +135,7 @@ SemAction ::= "(." ArbitraryStatements ".)"
 
 CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"]
 
-WhiteSpaceDecl ::= IGNORE Set
+WhiteSpaceDecl ::= "IGNORE" Set {pin=1 extends=ScannerSpecification}
 
 ParserSpecification ::= "PRODUCTIONS" {Production}*
 Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.'
@@ -144,6 +154,6 @@ ActualAttributes ::= Attributes
 private Attributes ::= '<' ArbitraryText '>'
 Resolver ::= "IF" '(' {ANY}* ')'
 
-End ::= "END" ident '.'
+End ::= "END" ident '.' {pin=1}
 
 private Symbols ::= '+' | '-'  | '=' | '(' | ')' | '<' | '>' | '{' | '}' | '[' | ']' | '..' {name = "Symbols"}
