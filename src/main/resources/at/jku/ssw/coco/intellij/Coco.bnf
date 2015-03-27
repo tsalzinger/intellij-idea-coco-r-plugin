@@ -87,7 +87,7 @@ private JavaCode ::= {JavaSymbols}*
 ANY ::= JavaSymbols
 ArbitraryText ::= (ident | string | char | number | ANY_CHAR | '.')*
 ArbitraryStatements ::= {JavaSymbols}*
-private JavaSymbols ::= (ident | string | char | number | ANY_CHAR | Symbols | '.' | '||') {name = "Java Code"}
+private JavaSymbols ::= (ident | string | char | number | ANY_CHAR | Symbols | '.' | '||' | '|') {pin(".*")=1 name = "Java Code"}
 
 //ScannerSpecification =
 // ["IGNORECASE"]
@@ -102,7 +102,7 @@ ScannerSpecification ::=
     [Characters]
     [Tokens]
     [Pragmas]
-    {CommentDecl}*
+    [Comments]
     {WhiteSpaceDecl}*
 
 Characters ::= "CHARACTERS" {SetDecl}*
@@ -135,11 +135,12 @@ Pragmas ::= "PRAGMAS" {PragmaDecl}*
 PragmaDecl ::= TokenDecl [SemAction]
 SemAction ::= "(." ArbitraryStatements ".)"
 
+Comments ::= CommentDecl {CommentDecl}* {pin=1}
 CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"]
 
 WhiteSpaceDecl ::= "IGNORE" Set {pin=1 extends=ScannerSpecification}
 
-ParserSpecification ::= "PRODUCTIONS" {Production}*
+ParserSpecification ::= "PRODUCTIONS" {Production}* {pin = 1}
 Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.'
 Expression ::= Term {'|' Term}*
 Term ::= [[Resolver] Factor {Factor}*]

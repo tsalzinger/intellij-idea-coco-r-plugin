@@ -43,6 +43,7 @@
         <annotator language="JAVA" implementationClass="at.jku.ssw.coco.intellij.CocoAnnotator"/>
 
         <lang.commenter language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoCommenter"/>
+        <lang.foldingBuilder language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoFoldingBuilder"/>
     </extensions>
     <actions>
         <action id="at.jku.ssw.coco.intellij.RunCocoR" class="Coco.CocoRAction" text="Run _Coco/R"
