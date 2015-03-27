@@ -24,7 +24,6 @@ public class CocoColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Line Comment", CocoSyntaxHighlighter.LINE_COMMENT),
             new AttributesDescriptor("Keyword", CocoSyntaxHighlighter.KEYWORD),
             new AttributesDescriptor("Identifier", CocoSyntaxHighlighter.IDENTIFIER),
-            new AttributesDescriptor("Semantic Actions", CocoSyntaxHighlighter.SEM_ACTION),
             new AttributesDescriptor("Markup Tags", CocoSyntaxHighlighter.MARKUP_TAG),
             new AttributesDescriptor("Char", CocoSyntaxHighlighter.CHAR),
             new AttributesDescriptor("String", CocoSyntaxHighlighter.STRING),
@@ -35,7 +34,7 @@ public class CocoColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Terminal Symbol", CocoSyntaxHighlighter.TERMINATOR)
     };
     public static final String COLOR_SETTINGS_DEMO_ATG_FILE = "/at/jku/ssw/coco/intellij/colorSettingsDemo.ATG";
-    private final String FALLBACK_SETTINGS_CONTENT = "// test\n" +
+    private static final String FALLBACK_SETTINGS_CONTENT = "// test\n" +
             "\n" +
             "/* ... */\n" +
             "\n" +
