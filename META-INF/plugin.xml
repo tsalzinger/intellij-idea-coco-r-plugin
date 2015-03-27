@@ -34,11 +34,15 @@
                                        implementationClass="at.jku.ssw.coco.intellij.CocoSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="at.jku.ssw.coco.intellij.CocoColorSettingsPage"/>
 
-        <completion.contributor language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
+        <completion.contributor language="Cocol/R"
+                                implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
         <psi.referenceContributor implementation="at.jku.ssw.coco.intellij.CocoReferenceContributor"/>
 
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA"
+                                        implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>
         <annotator language="JAVA" implementationClass="at.jku.ssw.coco.intellij.CocoAnnotator"/>
+
+        <lang.commenter language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoCommenter"/>
     </extensions>
     <actions>
         <action id="at.jku.ssw.coco.intellij.RunCocoR" class="Coco.CocoRAction" text="Run _Coco/R"
