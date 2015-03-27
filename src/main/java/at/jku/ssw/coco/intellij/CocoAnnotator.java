@@ -2,6 +2,8 @@ package at.jku.ssw.coco.intellij;
 
 import at.jku.ssw.coco.intellij.psi.CocoCompiler;
 import at.jku.ssw.coco.intellij.psi.CocoEnd;
+import at.jku.ssw.coco.intellij.psi.CocoSetDecl;
+import at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
@@ -25,6 +27,20 @@ public class CocoAnnotator implements Annotator {
                 annotation.setTextAttributes(DefaultLanguageHighlighterColors.KEYWORD);
             } else {
                 holder.createErrorAnnotation(ident.getTextRange(), "Unresolved COMPILER '" + compilerName + "'");
+            }
+        } else if (element instanceof HasCocoCharacterReference) {
+            HasCocoCharacterReference cocoElement = (HasCocoCharacterReference) element;
+            PsiElement ident = cocoElement.getIdent();
+            if (ident != null) {
+                String characterReferenceName = ((HasCocoCharacterReference) element).getCharacterReferenceName();
+                CocoSetDecl characterDeclaration = CocoUtil.findCharacterDeclaration(element.getContainingFile(), characterReferenceName);
+
+                if (characterDeclaration != null) {
+                    Annotation annotation = holder.createInfoAnnotation(ident, null);
+                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                } else {
+                    holder.createErrorAnnotation(ident.getTextRange(), "Unresolved Character '" + characterReferenceName + "'");
+                }
             }
         }
     }
