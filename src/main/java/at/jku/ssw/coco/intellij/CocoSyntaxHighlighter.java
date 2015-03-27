@@ -22,6 +22,8 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
     public static final TextAttributesKey CHAR = TextAttributesKey.createTextAttributesKey("CHAR", DefaultLanguageHighlighterColors.STRING);
     private static final TextAttributesKey[] CHAR_KEYS = new TextAttributesKey[]{CHAR};
+    public static final TextAttributesKey NUMBER = TextAttributesKey.createTextAttributesKey("NUMBER", DefaultLanguageHighlighterColors.NUMBER);
+    private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
     public static final TextAttributesKey MARKUP_TAG = TextAttributesKey.createTextAttributesKey("MARKUP_TAG", DefaultLanguageHighlighterColors.MARKUP_TAG);
     private static final TextAttributesKey[] MARKUP_TAG_KEYS = new TextAttributesKey[]{MARKUP_TAG};
     public static final TextAttributesKey SEM_ACTION = TextAttributesKey.createTextAttributesKey("SEM_ACTION", DefaultLanguageHighlighterColors.TEMPLATE_LANGUAGE_COLOR);
@@ -52,6 +54,8 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
             return LINE_COMMENT_KEYS;
         } else if (tokenType.equals(CocoTypes.BLOCK_COMMENT)) {
             return BLOCK_COMMENT_KEYS;
+        }  else if (tokenType.equals(CocoTypes.NUMBER)) {
+            return NUMBER_KEYS;
         } else if (tokenType.equals(CocoTypes.PAR_CLOSE) ||
                 tokenType.equals(CocoTypes.PAR_OPEN)) {
             return PARENTHESES_KEYS;
