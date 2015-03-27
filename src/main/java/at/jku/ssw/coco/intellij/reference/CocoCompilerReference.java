@@ -1,5 +1,6 @@
-package at.jku.ssw.coco.intellij;
+package at.jku.ssw.coco.intellij.reference;
 
+import at.jku.ssw.coco.intellij.CocoUtil;
 import at.jku.ssw.coco.intellij.psi.CocoEnd;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;

@@ -1,4 +1,4 @@
-package at.jku.ssw.coco.intellij.psi;
+package at.jku.ssw.coco.intellij.psi.impl;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;

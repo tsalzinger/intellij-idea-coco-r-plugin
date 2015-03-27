@@ -1,7 +1,6 @@
 package at.jku.ssw.coco.intellij;
 
-import at.jku.ssw.coco.intellij.psi.CocoCompiler;
-import at.jku.ssw.coco.intellij.psi.CocoFile;
+import at.jku.ssw.coco.intellij.psi.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -32,7 +31,7 @@ public class CocoUtil {
                 .collect(Collectors.toList());
     }
 
-    @Contract("_,null -> null")
+    @Contract("_, null -> null")
     @Nullable
     public static CocoCompiler findCompiler(@NotNull PsiFile file, @Nullable String name) {
         if (StringUtils.isBlank(name)) {
@@ -44,7 +43,7 @@ public class CocoUtil {
                 .filter(compiler -> name.equals(compiler.getName()))
                 .findFirst();
 
-        if(first.isPresent()) {
+        if (first.isPresent()) {
             return first.get();
         }
 
@@ -84,5 +83,37 @@ public class CocoUtil {
             }
         }
         return compilers;
+    }
+
+    @NotNull
+    public static List<CocoSetDecl> findCharacterDeclarations(@NotNull PsiFile file) {
+        CocoScannerSpecification scannerSpecification = PsiTreeUtil.getChildOfType(file, CocoScannerSpecification.class);
+
+        if (scannerSpecification == null) {
+            return Collections.emptyList();
+        }
+
+        CocoCharacters characters = scannerSpecification.getCharacters();
+
+        if (characters == null) {
+            return Collections.emptyList();
+        }
+
+        return characters.getSetDeclList();
+    }
+
+    @Contract("_, null -> null")
+    @Nullable
+    public static CocoSetDecl findCharacterDeclaration(@NotNull PsiFile file, @Nullable String name) {
+        if (StringUtils.isBlank(name)) {
+            return null;
+        }
+
+        Optional<CocoSetDecl> first = findCharacterDeclarations(file)
+                .stream()
+                .filter(cocoSetDecl -> name.equals(cocoSetDecl.getName()))
+                .findFirst();
+
+        return first.isPresent() ? first.get() : null;
     }
 }

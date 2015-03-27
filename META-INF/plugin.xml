@@ -36,7 +36,7 @@
 
         <completion.contributor language="Cocol/R"
                                 implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
-        <psi.referenceContributor implementation="at.jku.ssw.coco.intellij.CocoReferenceContributor"/>
+        <psi.referenceContributor implementation="at.jku.ssw.coco.intellij.reference.CocoReferenceContributor"/>
 
         <codeInsight.lineMarkerProvider language="JAVA"
                                         implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>

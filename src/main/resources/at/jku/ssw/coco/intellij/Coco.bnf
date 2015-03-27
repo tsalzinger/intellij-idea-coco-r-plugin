@@ -14,11 +14,18 @@
 
     psiImplUtilClass="at.jku.ssw.coco.intellij.psi.impl.CocoPsiImplUtil"
 
-//    name("Symbols")="Symbols"
+    mixin("End")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
+    implements("End")="com.intellij.psi.ContributedReferenceHost"
+    mixin("BasicSet")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
+    implements("BasicSet")="com.intellij.psi.ContributedReferenceHost"
 
-    mixin=[
-        End="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
-    ]
+    mixin("Compiler")="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
+    implements("Compiler")="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
+    mixin("SetDecl")="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
+    implements("SetDecl")="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
+
+    methods("Compiler")=[getName setName getNameIdentifier getPresentation]
+    methods("SetDecl")=[getName setName getNameIdentifier getPresentation]
 
     tokens=[
         string='regexp:"(\\\\|\\"|[^\"\n])*"'
@@ -79,12 +86,7 @@ Cocol ::=
     ParserSpecification
     End
 
-Compiler ::= "COMPILER" ident {
-    mixin="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
-    implements="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
-    methods=[getName setName getNameIdentifier getPresentation]
-    pin=1
-}
+Compiler ::= "COMPILER" ident {pin=1}
 
 Imports ::= JavaCode
 //
@@ -164,6 +166,6 @@ ActualAttributes ::= Attributes
 private Attributes ::= '<' ArbitraryText '>'
 Resolver ::= "IF" '(' {ANY}* ')'
 
-End ::= "END" ident '.' {pin=1 mixin="at.jku.ssw.coco.intellij.psi.CocoReferencingType" implements="com.intellij.psi.ContributedReferenceHost"}
+End ::= "END" ident '.' {pin=1}
 
 private Symbols ::= '+' | '-'  | '=' | '(' | ')' | '<' | '>' | '{' | '}' | '[' | ']' | '..' {name = "Symbols"}

@@ -7,6 +7,8 @@ import at.jku.ssw.coco.intellij.psi.CocoTypes;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
+import org.apache.commons.lang.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -17,26 +19,29 @@ import javax.swing.*;
 public class CocoPsiImplUtil {
 
 
-    public static String getName(CocoCompiler element) {
+    public static String getName(PsiNamedElement element) {
         ASTNode nameNode = element.getNode().findChildByType(CocoTypes.IDENT);
         return nameNode != null ? nameNode.getText() : null;
     }
 
-    public static PsiElement setName(CocoCompiler element, String newName) {
+    public static PsiElement setName(PsiNamedElement element, String newName) {
         ASTNode nameNode = element.getNode().findChildByType(CocoTypes.IDENT);
         if (nameNode != null) {
 
-            CocoCompiler compiler = CocoElementFactory.createCompiler(element.getProject(), newName);
+            if (element instanceof CocoCompiler) {
+                CocoCompiler compiler = CocoElementFactory.createCompiler(element.getProject(), newName);
+                ASTNode newNameNode = compiler.getNode().findChildByType(CocoTypes.IDENT);
+                assert newNameNode != null;
+                element.getNode().replaceChild(nameNode, newNameNode);
+            } else {
+                throw new NotImplementedException();
+            }
 
-
-            ASTNode newNameNode = compiler.getNode().findChildByType(CocoTypes.IDENT);
-            assert newNameNode != null;
-            element.getNode().replaceChild(nameNode, newNameNode);
         }
         return element;
     }
 
-    public static PsiElement getNameIdentifier(CocoCompiler element) {
+    public static PsiElement getNameIdentifier(PsiNamedElement element) {
         ASTNode nameNode = element.getNode().findChildByType(CocoTypes.IDENT);
         if (nameNode != null) {
             return nameNode.getPsi();
@@ -45,7 +50,7 @@ public class CocoPsiImplUtil {
         }
     }
 
-    public static ItemPresentation getPresentation(final CocoCompiler element) {
+    public static ItemPresentation getPresentation(final PsiNamedElement element) {
         return new ItemPresentation() {
             @Nullable
             @Override
