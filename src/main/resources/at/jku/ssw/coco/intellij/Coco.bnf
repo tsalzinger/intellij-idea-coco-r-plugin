@@ -15,9 +15,11 @@
     psiImplUtilClass="at.jku.ssw.coco.intellij.psi.impl.CocoPsiImplUtil"
 
     mixin("End")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
-    implements("End")="com.intellij.psi.ContributedReferenceHost"
-    mixin("BasicSet")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
-    implements("BasicSet")="com.intellij.psi.ContributedReferenceHost"
+    implements("End")="at.jku.ssw.coco.intellij.psi.HasCocoCompilerReference"
+    mixin("BasicSet|TokenFactor")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
+    implements("BasicSet|TokenFactor")="at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference"
+    methods("BasicSet|TokenFactor")=[getCharacterReferenceName]
+
 
     mixin("Compiler")="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
     implements("Compiler")="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
@@ -137,7 +139,7 @@ TokenFactor ::= Symbol
 private TokenFactor_parenthesis ::= '(' TokenExpr ')' {pin=1}
 private TokenFactor_bracket ::= '[' TokenExpr ']' {pin=1}
 private TokenFactor_brace ::= '{' TokenExpr '}' {pin=1}
-Symbol ::= ident | string | char
+private Symbol ::= ident | string | char
 
 
 Pragmas ::= "PRAGMAS" {PragmaDecl}*

@@ -2,9 +2,9 @@ package at.jku.ssw.coco.intellij.reference;
 
 import at.jku.ssw.coco.intellij.CocoUtil;
 import at.jku.ssw.coco.intellij.psi.CocoSetDecl;
+import at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
@@ -12,22 +12,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class CocoCharacterReference extends PsiReferenceBase<PsiElement> implements PsiReference {
+public class CocoCharacterReference extends PsiReferenceBase<HasCocoCharacterReference> implements PsiReference {
 
-    public CocoCharacterReference(@NotNull PsiElement element, TextRange textRange) {
+    public CocoCharacterReference(@NotNull HasCocoCharacterReference element, TextRange textRange) {
         super(element, textRange);
     }
 
     @Nullable
     @Override
     public PsiElement resolve() {
-        String name = myElement.getText();
-
-        if (myElement instanceof PsiNamedElement) {
-            name = ((PsiNamedElement) myElement).getName();
-        }
-
-        return CocoUtil.findCharacterDeclaration(myElement.getContainingFile(), name);
+        return CocoUtil.findCharacterDeclaration(myElement.getContainingFile(), myElement.getCharacterReferenceName());
     }
 
     @NotNull

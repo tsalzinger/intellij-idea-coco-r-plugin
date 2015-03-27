@@ -4,6 +4,7 @@ import at.jku.ssw.coco.intellij.CocoIcons;
 import at.jku.ssw.coco.intellij.psi.CocoCompiler;
 import at.jku.ssw.coco.intellij.psi.CocoElementFactory;
 import at.jku.ssw.coco.intellij.psi.CocoTypes;
+import at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
@@ -70,5 +71,14 @@ public class CocoPsiImplUtil {
                 return CocoIcons.FILE;
             }
         };
+    }
+
+    public static String getCharacterReferenceName(HasCocoCharacterReference element) {
+        PsiElement ident = element.getIdent();
+        if (ident != null) {
+            return ident.getText();
+        }
+
+        return null;
     }
 }

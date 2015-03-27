@@ -1,7 +1,7 @@
 package at.jku.ssw.coco.intellij.reference;
 
 import at.jku.ssw.coco.intellij.CocoUtil;
-import at.jku.ssw.coco.intellij.psi.CocoEnd;
+import at.jku.ssw.coco.intellij.psi.HasCocoCompilerReference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -9,9 +9,9 @@ import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CocoCompilerReference extends PsiReferenceBase<CocoEnd> implements PsiReference {
+public class CocoCompilerReference extends PsiReferenceBase<HasCocoCompilerReference> implements PsiReference {
 
-    public CocoCompilerReference(@NotNull CocoEnd element, TextRange textRange) {
+    public CocoCompilerReference(@NotNull HasCocoCompilerReference element, TextRange textRange) {
         super(element, textRange);
     }
 
@@ -28,7 +28,6 @@ public class CocoCompilerReference extends PsiReferenceBase<CocoEnd> implements 
     @NotNull
     @Override
     public Object[] getVariants() {
-        PsiElement resolve = resolve();
-        return resolve != null ? new Object[]{resolve} : new Object[0];
+        return CocoUtil.findCompilers(myElement.getContainingFile()).toArray();
     }
 }
