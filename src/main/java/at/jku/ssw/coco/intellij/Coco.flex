@@ -48,9 +48,12 @@ ANY_CHAR=.
   "IF"                 { return KEYWORD_IF; }
   "IGNORE"             { return KEYWORD_IGNORE; }
   "IGNORECASE"         { return KEYWORD_IGNORECASE; }
+  "import"             { return KEYWORD_IMPORT; }
   "NESTED"             { return KEYWORD_NESTED; }
+  "out"                { return KEYWORD_OUT; }
   "PRAGMAS"            { return KEYWORD_PRAGMAS; }
   "PRODUCTIONS"        { return KEYWORD_PRODUCTIONS; }
+  "SYNC"               { return KEYWORD_SYNC; }
   "TO"                 { return KEYWORD_TO; }
   "TOKENS"             { return KEYWORD_TOKENS; }
   "WEAK"               { return KEYWORD_WEAK; }

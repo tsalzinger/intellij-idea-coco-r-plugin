@@ -14,7 +14,7 @@ import java.util.Collection;
  * Created by Thomas on 23/03/2015.
  */
 @RunWith(Parameterized.class)
-public class LexerTokenTest extends AbstractLexerTest {
+public class LexerKeywordTest extends AbstractLexerTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -28,9 +28,12 @@ public class LexerTokenTest extends AbstractLexerTest {
                 {"IF", CocoTypes.KEYWORD_IF},
                 {"IGNORE", CocoTypes.KEYWORD_IGNORE},
                 {"IGNORECASE", CocoTypes.KEYWORD_IGNORECASE},
+                {"import", CocoTypes.KEYWORD_IMPORT},
                 {"NESTED", CocoTypes.KEYWORD_NESTED},
+                {"out", CocoTypes.KEYWORD_OUT},
                 {"PRAGMAS", CocoTypes.KEYWORD_PRAGMAS},
                 {"PRODUCTIONS", CocoTypes.KEYWORD_PRODUCTIONS},
+                {"SYNC", CocoTypes.KEYWORD_SYNC},
                 {"TO", CocoTypes.KEYWORD_TO},
                 {"TOKENS", CocoTypes.KEYWORD_TOKENS},
                 {"WEAK", CocoTypes.KEYWORD_WEAK}
@@ -40,7 +43,7 @@ public class LexerTokenTest extends AbstractLexerTest {
     private final String token;
     private final IElementType elementType;
 
-    public LexerTokenTest(String token, IElementType elementType) {
+    public LexerKeywordTest(String token, IElementType elementType) {
         this.token = token;
         this.elementType = elementType;
     }
