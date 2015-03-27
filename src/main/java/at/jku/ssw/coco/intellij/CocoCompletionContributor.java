@@ -24,7 +24,7 @@ public class CocoCompletionContributor extends CompletionContributor {
                 new CompletionProvider<CompletionParameters>() {
                     @Override
                     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                        List<CocoCompiler> compilers = CocoUtil.findCompilers(completionParameters.getEditor().getProject());
+                        List<CocoCompiler> compilers = CocoUtil.findCompilers(completionParameters.getOriginalFile());
 
                         for (CocoCompiler compiler : compilers) {
                             if (Objects.isNull(compiler.getName())) {

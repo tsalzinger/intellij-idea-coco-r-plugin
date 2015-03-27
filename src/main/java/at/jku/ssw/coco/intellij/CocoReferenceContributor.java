@@ -1,5 +1,7 @@
 package at.jku.ssw.coco.intellij;
 
+import at.jku.ssw.coco.intellij.psi.CocoCompiler;
+import at.jku.ssw.coco.intellij.psi.CocoEnd;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
@@ -8,27 +10,28 @@ import org.jetbrains.annotations.NotNull;
 
 public class CocoReferenceContributor extends PsiReferenceContributor {
     @Override
-    public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
-        registrar.registerReferenceProvider(PlatformPatterns.psiElement(PsiLiteralExpression.class),
+    public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
+        registrar.registerReferenceProvider(PlatformPatterns.psiElement(CocoEnd.class),
                 new PsiReferenceProvider() {
                     @NotNull
                     @Override
                     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-                        PsiLiteralExpression literalExpression = (PsiLiteralExpression) element;
-                        Object value = literalExpression.getValue();
+                        CocoEnd cocoEnd = (CocoEnd) element;
+                        PsiElement compilerIdent = cocoEnd.getIdent();
+                        if (compilerIdent != null) {
+                            CocoCompiler compiler = CocoUtil.findCompiler(element.getContainingFile(), compilerIdent.getText());
 
-                        if (value != null && value instanceof String) {
-                            String text = (String) value;
-                            if (text.startsWith("coco:")) {
-                                return new PsiReference[]{new CocoCompilerReference(element, new TextRange(6, text.length() + 1))};
+                            if (compiler != null) {
+
+                                int startOffsetInParent = compilerIdent.getStartOffsetInParent();
+                                TextRange range = new TextRange(startOffsetInParent, startOffsetInParent + compilerIdent.getTextLength());
+                                return new PsiReference[]{new CocoCompilerReference(cocoEnd, range)};
                             }
-
                         }
+
                         return PsiReference.EMPTY_ARRAY;
                     }
-                }
-
-        );
+                });
     }
 
 

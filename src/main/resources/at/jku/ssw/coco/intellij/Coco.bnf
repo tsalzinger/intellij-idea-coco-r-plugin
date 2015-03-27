@@ -16,6 +16,10 @@
 
 //    name("Symbols")="Symbols"
 
+    mixin=[
+        End="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
+    ]
+
     tokens=[
         string='regexp:"(\\\\|\\"|[^\"\n])*"'
         char="regexp:'(\\u(\p{XDigit}{4})|\\.|.)'"
@@ -157,6 +161,6 @@ ActualAttributes ::= Attributes
 private Attributes ::= '<' ArbitraryText '>'
 Resolver ::= "IF" '(' {ANY}* ')'
 
-End ::= "END" ident '.' {pin=1}
+End ::= "END" ident '.' {pin=1 mixin="at.jku.ssw.coco.intellij.psi.CocoReferencingType" implements="com.intellij.psi.ContributedReferenceHost"}
 
 private Symbols ::= '+' | '-'  | '=' | '(' | ')' | '<' | '>' | '{' | '}' | '[' | ']' | '..' {name = "Symbols"}

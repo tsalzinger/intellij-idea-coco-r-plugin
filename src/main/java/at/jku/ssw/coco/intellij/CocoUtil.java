@@ -4,11 +4,14 @@ import at.jku.ssw.coco.intellij.psi.CocoCompiler;
 import at.jku.ssw.coco.intellij.psi.CocoFile;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
+import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +29,33 @@ public class CocoUtil {
                 .stream()
                 .map(CocoCompiler::getName)
                 .filter(it -> !Objects.isNull(it))
+                .collect(Collectors.toList());
+    }
+
+    @Contract("_,null -> null")
+    @Nullable
+    public static CocoCompiler findCompiler(@NotNull PsiFile file, @Nullable String name) {
+        if (StringUtils.isBlank(name)) {
+            return null;
+        }
+
+        Optional<CocoCompiler> first = findCompilers(file)
+                .stream()
+                .filter(compiler -> name.equals(compiler.getName()))
+                .findFirst();
+
+        if(first.isPresent()) {
+            return first.get();
+        }
+
+        return null;
+    }
+
+    @NotNull
+    public static List<CocoCompiler> findCompilers(@NotNull PsiFile file) {
+        return findCompilers(file.getProject())
+                .stream()
+                .filter(compiler -> file.equals(compiler.getContainingFile()))
                 .collect(Collectors.toList());
     }
 
