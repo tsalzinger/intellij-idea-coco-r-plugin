@@ -17,25 +17,29 @@
 //    name("Symbols")="Symbols"
 
     tokens=[
-        string='regexp:"([^\"\n]|\\"|)*"'
+        string='regexp:"(\\\\|\\"|[^\"\n])*"'
         char="regexp:'(\\u(\p{XDigit}{4})|\\.|.)'"
 
         WHITE_SPACE='regexp:\s+'
         LINE_COMMENT='regexp://.*'
-        BLOCK_COMMENT='regexp:/\*([^\*]|\*+[^/\*])*\*/'
+        BLOCK_COMMENT='regexp:/\*([^\*]|\*+[^/\*])*\*+/'
 
-        KEYWORD_COMPILER='COMPILER'
-        KEYWORD_PRODUCTIONS='PRODUCTIONS'
-        KEYWORD_END='END'
-        KEYWORD_NESTED='NESTED'
-        KEYWORD_TO='TO'
-        KEYWORD_FROM='FROM'
+        KEYWORD_ANY='ANY'
         KEYWORD_CHARACTERS='CHARACTERS'
-        KEYWORD_CONTEXT='CONTEXT'
-        KEYWORD_TOKENS='TOKENS'
-        KEYWORD_PRAGMAS='PRAGMAS'
+        KEYWORD_COMPILER='COMPILER'
         KEYWORD_COMMENTS='COMMENTS'
+        KEYWORD_CONTEXT='CONTEXT'
+        KEYWORD_END='END'
+        KEYWORD_FROM='FROM'
+        KEYWORD_IF='IF'
         KEYWORD_IGNORE='IGNORE'
+        KEYWORD_IGNORECASE='IGNORECASE'
+        KEYWORD_NESTED='NESTED'
+        KEYWORD_PRAGMAS='PRAGMAS'
+        KEYWORD_PRODUCTIONS='PRODUCTIONS'
+        KEYWORD_TO='TO'
+        KEYWORD_TOKENS='TOKENS'
+        KEYWORD_WEAK='WEAK'
 
         TERMINATOR='.'
         PLUS='+'
@@ -61,15 +65,14 @@
 }
 
 Cocol ::=
-    !<<EOF>>
     [Imports]
     Compiler
     [GlobalFieldsAndMethods]
     ScannerSpecification
     ParserSpecification
-    End/ {pin=1}
+    End
 
-Compiler ::= !<<EOF>> "COMPILER" ident {
+Compiler ::= "COMPILER" ident {
     mixin="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
     implements="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
     methods=[getName setName getNameIdentifier getPresentation]
@@ -82,8 +85,8 @@ GlobalFieldsAndMethods ::= JavaCode
 
 private JavaCode ::= {JavaSymbols}*
 ANY ::= JavaSymbols
-private ArbitraryText ::= (ident | string | char | number | ANY_CHAR | '.')*
-private ArbitraryStatements ::= {JavaSymbols}*
+ArbitraryText ::= (ident | string | char | number | ANY_CHAR | '.')*
+ArbitraryStatements ::= {JavaSymbols}*
 private JavaSymbols ::= (ident | string | char | number | ANY_CHAR | Symbols | '.' | '||') {name = "Java Code"}
 
 //ScannerSpecification =
@@ -102,7 +105,7 @@ ScannerSpecification ::=
     {CommentDecl}*
     {WhiteSpaceDecl}*
 
-Characters ::= !<<EOF>> "CHARACTERS" {SetDecl}*
+Characters ::= "CHARACTERS" {SetDecl}*
 
 SetDecl ::= ident '=' Set '.' {pin=1}
 
@@ -111,11 +114,10 @@ BasicSet ::= string | ident | char [".." char] | "ANY"
 
 Tokens ::= "TOKENS" {TokenDecl}* {pin=1}
 TokenDecl ::= Symbol [TokenAssignment]
-private recoverToNextKnown ::= !('.' | ident | Symbols | "PRODUCTIONS")
 private TokenAssignment ::= '=' TokenExpr '.' {pin=1}
 
 TokenExpr ::= TokenTerm {TokenTermOption}* {pin=1}
-private TokenTermOption ::= '|' TokenTerm {pin=1 recoverWhile=recoverToNextKnown}
+private TokenTermOption ::= '|' TokenTerm {pin=1}
 TokenTerm ::= TokenFactor {TokenFactor}* [TokenContext]
 private TokenContext ::= "CONTEXT" '(' TokenExpr ')' {pin=1}
 TokenFactor ::= Symbol

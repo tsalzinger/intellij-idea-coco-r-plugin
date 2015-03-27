@@ -11,12 +11,15 @@
 
     <change-notes><![CDATA[
         Current features:<br>
-        <ul></ul>
+        <ul>
+            <li>Syntax Highlighting</li>
+            <li>Basic error handling (parser only)</li>
+            <li>Generate Scanner and Parser via menu action</li>
+        </ul>
         TODO:<br>
-            <ul>
-            <li>Syntax highlighting</li>
+        <ul>
             <li>Code completion</li>
-            <li>Trigger generation of Scanner & Parser directly from IDE</li>
+            <li></li>
             <li>Support direct usage of generated classes within project</li>
         </ul>
     ]]>
@@ -26,12 +29,12 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="at.jku.ssw.coco.intellij.CocoFileTypeFactory"/>
-        <lang.parserDefinition language="Cocol" implementationClass="at.jku.ssw.coco.intellij.CocoParserDefinition"/>
-        <lang.syntaxHighlighterFactory key="Cocol"
+        <lang.parserDefinition language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoParserDefinition"/>
+        <lang.syntaxHighlighterFactory key="Cocol/R"
                                        implementationClass="at.jku.ssw.coco.intellij.CocoSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="at.jku.ssw.coco.intellij.CocoColorSettingsPage"/>
 
-        <completion.contributor language="Cocol" implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
+        <completion.contributor language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
         <psi.referenceContributor implementation="at.jku.ssw.coco.intellij.CocoReferenceContributor"/>
 
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>

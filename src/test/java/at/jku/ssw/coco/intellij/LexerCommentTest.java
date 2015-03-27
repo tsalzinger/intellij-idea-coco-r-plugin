@@ -12,12 +12,12 @@ public class LexerCommentTest extends AbstractLexerTest {
 
     @Test
     public void testSimpleLineComment() throws IOException {
-        init("//TEST\n");
+        init("//TEST");
         assertElementTypeStrict(CocoTypes.LINE_COMMENT);
     }
     @Test
     public void testLineCommentWithParenthesis() throws IOException {
-        init("//TEST(some note) (some other note)\n");
+        init("//TEST(some note) (some other note)");
         assertElementTypeStrict(CocoTypes.LINE_COMMENT);
     }
 

@@ -43,6 +43,19 @@ public class AbstractLexerTest {
         cocoLexer.reset(input.toString(), 0, input.length(), CocoLexer.YYINITIAL);
     }
 
+    protected IElementType advanceUntil(IElementType elementType) throws IOException {
+        IElementType advance = cocoLexer.advance();
+
+        while (advance != null && !elementType.equals(advance)) {
+            advance = cocoLexer.advance();
+        }
+
+
+        Assert.assertEquals(elementType, advance);
+
+        return advance;
+    }
+
     protected void assertElementType(IElementType... elementTypes) throws IOException {
         try {
             IElementType advance = cocoLexer.advance();
@@ -118,7 +131,8 @@ public class AbstractLexerTest {
     }
 
     protected void assertSemanticAction() throws IOException {
-        assertElementType(CocoTypes.SEM_ACTION_);
+        assertElementType(CocoTypes.SEM_ACTION_START);
+        advanceUntil(CocoTypes.SEM_ACTION_END);
     }
 
     protected void assertBlockComment() throws IOException {
@@ -148,8 +162,7 @@ public class AbstractLexerTest {
     protected void assertIdentWithAttributes() throws IOException {
         assertIdent();
         assertElementType(CocoTypes.SMALLER_THEN);
-        assertElementType(CocoTypes.ARBITRARY_TEXT);
-        assertElementType(CocoTypes.GREATER_THEN);
+        advanceUntil(CocoTypes.GREATER_THEN);
     }
 
     protected void assertIdent() throws IOException {
@@ -173,13 +186,13 @@ public class AbstractLexerTest {
     }
 
     protected void assertCommentDefinition(boolean nested) throws IOException {
-        assertElementType(CocoTypes.COMMENTS);
-        assertElementType(CocoTypes.FROM);
+        assertElementType(CocoTypes.KEYWORD_COMMENTS);
+        assertElementType(CocoTypes.KEYWORD_FROM);
         assertElementType(CocoTypes.STRING, CocoTypes.IDENT);
-        assertElementType(CocoTypes.TO);
+        assertElementType(CocoTypes.KEYWORD_TO);
         assertElementType(CocoTypes.STRING, CocoTypes.IDENT);
         if (nested) {
-            assertElementType(CocoTypes.NESTED);
+            assertElementType(CocoTypes.KEYWORD_NESTED);
         }
     }
 }

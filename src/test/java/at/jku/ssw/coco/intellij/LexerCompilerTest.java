@@ -13,35 +13,39 @@ public class LexerCompilerTest extends AbstractLexerTest {
 
     @Test
     public void testSimpleCompiler() throws IOException {
-        init("COMPILER Taste");
+        addInput("COMPILER Taste");
+        init("PRODUCTIONS");
 
-        assertElementTypeStrict(CocoTypes.TOKEN_COMPILER);
+        assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        assertElementTypeStrict(CocoTypes.JAVACODE);
+        assertElementTypeStrict(TokenType.WHITE_SPACE);
+        assertElementTypeStrict(CocoTypes.KEYWORD_PRODUCTIONS);
     }
 
     @Test
     public void testCompilerWithJavaCodeShort() throws IOException {
         addInput("COMPILER Taste");
-        init("private String test = \"test\";");
+        addInput("private String test = \"test\";");
+        init("PRODUCTIONS");
 
-        assertElementTypeStrict(CocoTypes.TOKEN_COMPILER);
+        assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        assertElementTypeStrict(CocoTypes.JAVACODE);
+        advanceUntil(CocoTypes.KEYWORD_PRODUCTIONS);
     }
 
     @Test
     public void testCompilerWithJavaCodeShort2() throws IOException {
         addInput("COMPILER Taste");
-        init("private String test = \"test\";");
-        init("private String test = \"test\";");
+        addInput("private String test = \"test\";");
+        addInput("private String test = \"test\";");
+        init("PRODUCTIONS");
 
-        assertElementTypeStrict(CocoTypes.TOKEN_COMPILER);
+        assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        assertElementTypeStrict(CocoTypes.JAVACODE);
+        advanceUntil(CocoTypes.KEYWORD_PRODUCTIONS);
     }
 
     @Test
@@ -52,12 +56,13 @@ public class LexerCompilerTest extends AbstractLexerTest {
         addInput("// another one with ( parenthesis )");
         addInput("/* and a block comment */");
         addInput("and some illegal code");
-        init("private long abc = -1;");
+        addInput("private long abc = -1;");
+        init("PRODUCTIONS");
 
-        assertElementTypeStrict(CocoTypes.TOKEN_COMPILER);
+        assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        assertElementTypeStrict(CocoTypes.JAVACODE);
+        advanceUntil(CocoTypes.KEYWORD_PRODUCTIONS);
     }
 
     @Test
@@ -69,14 +74,12 @@ public class LexerCompilerTest extends AbstractLexerTest {
         addInput("/* and a block comment */");
         addInput("and some illegal code");
         addInput("private long abc = -1;");
-        addInput("IGNORECASE");
-        init();
+        init("IGNORECASE");
 
-        assertElementTypeStrict(CocoTypes.TOKEN_COMPILER);
+        assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        assertElementTypeStrict(CocoTypes.JAVACODE);
-        assertElementTypeStrict(CocoTypes.TOKEN_IGNORECASE);
+        advanceUntil(CocoTypes.KEYWORD_IGNORECASE);
 
     }
 }

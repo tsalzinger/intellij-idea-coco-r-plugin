@@ -26,15 +26,14 @@ public class LexerTasteTest extends AbstractLexerTest {
 
         init(tasteATG);
 
+        // IMPORTS (javacode)
         // COMPILER
-        assertElementTypeStrict(CocoTypes.TOKEN_COMPILER);
+        advanceUntil(CocoTypes.KEYWORD_COMPILER);
         assertIdent();
 
         // GLOBALS (javacode)
-        assertElementType(CocoTypes.JAVACODE);
-
         // CHARACTERS
-        assertElementTypeStrict(CocoTypes.TOKEN_CHARACTERS);
+        advanceUntil(CocoTypes.KEYWORD_CHARACTERS);
         assertCharacterDefinition(CocoTypes.STRING);
         assertCharacterDefinition(CocoTypes.STRING);
         assertCharacterDefinition(CocoTypes.CHAR);
@@ -42,7 +41,7 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertCharacterDefinition(CocoTypes.CHAR);
 
         // TOKENS
-        assertElementType(CocoTypes.TOKEN_TOKENS);
+        assertElementType(CocoTypes.KEYWORD_TOKENS);
         assertTokenDefinitionStart();
         assertIdent();
         assertPipe();
@@ -57,7 +56,7 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertCommentDefinition(false);
 
         // IGNORE
-        assertElementType(CocoTypes.IGNORE);
+        assertElementType(CocoTypes.KEYWORD_IGNORE);
         assertIdent();
         assertElementType(CocoTypes.PLUS);
         assertIdent();
@@ -65,7 +64,7 @@ public class LexerTasteTest extends AbstractLexerTest {
         assertIdent();
 
         // PRODUCTIONS
-        assertElementType(CocoTypes.TOKEN_PRODUCTIONS);
+        assertElementType(CocoTypes.KEYWORD_PRODUCTIONS);
         // Program and declarations
         checkTaste();
         checkVarDecl();
@@ -78,7 +77,7 @@ public class LexerTasteTest extends AbstractLexerTest {
         checkExpr();
 
         // END
-        assertElementType(CocoTypes.TOKEN_END);
+        assertElementType(CocoTypes.KEYWORD_END);
         assertIdent();
         assertTerminator();
     }

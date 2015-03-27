@@ -132,6 +132,6 @@ public class CocoColorSettingsPage implements ColorSettingsPage {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Coco";
+        return "Cocol/R";
     }
 }

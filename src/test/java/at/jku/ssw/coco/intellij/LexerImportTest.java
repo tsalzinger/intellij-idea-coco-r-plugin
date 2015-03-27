@@ -13,31 +13,17 @@ public class LexerImportTest extends AbstractLexerTest {
 
     @Test
     public void testSimpleImport() throws IOException {
-        init("import test.*;");
-        assertImport();
+        addInput("import test.*;");
+        init("COMPILER");
+        advanceUntil(CocoTypes.KEYWORD_COMPILER);
     }
 
     @Test
     public void testMultipleSimpleImport() throws IOException {
         addInput("import test.abc.Def;");
         addInput("import test.def.ghi.A;");
-        init();
-        assertImports(2);
-    }
-
-    private void assertImport() throws IOException {
-        assertImports(1);
-    }
-
-    private void assertImports(int count) throws IOException {
-        for (int i = 1; i <= count; i++) {
-            assertElementTypeStrict(CocoTypes.IMPORT);
-            assertElementTypeStrict(TokenType.WHITE_SPACE);
-            assertElementTypeStrict(CocoTypes.IMPORTPATH);
-            if (i != count) {
-                assertElementTypeStrict(TokenType.WHITE_SPACE);
-            }
-        }
+        init("COMPILER");
+        advanceUntil(CocoTypes.KEYWORD_COMPILER);
     }
 
 }

@@ -78,26 +78,27 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
                 || tokenType.equals(CocoTypes.RANGE)) {
             return OPERATION_SIGN_KEYS;
         } else if (
-//                tokenType.equals(CocoTypes.SEM_ACTION_START) ||
-//                tokenType.equals(CocoTypes.SEM_ACTION_END) ||
+                tokenType.equals(CocoTypes.SEM_ACTION_START) ||
+                tokenType.equals(CocoTypes.SEM_ACTION_END) ||
                 tokenType.equals(CocoTypes.GREATER_THEN) ||
                 tokenType.equals(CocoTypes.SMALLER_THEN)) {
             return MARKUP_TAG_KEYS;
-        } else if (tokenType.equals(CocoTypes.TOKEN_COMPILER) ||
-                tokenType.equals(CocoTypes.TOKEN_CHARACTERS) ||
-                tokenType.equals(CocoTypes.TOKEN_PRAGMAS) ||
-                tokenType.equals(CocoTypes.TOKEN_TOKENS) ||
-                tokenType.equals(CocoTypes.COMMENTS) ||
-                tokenType.equals(CocoTypes.FROM) ||
-                tokenType.equals(CocoTypes.TO) ||
-                tokenType.equals(CocoTypes.NESTED) ||
-                tokenType.equals(CocoTypes.IGNORE) ||
-                tokenType.equals(CocoTypes.TOKEN_PRODUCTIONS) ||
-                tokenType.equals(CocoTypes.TOKEN_END) ||
-                tokenType.equals(CocoTypes.WEAK) ||
-                tokenType.equals(CocoTypes.IF) ||
-                tokenType.equals(CocoTypes.ANY) ||
-                tokenType.equals(CocoTypes.TOKEN_IGNORECASE)) {
+        } else if (tokenType.equals(CocoTypes.KEYWORD_ANY) ||
+                tokenType.equals(CocoTypes.KEYWORD_CHARACTERS) ||
+                tokenType.equals(CocoTypes.KEYWORD_COMPILER) ||
+                tokenType.equals(CocoTypes.KEYWORD_COMMENTS) ||
+                tokenType.equals(CocoTypes.KEYWORD_CONTEXT) ||
+                tokenType.equals(CocoTypes.KEYWORD_END) ||
+                tokenType.equals(CocoTypes.KEYWORD_FROM) ||
+                tokenType.equals(CocoTypes.KEYWORD_IF) ||
+                tokenType.equals(CocoTypes.KEYWORD_IGNORE) ||
+                tokenType.equals(CocoTypes.KEYWORD_IGNORECASE) ||
+                tokenType.equals(CocoTypes.KEYWORD_NESTED) ||
+                tokenType.equals(CocoTypes.KEYWORD_PRAGMAS) ||
+                tokenType.equals(CocoTypes.KEYWORD_PRODUCTIONS) ||
+                tokenType.equals(CocoTypes.KEYWORD_TO) ||
+                tokenType.equals(CocoTypes.KEYWORD_TOKENS) ||
+                tokenType.equals(CocoTypes.KEYWORD_WEAK)) {
             return KEYWORD_KEYS;
         }
         return new TextAttributesKey[0];

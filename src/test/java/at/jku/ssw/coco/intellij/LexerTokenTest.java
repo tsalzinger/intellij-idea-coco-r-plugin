@@ -18,14 +18,22 @@ public class LexerTokenTest extends AbstractLexerTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"COMPILER", CocoTypes.TOKEN_COMPILER},
-                {"CHARACTERS", CocoTypes.TOKEN_CHARACTERS},
-                {"TOKENS", CocoTypes.TOKEN_TOKENS},
-                {"CONTEXT", CocoTypes.TOKEN_CONTEXT},
-                {"IGNORECASE", CocoTypes.TOKEN_IGNORECASE},
-                {"PRAGMAS", CocoTypes.TOKEN_PRAGMAS},
-                {"PRODUCTIONS", CocoTypes.TOKEN_PRODUCTIONS},
-                {"END", CocoTypes.TOKEN_END}
+                {"ANY", CocoTypes.KEYWORD_ANY},
+                {"CHARACTERS", CocoTypes.KEYWORD_CHARACTERS},
+                {"COMMENTS", CocoTypes.KEYWORD_COMMENTS},
+                {"COMPILER", CocoTypes.KEYWORD_COMPILER},
+                {"CONTEXT", CocoTypes.KEYWORD_CONTEXT},
+                {"END", CocoTypes.KEYWORD_END},
+                {"FROM", CocoTypes.KEYWORD_FROM},
+                {"IF", CocoTypes.KEYWORD_IF},
+                {"IGNORE", CocoTypes.KEYWORD_IGNORE},
+                {"IGNORECASE", CocoTypes.KEYWORD_IGNORECASE},
+                {"NESTED", CocoTypes.KEYWORD_NESTED},
+                {"PRAGMAS", CocoTypes.KEYWORD_PRAGMAS},
+                {"PRODUCTIONS", CocoTypes.KEYWORD_PRODUCTIONS},
+                {"TO", CocoTypes.KEYWORD_TO},
+                {"TOKENS", CocoTypes.KEYWORD_TOKENS},
+                {"WEAK", CocoTypes.KEYWORD_WEAK}
         });
     }
 
