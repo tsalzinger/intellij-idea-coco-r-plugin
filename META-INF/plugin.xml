@@ -38,6 +38,8 @@
         <completion.contributor language="Cocol/R"
                                 implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
         <psi.referenceContributor implementation="at.jku.ssw.coco.intellij.reference.CocoReferenceContributor"/>
+        <lang.findUsagesProvider language="Cocol/R"
+                                 implementationClass="at.jku.ssw.coco.intellij.CocoFindUsagesProvider"/>
 
         <codeInsight.lineMarkerProvider language="JAVA"
                                         implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>
