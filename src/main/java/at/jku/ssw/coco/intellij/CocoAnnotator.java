@@ -1,9 +1,6 @@
 package at.jku.ssw.coco.intellij;
 
-import at.jku.ssw.coco.intellij.psi.CocoCompiler;
-import at.jku.ssw.coco.intellij.psi.CocoEnd;
-import at.jku.ssw.coco.intellij.psi.CocoSetDecl;
-import at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference;
+import at.jku.ssw.coco.intellij.psi.*;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
@@ -20,11 +17,13 @@ public class CocoAnnotator implements Annotator {
             if (ident == null) {
                 return;
             }
+
             String compilerName = ident.getText();
             CocoCompiler compiler = CocoUtil.findCompiler(element.getContainingFile(), compilerName);
+
             if (compiler != null) {
                 Annotation annotation = holder.createInfoAnnotation(ident.getTextRange(), null);
-                annotation.setTextAttributes(DefaultLanguageHighlighterColors.KEYWORD);
+                annotation.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE);
             } else {
                 holder.createErrorAnnotation(ident.getTextRange(), "Unresolved COMPILER '" + compilerName + "'");
             }
@@ -36,11 +35,33 @@ public class CocoAnnotator implements Annotator {
                 CocoSetDecl characterDeclaration = CocoUtil.findCharacterDeclaration(element.getContainingFile(), characterReferenceName);
 
                 if (characterDeclaration != null) {
-                    Annotation annotation = holder.createInfoAnnotation(ident, null);
-                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                    int characterOffset = characterDeclaration.getTextRange().getStartOffset();
+                    int referenceOffset = cocoElement.getTextRange().getStartOffset();
+
+                    if (referenceOffset < characterOffset) {
+                        holder.createWarningAnnotation(ident, "Character '" + characterReferenceName + "' used before its defined");
+                    } else {
+                        Annotation annotation = holder.createInfoAnnotation(ident, null);
+                        annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                    }
                 } else {
                     holder.createErrorAnnotation(ident.getTextRange(), "Unresolved Character '" + characterReferenceName + "'");
                 }
+            }
+        } else if (element instanceof CocoCompiler) {
+            PsiElement ident = ((CocoCompiler) element).getIdent();
+
+            if (ident != null) {
+                Annotation annotation = holder.createInfoAnnotation(ident, null);
+                annotation.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_NAME);
+            }
+        } else if (element instanceof CocoNamedElement) {
+            PsiElement ident = ((CocoNamedElement) element).getIdent();
+
+            if (ident != null) {
+                // TODO check usage
+                Annotation annotation = holder.createInfoAnnotation(ident, null);
+                annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
             }
         }
     }
