@@ -49,6 +49,10 @@ public class CocoPsiImplUtil {
         }
     }
 
+    public static int getTextOffset(CocoCompiler cocoCompiler) {
+        return cocoCompiler.getStartOffsetInParent() + cocoCompiler.getIdent().getStartOffsetInParent();
+    }
+
     public static ItemPresentation getPresentation(final PsiNamedElement element) {
         return new ItemPresentation() {
             @Nullable

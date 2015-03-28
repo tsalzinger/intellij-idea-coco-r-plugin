@@ -25,7 +25,8 @@
 
     mixin("Compiler|SetDecl|TokenDecl|Production")="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
     implements("Compiler|SetDecl|TokenDecl|Production")="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
-    methods("Compiler|SetDecl|TokenDecl|Production")=[getName setName getNameIdentifier getPresentation]
+    methods("SetDecl|TokenDecl|Production")=[getName setName getNameIdentifier getPresentation]
+    methods("Compiler")=[getName setName getNameIdentifier getPresentation getTextOffset]
 
     tokens=[
         string='regexp:"(\\\\|\\"|[^\"\n])*"'
