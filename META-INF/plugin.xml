@@ -33,6 +33,7 @@
         <lang.syntaxHighlighterFactory key="Cocol/R"
                                        implementationClass="at.jku.ssw.coco.intellij.CocoSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="at.jku.ssw.coco.intellij.CocoColorSettingsPage"/>
+        <lang.braceMatcher language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoBraceMatcher"/>
 
         <completion.contributor language="Cocol/R"
                                 implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
