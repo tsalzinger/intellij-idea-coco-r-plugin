@@ -97,9 +97,12 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
                 tokenType.equals(CocoTypes.KEYWORD_IF) ||
                 tokenType.equals(CocoTypes.KEYWORD_IGNORE) ||
                 tokenType.equals(CocoTypes.KEYWORD_IGNORECASE) ||
+                tokenType.equals(CocoTypes.KEYWORD_IMPORT) ||
                 tokenType.equals(CocoTypes.KEYWORD_NESTED) ||
+                tokenType.equals(CocoTypes.KEYWORD_OUT) ||
                 tokenType.equals(CocoTypes.KEYWORD_PRAGMAS) ||
                 tokenType.equals(CocoTypes.KEYWORD_PRODUCTIONS) ||
+                tokenType.equals(CocoTypes.KEYWORD_SYNC) ||
                 tokenType.equals(CocoTypes.KEYWORD_TO) ||
                 tokenType.equals(CocoTypes.KEYWORD_TOKENS) ||
                 tokenType.equals(CocoTypes.KEYWORD_WEAK)) {
