@@ -1,16 +1,15 @@
 package at.jku.ssw.coco.intellij.reference;
 
 import at.jku.ssw.coco.intellij.CocoUtil;
-import at.jku.ssw.coco.intellij.psi.CocoTokenDecl;
+import at.jku.ssw.coco.intellij.psi.CocoTokenExpr;
 import at.jku.ssw.coco.intellij.psi.HasCocoTokenReference;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class CocoTokenReference extends PsiReferenceBase<HasCocoTokenReference> implements PsiReference {
 
@@ -27,7 +26,20 @@ public class CocoTokenReference extends PsiReferenceBase<HasCocoTokenReference> 
     @NotNull
     @Override
     public Object[] getVariants() {
-        List<CocoTokenDecl> characterDeclarations = CocoUtil.findTokenDecls(myElement.getContainingFile());
-        return characterDeclarations.toArray();
+        return CocoUtil.findTokenDecls(myElement.getContainingFile())
+                .stream()
+                .map(it -> {
+                    CocoTokenExpr tokenExpr = it.getTokenExpr();
+
+                    LookupElementBuilder lookupElementBuilder = LookupElementBuilder.create(it)
+                            .withTypeText("Token");
+
+                    if (tokenExpr != null) {
+                        return lookupElementBuilder.withTailText(" = " +tokenExpr.getText(), true);
+                    }
+
+                    return lookupElementBuilder;
+                })
+                .toArray();
     }
 }

@@ -1,16 +1,15 @@
 package at.jku.ssw.coco.intellij.reference;
 
 import at.jku.ssw.coco.intellij.CocoUtil;
-import at.jku.ssw.coco.intellij.psi.CocoSetDecl;
+import at.jku.ssw.coco.intellij.psi.CocoSet;
 import at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class CocoCharacterReference extends PsiReferenceBase<HasCocoCharacterReference> implements PsiReference {
 
@@ -27,7 +26,19 @@ public class CocoCharacterReference extends PsiReferenceBase<HasCocoCharacterRef
     @NotNull
     @Override
     public Object[] getVariants() {
-        List<CocoSetDecl> characterDeclarations = CocoUtil.findCharacterDeclarations(myElement.getContainingFile());
-        return characterDeclarations.toArray();
+        return CocoUtil.findCharacterDeclarations(myElement.getContainingFile())
+                .stream()
+                .map(it -> {
+                    CocoSet set = it.getSet();
+                    LookupElementBuilder lookupElementBuilder = LookupElementBuilder.create(it)
+                            .withTypeText("Character");
+
+                    if (set != null) {
+                        return lookupElementBuilder.withTailText(" = " +set.getText(), true);
+                    }
+
+                    return lookupElementBuilder;
+                })
+                .toArray();
     }
 }
