@@ -6,6 +6,8 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import org.jetbrains.annotations.NotNull;
 
 public class CocoAnnotator implements Annotator {
@@ -84,9 +86,31 @@ public class CocoAnnotator implements Annotator {
             PsiElement ident = ((CocoNamedElement) element).getIdent();
 
             if (ident != null) {
-                // TODO check usage
-                Annotation annotation = holder.createInfoAnnotation(ident, null);
-                annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                PsiReference first = ReferencesSearch.search(element).findFirst();
+
+                if (first == null) {
+                    String warningText;
+
+                    if (element instanceof CocoSetDecl) {
+                        warningText = "Character '" + ident.getText() + "' is never used";
+                    } else if (element instanceof CocoTokenDecl) {
+                        if (element.getParent() instanceof CocoPragmaDecl) {
+                            warningText = "Pragma '" + ident.getText() + "' is never used";
+                        } else {
+                            warningText = "Token '" + ident.getText() + "' is never used";
+                        }
+                    } else if (element instanceof CocoProduction) {
+                        warningText = "Production '" + ident.getText() + "' is never used";
+                    } else {
+                        warningText = "'" + ident.getText() + "' is never used";
+                    }
+
+                    Annotation annotation = holder.createWeakWarningAnnotation(ident, warningText);
+                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT);
+                } else {
+                    Annotation annotation = holder.createInfoAnnotation(ident, null);
+                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                }
             }
         }
     }
