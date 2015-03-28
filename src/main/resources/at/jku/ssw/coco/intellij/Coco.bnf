@@ -14,16 +14,21 @@
 
     psiImplUtilClass="at.jku.ssw.coco.intellij.psi.impl.CocoPsiImplUtil"
 
-    mixin("End")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
+    mixin("End|BasicSet|TokenFactor|Factor")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
     implements("End")="at.jku.ssw.coco.intellij.psi.HasCocoCompilerReference"
-    mixin("BasicSet|TokenFactor")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
+    methods("End")=[getIdentText]
     implements("BasicSet|TokenFactor")="at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference"
-    methods("BasicSet|TokenFactor")=[getCharacterReferenceName]
+    methods("BasicSet|TokenFactor")=[getCharacterReferenceName getIdentText]
+    implements("Factor")=[
+        "at.jku.ssw.coco.intellij.psi.HasCocoTokenReference"
+        "at.jku.ssw.coco.intellij.psi.HasCocoProductionReference"
+    ]
+    methods("Factor")=[getTokenReferenceName getProductionReferenceName getIdentText]
 
 
-    mixin("Compiler|SetDecl|TokenDecl")="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
-    implements("Compiler|SetDecl|TokenDecl")="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
-    methods("Compiler|SetDecl|TokenDecl")=[getName setName getNameIdentifier getPresentation]
+    mixin("Compiler|SetDecl|TokenDecl|Production")="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
+    implements("Compiler|SetDecl|TokenDecl|Production")="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
+    methods("Compiler|SetDecl|TokenDecl|Production")=[getName setName getNameIdentifier getPresentation]
 
     tokens=[
         string='regexp:"(\\\\|\\"|[^\"\n])*"'

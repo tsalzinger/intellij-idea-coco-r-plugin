@@ -1,7 +1,6 @@
 package at.jku.ssw.coco.intellij.reference;
 
-import at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference;
-import at.jku.ssw.coco.intellij.psi.HasCocoCompilerReference;
+import at.jku.ssw.coco.intellij.psi.*;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
@@ -9,41 +8,36 @@ import com.intellij.util.ProcessingContext;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.BiFunction;
+
 public class CocoReferenceContributor extends PsiReferenceContributor {
-    private TextRange getRelativeTextRange(PsiElement element) {
+    @NotNull
+    private TextRange getRelativeTextRange(@NotNull PsiElement element) {
         int startOffsetInParent = element.getStartOffsetInParent();
         return new TextRange(startOffsetInParent, startOffsetInParent + element.getTextLength());
     }
 
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
-        registrar.registerReferenceProvider(PlatformPatterns.psiElement(HasCocoCompilerReference.class),
+        register(registrar, HasCocoCompilerReference.class, CocoCompilerReference::new);
+        register(registrar, HasCocoCharacterReference.class, CocoCharacterReference::new);
+        register(registrar, HasCocoProductionReference.class, CocoProductionReference::new);
+        register(registrar, HasCocoTokenReference.class, CocoTokenReference::new);
+    }
+
+    private <T extends HasIdent> void register(PsiReferenceRegistrar registrar, Class<T> hasIdentClass, BiFunction<T, TextRange, PsiReference> psiReferenceProvider) {
+        registrar.registerReferenceProvider(PlatformPatterns.psiElement(hasIdentClass),
                 new PsiReferenceProvider() {
                     @NotNull
                     @Override
+                    @SuppressWarnings("unchecked")
                     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-                        HasCocoCompilerReference cocoEnd = (HasCocoCompilerReference) element;
-                        PsiElement compilerIdent = cocoEnd.getIdent();
-                        if (compilerIdent != null && StringUtils.isNotBlank(compilerIdent.getText())) {
-                            return new PsiReference[]{new CocoCompilerReference(cocoEnd, getRelativeTextRange(compilerIdent))};
-                        }
-
-                        return PsiReference.EMPTY_ARRAY;
-                    }
-                });
-
-        registrar.registerReferenceProvider(PlatformPatterns.psiElement(HasCocoCharacterReference.class),
-                new PsiReferenceProvider() {
-                    @NotNull
-                    @Override
-                    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-                        HasCocoCharacterReference hasCocoCharacterReference = (HasCocoCharacterReference) element;
-                        PsiElement ident = hasCocoCharacterReference.getIdent();
+                        T hasIdent = (T) element;
+                        PsiElement ident = hasIdent.getIdent();
 
                         if (ident != null) {
-                            String referenceName = ident.getText();
-                            if (StringUtils.isNotBlank(referenceName)) {
-                                return new PsiReference[]{new CocoCharacterReference(hasCocoCharacterReference, getRelativeTextRange(ident))};
+                            if (StringUtils.isNotBlank(hasIdent.getIdentText())) {
+                                return new PsiReference[]{psiReferenceProvider.apply(hasIdent, getRelativeTextRange(ident))};
                             }
                         }
 

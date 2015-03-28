@@ -1,15 +1,13 @@
 package at.jku.ssw.coco.intellij.psi.impl;
 
 import at.jku.ssw.coco.intellij.CocoIcons;
-import at.jku.ssw.coco.intellij.psi.CocoCompiler;
-import at.jku.ssw.coco.intellij.psi.CocoElementFactory;
-import at.jku.ssw.coco.intellij.psi.CocoTypes;
-import at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference;
+import at.jku.ssw.coco.intellij.psi.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import org.apache.commons.lang.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -73,7 +71,23 @@ public class CocoPsiImplUtil {
         };
     }
 
-    public static String getCharacterReferenceName(HasCocoCharacterReference element) {
+    @Nullable
+    public static String getCharacterReferenceName(@NotNull HasCocoCharacterReference element) {
+        return getIdentText(element);
+    }
+
+    @Nullable
+    public static String getTokenReferenceName(@NotNull HasCocoTokenReference element) {
+        return getIdentText(element);
+    }
+
+    @Nullable
+    public static String getProductionReferenceName(@NotNull HasCocoProductionReference element) {
+        return getIdentText(element);
+    }
+
+    @Nullable
+    public static String getIdentText(@NotNull HasIdent element) {
         PsiElement ident = element.getIdent();
         if (ident != null) {
             return ident.getText();

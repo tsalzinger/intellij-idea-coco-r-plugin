@@ -8,9 +8,14 @@
     <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/psi/CocoNamedElement.java" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/psi/HasCocoCharacterReference.java" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/psi/HasCocoCompilerReference.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/psi/HasCocoProductionReference.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/psi/HasCocoTokenReference.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/psi/HasIdent.java" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/reference/CocoCharacterReference.java" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/reference/CocoCompilerReference.java" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/reference/CocoReferenceContributor.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/reference/CocoProductionReference.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/reference/CocoReferenceContributor.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/at/jku/ssw/coco/intellij/reference/CocoTokenReference.java" charset="windows-1252" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>
