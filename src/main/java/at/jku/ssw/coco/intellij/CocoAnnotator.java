@@ -41,7 +41,7 @@ public class CocoAnnotator implements Annotator {
                     int referenceOffset = cocoElement.getTextRange().getStartOffset();
 
                     if (referenceOffset < characterOffset) {
-                        holder.createWarningAnnotation(ident, "Character '" + characterReferenceName + "' used before its defined");
+                        holder.createErrorAnnotation(ident, "Character '" + characterReferenceName + "' used before its defined");
                     } else {
                         Annotation annotation = holder.createInfoAnnotation(ident, null);
                         annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
