@@ -19,10 +19,7 @@
     methods("End")=[getIdentText]
     implements("BasicSet|TokenFactor")="at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference"
     methods("BasicSet|TokenFactor")=[getCharacterReferenceName getIdentText]
-    implements("Factor")=[
-        "at.jku.ssw.coco.intellij.psi.HasCocoTokenReference"
-        "at.jku.ssw.coco.intellij.psi.HasCocoProductionReference"
-    ]
+    implements("Factor")="at.jku.ssw.coco.intellij.psi.HasCocoTokenOrProductionReference"
     methods("Factor")=[getTokenReferenceName getProductionReferenceName getIdentText]
 
 

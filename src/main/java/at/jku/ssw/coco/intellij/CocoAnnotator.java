@@ -48,6 +48,31 @@ public class CocoAnnotator implements Annotator {
                     holder.createErrorAnnotation(ident.getTextRange(), "Unresolved Character '" + characterReferenceName + "'");
                 }
             }
+        } else if (element instanceof HasCocoTokenOrProductionReference) {
+            HasCocoTokenOrProductionReference cocoElement = (HasCocoTokenOrProductionReference) element;
+            PsiElement ident = cocoElement.getIdent();
+            if (ident != null) {
+                String referenceName = cocoElement.getIdentText();
+                CocoTokenDecl tokenDecl = CocoUtil.findTokenDecl(element.getContainingFile(), referenceName);
+                CocoProduction production = CocoUtil.findProduction(element.getContainingFile(), referenceName);
+
+                if (tokenDecl != null) {
+                    int characterOffset = tokenDecl.getTextRange().getStartOffset();
+                    int referenceOffset = cocoElement.getTextRange().getStartOffset();
+
+                    if (referenceOffset < characterOffset) {
+                        holder.createWarningAnnotation(ident, "Token '" + referenceName + "' used before its defined");
+                    } else {
+                        Annotation annotation = holder.createInfoAnnotation(ident, null);
+                        annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                    }
+                } else if (production != null) {
+                    Annotation annotation = holder.createInfoAnnotation(ident, null);
+                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                } else {
+                    holder.createErrorAnnotation(ident.getTextRange(), "Unresolved Token or Production'" + referenceName + "'");
+                }
+            }
         } else if (element instanceof CocoCompiler) {
             PsiElement ident = ((CocoCompiler) element).getIdent();
 
