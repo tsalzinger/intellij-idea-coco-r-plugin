@@ -20,6 +20,7 @@ public class LexerStringTest extends AbstractLexerTest {
     public static Collection<String[]> data() {
         String[][] strings = {
                 {"\"\""},
+                {"\"\\'\""},
                 {"\"simpleString\""},
                 {"\"string with spaces\""},
                 {"\"string with ' apostrophe\""},

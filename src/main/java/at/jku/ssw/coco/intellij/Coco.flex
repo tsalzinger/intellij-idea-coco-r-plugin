@@ -20,13 +20,13 @@ import static at.jku.ssw.coco.intellij.psi.CocoTypes.*;
 
 hexValue = ([:digit:]|[A-F]|[a-f])
 hexCharValue = \\u{hexValue}{4}
-escapesequences = (\\\\ | \\0 | \\r | \\n | \\t | \\v | \\f | \\a | \\b | {hexCharValue})
+escapesequences = (\\\' | \\\" | \\\\ | \\0 | \\r | \\n | \\t | \\v | \\f | \\a | \\b | {hexCharValue})
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 //       \" ([^\"] | {escapesequences} | \\\" | " ")*  \"
-STRING=\"([^\"\n\\]|{escapesequences}|\\\")*?\"
-CHAR='([^"'"]|{escapesequences}|\\\'|" ")'
+STRING=\"([^\"\n\\]|{escapesequences})*?\"
+CHAR='([^"'"]|{escapesequences}|" ")'
 WHITE_SPACE=[ \t\n\x0B\f\r]+
 LINE_COMMENT="//".*
 BLOCK_COMMENT="/"\*([^\*]|\*+[^/\*])*\*+"/"

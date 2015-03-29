@@ -25,6 +25,7 @@ public class LexerCharTest extends AbstractLexerTest {
                 {"'*'"},
                 {"'\\\''"},
                 {"'\"'"},
+                {"'\\\"'"},
                 {"'\\n'"},
                 {"'\\r'"},
                 {"'\\0'"},
