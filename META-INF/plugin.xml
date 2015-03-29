@@ -46,6 +46,8 @@
         <codeInsight.lineMarkerProvider language="Cocol/R"
                                         implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>
 
+        <lang.psiStructureViewFactory language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.structure.CocoStructureViewFactory"/>
+
 
         <gotoSymbolContributor
                 implementation="at.jku.ssw.coco.intellij.symbolcontributor.CocoChooseByNameTokenContributor"/>
