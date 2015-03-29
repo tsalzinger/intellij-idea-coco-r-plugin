@@ -25,7 +25,7 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 //       \" ([^\"] | {escapesequences} | \\\" | " ")*  \"
-STRING=\"([^\"\n]|\\\"|{escapesequences})*\"
+STRING=\"([^\"\n\\]|{escapesequences}|\\\")*?\"
 CHAR='([^"'"]|{escapesequences}|\\\'|" ")'
 WHITE_SPACE=[ \t\n\x0B\f\r]+
 LINE_COMMENT="//".*
