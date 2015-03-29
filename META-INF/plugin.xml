@@ -41,6 +41,8 @@
         <lang.findUsagesProvider language="Cocol/R"
                                  implementationClass="at.jku.ssw.coco.intellij.CocoFindUsagesProvider"/>
 
+
+        <lang.refactoringSupport language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoRefactoringProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA"
                                         implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>
         <annotator language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoAnnotator"/>

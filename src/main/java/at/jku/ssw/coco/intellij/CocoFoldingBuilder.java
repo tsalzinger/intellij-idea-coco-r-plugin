@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.FoldingGroup;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -123,7 +122,7 @@ public class CocoFoldingBuilder extends FoldingBuilderEx {
         }
 
         if (psiElement instanceof CocoEnd) {
-            PsiElement ident = ((CocoEnd) psiElement).getIdent();
+            PsiElement ident = ((CocoEnd) psiElement).getNameIdentifier();
             if (ident != null) {
                 return "END " + ident.getText() + ".";
             }
@@ -132,8 +131,8 @@ public class CocoFoldingBuilder extends FoldingBuilderEx {
         }
 
         if (psiElement instanceof CocoProduction) {
-            PsiElement ident = ((CocoProduction) psiElement).getIdent();
-            return ident.getText() + " ...";
+            String name = ((CocoProduction) psiElement).getName();
+            return name + " ...";
         }
 
         if(completeText.length == 1) {

@@ -1,6 +1,9 @@
 package at.jku.ssw.coco.intellij.reference;
 
-import at.jku.ssw.coco.intellij.psi.*;
+import at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference;
+import at.jku.ssw.coco.intellij.psi.HasCocoCompilerReference;
+import at.jku.ssw.coco.intellij.psi.HasCocoProductionReference;
+import at.jku.ssw.coco.intellij.psi.HasCocoTokenReference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
@@ -25,7 +28,7 @@ public class CocoReferenceContributor extends PsiReferenceContributor {
         register(registrar, HasCocoTokenReference.class, CocoTokenReference::new);
     }
 
-    private <T extends HasIdent> void register(PsiReferenceRegistrar registrar, Class<T> hasIdentClass, BiFunction<T, TextRange, PsiReference> psiReferenceProvider) {
+    private <T extends PsiNameIdentifierOwner> void register(PsiReferenceRegistrar registrar, Class<T> hasIdentClass, BiFunction<T, TextRange, PsiReference> psiReferenceProvider) {
         registrar.registerReferenceProvider(PlatformPatterns.psiElement(hasIdentClass),
                 new PsiReferenceProvider() {
                     @NotNull
@@ -33,10 +36,10 @@ public class CocoReferenceContributor extends PsiReferenceContributor {
                     @SuppressWarnings("unchecked")
                     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
                         T hasIdent = (T) element;
-                        PsiElement ident = hasIdent.getIdent();
+                        PsiElement ident = hasIdent.getNameIdentifier();
 
                         if (ident != null) {
-                            if (StringUtils.isNotBlank(hasIdent.getIdentText())) {
+                            if (StringUtils.isNotBlank(hasIdent.getName())) {
                                 return new PsiReference[]{psiReferenceProvider.apply(hasIdent, getRelativeTextRange(ident))};
                             }
                         }

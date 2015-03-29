@@ -7,11 +7,10 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CocoTokenReference extends PsiReferenceBase<HasCocoTokenReference> implements PsiReference {
+public class CocoTokenReference extends AbstractRenamableReference<HasCocoTokenReference> implements PsiReference {
 
     public CocoTokenReference(@NotNull HasCocoTokenReference element, TextRange textRange) {
         super(element, textRange);
@@ -20,7 +19,7 @@ public class CocoTokenReference extends PsiReferenceBase<HasCocoTokenReference> 
     @Nullable
     @Override
     public PsiElement resolve() {
-        return CocoUtil.findTokenDecl(myElement.getContainingFile(), myElement.getTokenReferenceName());
+        return CocoUtil.findTokenDecl(myElement.getContainingFile(), myElement.getName());
     }
 
     @NotNull

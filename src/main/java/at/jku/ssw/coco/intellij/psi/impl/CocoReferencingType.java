@@ -3,6 +3,7 @@ package at.jku.ssw.coco.intellij.psi.impl;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.ContributedReferenceHost;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by Thomas on 27/03/2015.
  */
-public abstract class CocoReferencingType extends ASTWrapperPsiElement implements ContributedReferenceHost {
+public abstract class CocoReferencingType extends ASTWrapperPsiElement implements ContributedReferenceHost, PsiNameIdentifierOwner {
 
     public CocoReferencingType(@NotNull ASTNode node) {
         super(node);

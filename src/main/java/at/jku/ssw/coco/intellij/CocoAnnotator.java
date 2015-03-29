@@ -6,6 +6,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ public class CocoAnnotator implements Annotator {
     public void annotate(@NotNull final PsiElement element, @NotNull AnnotationHolder holder) {
         if (element instanceof CocoEnd) {
             CocoEnd cocoEnd = (CocoEnd) element;
-            PsiElement ident = cocoEnd.getIdent();
+            PsiElement ident = cocoEnd.getNameIdentifier();
             if (ident == null) {
                 return;
             }
@@ -31,9 +32,9 @@ public class CocoAnnotator implements Annotator {
             }
         } else if (element instanceof HasCocoCharacterReference) {
             HasCocoCharacterReference cocoElement = (HasCocoCharacterReference) element;
-            PsiElement ident = cocoElement.getIdent();
+            PsiElement ident = cocoElement.getNameIdentifier();
             if (ident != null) {
-                String characterReferenceName = ((HasCocoCharacterReference) element).getCharacterReferenceName();
+                String characterReferenceName = ((HasCocoCharacterReference) element).getName();
                 CocoSetDecl characterDeclaration = CocoUtil.findCharacterDeclaration(element.getContainingFile(), characterReferenceName);
 
                 if (characterDeclaration != null) {
@@ -52,9 +53,9 @@ public class CocoAnnotator implements Annotator {
             }
         } else if (element instanceof HasCocoTokenOrProductionReference) {
             HasCocoTokenOrProductionReference cocoElement = (HasCocoTokenOrProductionReference) element;
-            PsiElement ident = cocoElement.getIdent();
+            PsiElement ident = cocoElement.getNameIdentifier();
             if (ident != null) {
-                String referenceName = cocoElement.getIdentText();
+                String referenceName = cocoElement.getName();
                 CocoTokenDecl tokenDecl = CocoUtil.findTokenDecl(element.getContainingFile(), referenceName);
                 CocoProduction production = CocoUtil.findProduction(element.getContainingFile(), referenceName);
 
@@ -76,17 +77,32 @@ public class CocoAnnotator implements Annotator {
                 }
             }
         } else if (element instanceof CocoCompiler) {
-            PsiElement ident = ((CocoCompiler) element).getIdent();
+            PsiElement ident = ((CocoCompiler) element).getNameIdentifier();
 
             if (ident != null) {
                 Annotation annotation = holder.createInfoAnnotation(ident, null);
                 annotation.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_NAME);
+                CocoProduction production = CocoUtil.findProduction(element.getContainingFile(), ident.getText());
+
+                if (production == null) {
+                    holder.createErrorAnnotation(ident, "Missing production for '" + ident.getText() + "'");
+                }
             }
-        } else if (element instanceof CocoNamedElement) {
-            PsiElement ident = ((CocoNamedElement) element).getIdent();
+
+        } else if (element instanceof PsiNameIdentifierOwner) {
+            PsiElement ident = ((PsiNameIdentifierOwner) element).getNameIdentifier();
 
             if (ident != null) {
                 PsiReference first = ReferencesSearch.search(element).findFirst();
+
+                if (first == null && element instanceof CocoProduction) {
+                    CocoCompiler compiler = CocoUtil.findCompiler(element.getContainingFile(), ((CocoProduction) element).getName());
+                    if (compiler != null) {
+                        Annotation annotation = holder.createInfoAnnotation(ident, "Main production for grammar");
+                        annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                        return;
+                    }
+                }
 
                 if (first == null) {
                     String warningText;

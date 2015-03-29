@@ -16,17 +16,16 @@
 
     mixin("End|BasicSet|TokenFactor|Factor")="at.jku.ssw.coco.intellij.psi.impl.CocoReferencingType"
     implements("End")="at.jku.ssw.coco.intellij.psi.HasCocoCompilerReference"
-    methods("End")=[getIdentText]
     implements("BasicSet|TokenFactor")="at.jku.ssw.coco.intellij.psi.HasCocoCharacterReference"
-    methods("BasicSet|TokenFactor")=[getCharacterReferenceName getIdentText]
     implements("Factor")="at.jku.ssw.coco.intellij.psi.HasCocoTokenOrProductionReference"
-    methods("Factor")=[getTokenReferenceName getProductionReferenceName getIdentText]
-
-
-    mixin("Compiler|SetDecl|TokenDecl|Production")="at.jku.ssw.coco.intellij.psi.impl.CocoNamedElementImpl"
     implements("Compiler|SetDecl|TokenDecl|Production")="at.jku.ssw.coco.intellij.psi.CocoNamedElement"
-    methods("SetDecl|TokenDecl|Production")=[getName setName getNameIdentifier getPresentation]
-    methods("Compiler")=[getName setName getNameIdentifier getPresentation getTextOffset]
+    methods("Compiler|End|BasicSet|TokenFactor|Factor|SetDecl|TokenDecl|Production")=[
+        getName
+        setName
+        getNameIdentifier
+        getPresentation
+        getTextOffset
+    ]
 
     tokens=[
         string='regexp:"(\\\\|\\"|[^\"\n])*"'

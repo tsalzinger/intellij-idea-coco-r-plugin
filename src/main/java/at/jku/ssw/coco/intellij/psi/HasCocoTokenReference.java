@@ -1,9 +1,7 @@
 package at.jku.ssw.coco.intellij.psi;
 
 import com.intellij.psi.ContributedReferenceHost;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.psi.PsiNameIdentifierOwner;
 
-public interface HasCocoTokenReference extends ContributedReferenceHost, HasIdent {
-    @Nullable
-    String getTokenReferenceName();
+public interface HasCocoTokenReference extends ContributedReferenceHost, PsiNameIdentifierOwner {
 }

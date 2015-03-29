@@ -7,11 +7,10 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CocoCharacterReference extends PsiReferenceBase<HasCocoCharacterReference> implements PsiReference {
+public class CocoCharacterReference extends AbstractRenamableReference<HasCocoCharacterReference> implements PsiReference {
 
     public CocoCharacterReference(@NotNull HasCocoCharacterReference element, TextRange textRange) {
         super(element, textRange);
@@ -20,7 +19,7 @@ public class CocoCharacterReference extends PsiReferenceBase<HasCocoCharacterRef
     @Nullable
     @Override
     public PsiElement resolve() {
-        return CocoUtil.findCharacterDeclaration(myElement.getContainingFile(), myElement.getCharacterReferenceName());
+        return CocoUtil.findCharacterDeclaration(myElement.getContainingFile(), myElement.getName());
     }
 
     @NotNull

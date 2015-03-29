@@ -1,13 +1,14 @@
 package at.jku.ssw.coco.intellij.psi.impl;
 
 import at.jku.ssw.coco.intellij.CocoIcons;
-import at.jku.ssw.coco.intellij.psi.*;
+import at.jku.ssw.coco.intellij.psi.CocoCompiler;
+import at.jku.ssw.coco.intellij.psi.CocoTypes;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiNamedElement;
-import org.apache.commons.lang.NotImplementedException;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -18,25 +19,20 @@ import javax.swing.*;
 public class CocoPsiImplUtil {
 
 
-    public static String getName(PsiNamedElement element) {
-        ASTNode nameNode = element.getNode().findChildByType(CocoTypes.IDENT);
-        return nameNode != null ? nameNode.getText() : null;
+    public static String getName(PsiNameIdentifierOwner element) {
+        PsiElement nameIdentifier = element.getNameIdentifier();
+        return nameIdentifier != null ? nameIdentifier.getText() : null;
     }
 
-    public static PsiElement setName(PsiNamedElement element, String newName) {
-        ASTNode nameNode = element.getNode().findChildByType(CocoTypes.IDENT);
-        if (nameNode != null) {
+    public static PsiElement setName(PsiNameIdentifierOwner element, String newName) {
+        PsiElement nameIdentifier = element.getNameIdentifier();
 
-            if (element instanceof CocoCompiler) {
-                CocoCompiler compiler = CocoElementFactory.createCompiler(element.getProject(), newName);
-                ASTNode newNameNode = compiler.getNode().findChildByType(CocoTypes.IDENT);
-                assert newNameNode != null;
-                element.getNode().replaceChild(nameNode, newNameNode);
-            } else {
-                throw new NotImplementedException();
-            }
-
+        if (nameIdentifier instanceof LeafPsiElement) {
+            ((LeafPsiElement) nameIdentifier).replaceWithText(newName);
+        } else {
+            throw new UnsupportedOperationException("Cannot rename element of type " + element.getClass().getSimpleName());
         }
+
         return element;
     }
 
@@ -50,7 +46,7 @@ public class CocoPsiImplUtil {
     }
 
     public static int getTextOffset(CocoCompiler cocoCompiler) {
-        return cocoCompiler.getStartOffsetInParent() + cocoCompiler.getIdent().getStartOffsetInParent();
+        return cocoCompiler.getStartOffsetInParent() + cocoCompiler.getNameIdentifier().getStartOffsetInParent();
     }
 
     public static ItemPresentation getPresentation(final PsiNamedElement element) {
@@ -73,30 +69,5 @@ public class CocoPsiImplUtil {
                 return CocoIcons.FILE;
             }
         };
-    }
-
-    @Nullable
-    public static String getCharacterReferenceName(@NotNull HasCocoCharacterReference element) {
-        return getIdentText(element);
-    }
-
-    @Nullable
-    public static String getTokenReferenceName(@NotNull HasCocoTokenReference element) {
-        return getIdentText(element);
-    }
-
-    @Nullable
-    public static String getProductionReferenceName(@NotNull HasCocoProductionReference element) {
-        return getIdentText(element);
-    }
-
-    @Nullable
-    public static String getIdentText(@NotNull HasIdent element) {
-        PsiElement ident = element.getIdent();
-        if (ident != null) {
-            return ident.getText();
-        }
-
-        return null;
     }
 }
