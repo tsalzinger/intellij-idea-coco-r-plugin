@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -128,6 +129,69 @@ public class CocoUtil {
         return tokens.getTokenDeclList();
     }
 
+    @NotNull
+    public static List<CocoProduction> findProductions(@Nullable Project project) {
+        List<CocoProduction> characterDecls = new ArrayList<>();
+        List<PsiFile> allFiles = getAllFiles(project);
+        for (PsiFile file : allFiles) {
+            characterDecls.addAll(findProductions(file));
+        }
+        return characterDecls;
+    }
+
+    @NotNull
+    public static List<CocoSetDecl> findCharacterDecls(@Nullable Project project) {
+        List<CocoSetDecl> characterDecls = new ArrayList<>();
+        List<PsiFile> allFiles = getAllFiles(project);
+        for (PsiFile file : allFiles) {
+            characterDecls.addAll(findCharacterDeclarations(file));
+        }
+        return characterDecls;
+    }
+
+    @NotNull
+    public static List<CocoTokenDecl> findTokenDecls(@Nullable Project project) {
+        List<CocoTokenDecl> tokenDecls = new ArrayList<>();
+        List<PsiFile> allFiles = getAllFiles(project);
+        for (PsiFile file : allFiles) {
+            tokenDecls.addAll(findTokenDecls(file));
+        }
+        return tokenDecls;
+    }
+
+    @NotNull
+    private static List<PsiFile> getAllFiles(@Nullable Project project) {
+        if (project == null) {
+            return Collections.emptyList();
+        }
+
+        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, CocoFileType.INSTANCE, GlobalSearchScope.allScope(project));
+
+        List<PsiFile> psiFiles = new ArrayList<>();
+        PsiManager psiManager = PsiManager.getInstance(project);
+
+        for (VirtualFile virtualFile : virtualFiles) {
+            psiFiles.add(psiManager.findFile(virtualFile));
+        }
+
+        return psiFiles;
+    }
+
+    @NotNull
+    public static List<CocoTokenDecl> findTokenDecls(@Nullable Project project, @Nullable String name) {
+        return findAllByName(findTokenDecls(project), name);
+    }
+
+    @NotNull
+    public static List<CocoSetDecl> findCharacterDecls(@Nullable Project project, @Nullable String name) {
+        return findAllByName(findCharacterDecls(project), name);
+    }
+
+    @NotNull
+    public static List<CocoProduction> findProductions(@Nullable Project project, @Nullable String name) {
+        return findAllByName(findProductions(project), name);
+    }
+
     @Contract("_, null -> null")
     @Nullable
     public static CocoTokenDecl findTokenDecl(@NotNull PsiFile file, @Nullable String name) {
@@ -136,16 +200,27 @@ public class CocoUtil {
 
     @Contract("_, null -> null")
     @Nullable
-    private static <T extends CocoNamedElement> T findByName(@NotNull Collection<T> collection, @Nullable String name) {
+    private static <T extends CocoNamedElement> T findByName(@NotNull List<T> collection, @Nullable String name) {
         if (StringUtils.isBlank(name)) {
             return null;
         }
 
-        Optional<T> first = collection
+        Optional<T> first = findAllByName(collection, name)
                 .stream()
-                .filter(item -> name.equals(item.getName()))
                 .findFirst();
 
         return first.isPresent() ? first.get() : null;
+    }
+
+    @NotNull
+    private static <T extends PsiNameIdentifierOwner> List<T> findAllByName(@NotNull List<T> collection, @Nullable String name) {
+        if (StringUtils.isBlank(name)) {
+            return collection;
+        }
+
+        return collection
+                .stream()
+                .filter(item -> name.equals(item.getName()))
+                .collect(Collectors.toList());
     }
 }

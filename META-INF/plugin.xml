@@ -45,6 +45,15 @@
         <lang.refactoringSupport language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoRefactoringProvider"/>
         <codeInsight.lineMarkerProvider language="Cocol/R"
                                         implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>
+
+
+        <gotoSymbolContributor
+                implementation="at.jku.ssw.coco.intellij.symbolcontributor.CocoChooseByNameTokenContributor"/>
+        <gotoSymbolContributor
+                implementation="at.jku.ssw.coco.intellij.symbolcontributor.CocoChooseByNameCharacterContributor"/>
+        <gotoSymbolContributor
+                implementation="at.jku.ssw.coco.intellij.symbolcontributor.CocoChooseByNameProductionContributor"/>
+
         <annotator language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoAnnotator"/>
 
         <lang.commenter language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoCommenter"/>
