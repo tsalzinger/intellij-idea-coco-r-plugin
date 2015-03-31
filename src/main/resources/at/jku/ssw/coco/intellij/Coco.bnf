@@ -161,11 +161,31 @@ Factor ::= ['WEAK'] Symbol [ActualAttributes]
 | "SYNC"
 | SemAction
 LocalDecl ::= SemAction
-FormalAttributes ::= Attributes
-ActualAttributes ::= Attributes
-private Attributes ::= '<' ArbitraryText '>'
-Resolver ::= "IF" '(' {ANY}* ')'
+FormalAttributes ::= '<' ['out'] ident ident {',' ident ident}* '>' {pin = 1}
+ActualAttributes ::= '<' ['out'] ident {',' ident}* '>' {pin = 1}
+
+Resolver ::= "IF" '(' {JavaBooleanExpression}* ')'
 
 End ::= "END" ident '.' {pin=1}
 
 private Symbols ::= '+' | '-'  | '=' | '(' | ')' | '<' | '>' | '{' | '}' | '[' | ']' | '..' {name = "Symbols"}
+
+// JAVA
+private JavaOperators ::= '+' | '-' | '*' | '/' | '%'
+private JavaBoolean ::= 'true' | 'false' | ('(' JavaBoolean ')')
+private JavaComparator ::= '==' | '!=' | '>=' | '>' | '<=' | '<'
+private JavaBooleanOperator ::= '&&' | '||' | '&' | '|'
+private JavaBooleanExpression ::= ((JavaBoolean | JavaExpression) [JavaComparator JavaExpression]) [JavaBooleanOperator JavaBooleanExpression]
+
+private JavaClassAccessor ::= ident {JavaPropertyAccessor}*
+private JavaPropertyAccessor ::= '.' ident
+private JavaVariable ::= (ident|string) {JavaPropertyAccessor}*
+private JavaMethodCall ::= JavaVariable JavaMethodParameters
+private JavaMethodParameters ::= '()' | JavaMethodParametersList
+private JavaMethodParametersList ::= '(' JavaExpression {JavaAdditionalParameters}*')' {pin = 1}
+private JavaAdditionalParameters ::= ',' JavaExpression {pin = 1}
+private JavaValueExpression ::= (JavaNewObject | JavaMethodCall | JavaVariable) {'.' (JavaMethodCall | JavaVariable)}*
+private JavaNewObject ::= 'new' JavaClassAccessor JavaMethodParameters {pin = 1}
+private JavaShortIf ::= JavaValueExpression '?' JavaValueExpression ':' JavaValueExpression {pin = 2}
+private JavaExpression ::= (JavaShortIf | JavaValueExpression | number) [JavaOperators JavaExpression]
+ | ('(' JavaExpression ')')
