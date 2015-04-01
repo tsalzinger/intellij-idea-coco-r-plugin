@@ -96,7 +96,7 @@ private JavaCode ::= {JavaSymbols}*
 ANY ::= JavaSymbols
 ArbitraryText ::= (ident | string | char | number | ANY_CHAR | '.' | "out")*
 ArbitraryStatements ::= {JavaSymbols}*
-private JavaSymbols ::= (ident | string | char | number | ANY_CHAR | Symbols | '.' | '||' | '|' | "import" | "out") {pin(".*")=1 name = "Java Code"}
+private JavaSymbols ::= (ident | string | char | number | ANY_CHAR | Symbols | JavaComparator | JavaBooleanOperator | '!' | '.' | "import" | "out") {pin(".*")=1 name = "Java Code"}
 
 //ScannerSpecification =
 // ["IGNORECASE"]
@@ -144,13 +144,13 @@ Pragmas ::= "PRAGMAS" {PragmaDecl}*
 PragmaDecl ::= TokenDecl [SemAction]
 SemAction ::= "(." ArbitraryStatements ".)"
 
-Comments ::= CommentDecl {CommentDecl}* {pin=1}
-CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"]
+Comments ::= CommentDecl {CommentDecl}*
+CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"] {pin = 1}
 
-WhiteSpaceDecl ::= "IGNORE" Set {pin=1 extends=ScannerSpecification}
+WhiteSpaceDecl ::= "IGNORE" Set {pin=1}
 
 ParserSpecification ::= "PRODUCTIONS" {Production}* {pin = 1}
-Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.'
+Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.' {pin = 1}
 Expression ::= Term {'|' Term}*
 Term ::= [[Resolver] Factor {Factor}*]
 Factor ::= ['WEAK'] Symbol [ActualAttributes]
@@ -161,10 +161,15 @@ Factor ::= ['WEAK'] Symbol [ActualAttributes]
 | "SYNC"
 | SemAction
 LocalDecl ::= SemAction
-FormalAttributes ::= '<' ['out'] ident ident {',' ident ident}* '>' {pin = 1}
-ActualAttributes ::= '<' ['out'] ident {',' ident}* '>' {pin = 1}
+FormalAttributes ::= '<' ['out'] FormalAttributesParameter {AdditionalFormalAttributesParameter}* '>' {pin = 1}
+private FormalAttributesParameter ::= JavaTypeReference JavaTypeReference {pin = 1}
+private AdditionalFormalAttributesParameter ::= ',' FormalAttributesParameter {pin = 1}
+ActualAttributes ::= '<' ['out'] JavaTypeReference {AdditionalActualAttributesParameter}* '>' {pin = 1}
+private AdditionalActualAttributesParameter ::= ',' ident {pin = 1}
+private JavaTypeReference ::= ident {JavaSubTypeReference}* {pin = 1}
+private JavaSubTypeReference ::= '.' ident {pin = 1}
 
-Resolver ::= "IF" '(' {JavaBooleanExpression}* ')'
+Resolver ::= "IF" '(' {JavaBooleanExpression}* ')' {pin=2}
 
 End ::= "END" ident '.' {pin=1}
 
@@ -175,17 +180,15 @@ private JavaOperators ::= '+' | '-' | '*' | '/' | '%'
 private JavaBoolean ::= 'true' | 'false' | ('(' JavaBoolean ')')
 private JavaComparator ::= '==' | '!=' | '>=' | '>' | '<=' | '<'
 private JavaBooleanOperator ::= '&&' | '||' | '&' | '|'
-private JavaBooleanExpression ::= ((JavaBoolean | JavaExpression) [JavaComparator JavaExpression]) [JavaBooleanOperator JavaBooleanExpression]
+private JavaBooleanExpression ::= (((JavaBoolean | JavaExpression) [JavaComparator JavaExpression]) [JavaBooleanOperator JavaBooleanExpression]) | '!' JavaBooleanExpression
 
-private JavaClassAccessor ::= ident {JavaPropertyAccessor}*
-private JavaPropertyAccessor ::= '.' ident
-private JavaVariable ::= (ident|string) {JavaPropertyAccessor}*
+private JavaVariable ::= (ident|string) {JavaSubTypeReference}*
 private JavaMethodCall ::= JavaVariable JavaMethodParameters
 private JavaMethodParameters ::= '()' | JavaMethodParametersList
 private JavaMethodParametersList ::= '(' JavaExpression {JavaAdditionalParameters}*')' {pin = 1}
 private JavaAdditionalParameters ::= ',' JavaExpression {pin = 1}
 private JavaValueExpression ::= (JavaNewObject | JavaMethodCall | JavaVariable) {'.' (JavaMethodCall | JavaVariable)}*
-private JavaNewObject ::= 'new' JavaClassAccessor JavaMethodParameters {pin = 1}
+private JavaNewObject ::= 'new' JavaTypeReference JavaMethodParameters {pin = 1}
 private JavaShortIf ::= JavaValueExpression '?' JavaValueExpression ':' JavaValueExpression {pin = 2}
-private JavaExpression ::= (JavaShortIf | JavaValueExpression | number) [JavaOperators JavaExpression]
- | ('(' JavaExpression ')')
+private JavaExpression ::= (JavaShortIf | JavaValueExpression | number | GroupedJavaExpression) [JavaOperators JavaBooleanExpression]
+private GroupedJavaExpression ::= '(' JavaBooleanExpression ')' {pin=1}
