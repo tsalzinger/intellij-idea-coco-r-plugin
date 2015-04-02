@@ -4,15 +4,28 @@ import at.jku.ssw.coco.intellij.psi.CocoFile;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.Result;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentEntry;
+import com.intellij.openapi.roots.JavaProjectRootsUtil;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.jetbrains.jps.model.java.JavaSourceRootProperties;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,11 +45,22 @@ public class CocoRAction extends AnAction {
 
 
         for (CocoFile file : bnfFiles) {
-            generate(file);
+            VirtualFile result = new WriteAction<VirtualFile>() {
+                @Override
+                protected void run(@NotNull Result<VirtualFile> result) throws Throwable {
+                    result.setResult(generate(file));
+                }
+            }.execute().throwException().getResultObject();
+
+
+            if (result != null) {
+                VfsUtil.markDirtyAndRefresh(false, true, true, result);
+            }
         }
     }
 
-    private static List<CocoFile> getFiles(AnActionEvent e) {
+    @NotNull
+    private static List<CocoFile> getFiles(@NotNull AnActionEvent e) {
         Project project = getEventProject(e);
         VirtualFile[] files = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
         if (project == null || files == null) return Collections.emptyList();
@@ -50,7 +74,27 @@ public class CocoRAction extends AnAction {
         });
     }
 
-    private void generate(CocoFile file) {
+    @NotNull
+    private List<SourceFolder> getGeneratedSourceFolders(@NotNull CocoFile file) {
+        Module module = ModuleUtil.findModuleForFile(file.getVirtualFile(), file.getProject());
+        if (module != null) {
+            List<SourceFolder> sourceFolders = new ArrayList<>();
+
+            for (ContentEntry entry : ModuleRootManager.getInstance(module).getContentEntries()) {
+                for (SourceFolder folder : entry.getSourceFolders()) {
+                    JavaSourceRootProperties properties = folder.getJpsElement().getProperties(JavaModuleSourceRootTypes.SOURCES);
+                    if (properties != null && properties.isForGeneratedSources()) {
+                        sourceFolders.add(folder);
+                    }
+                }
+            }
+            return sourceFolders;
+        }
+
+        return Collections.emptyList();
+    }
+
+    private VirtualFile generate(@NotNull CocoFile file) {
         String filePackage = null;
         PsiDirectory containingDirectory = file.getContainingDirectory();
         if (containingDirectory != null) {
@@ -59,12 +103,35 @@ public class CocoRAction extends AnAction {
                 filePackage = psiFilePackage.getQualifiedName();
             }
         }
+        VirtualFile outDirFile = null;
+        List<SourceFolder> generatedSourceFolders = getGeneratedSourceFolders(file);
+        for (SourceFolder generatedSourceFolder : generatedSourceFolders) {
+            VirtualFile generatedSourceFolderFile = generatedSourceFolder.getFile();
+            if (generatedSourceFolderFile != null) {
+                outDirFile = generatedSourceFolderFile;
+                break;
+            }
+        }
 
-        // TODO use correct output directory
-        String path = file.getVirtualFile().getParent().getPath();
+        if (outDirFile == null) {
+            List<VirtualFile> suitableDestinationSourceRoots = JavaProjectRootsUtil.getSuitableDestinationSourceRoots(file.getProject());
+            if (!suitableDestinationSourceRoots.isEmpty()) {
+                outDirFile = suitableDestinationSourceRoots.get(0);
+            }
+        }
+
+        if (outDirFile != null && filePackage != null) {
+            try {
+                outDirFile = VfsUtil.createDirectoryIfMissing(outDirFile, filePackage.replace(".", "/"));
+            } catch (IOException ignore) {
+            }
+        }
+
+        VirtualFile parent = file.getVirtualFile().getParent();
+        String path = parent.getPath();
         String filePath = file.getVirtualFile().getPath();
 
-        String frameDir = null, outDir = path, ddtString = null;
+        String frameDir = null, outDir = (outDirFile != null) ? outDirFile.getPath() : null, ddtString = null;
 
         Scanner scanner = new Scanner(filePath);
         Parser parser = new Parser(scanner);
@@ -91,11 +158,15 @@ public class CocoRAction extends AnAction {
 
         if (parser.errors.count > 0) {
             Messages.showMessageDialog(file.getProject(), parser.errors.count + " errors occured", "Error", Messages.getErrorIcon());
-        } else {
-            VfsUtil.markDirtyAndRefresh(false, true, true, file.getVirtualFile().getParent());
-            Messages.showMessageDialog(file.getProject(), "Scanner and Parser successfuly generated", "Success", Messages.getInformationIcon());
+            return null;
         }
 
+        Messages.showMessageDialog(file.getProject(), "Scanner and Parser successfuly generated", "Success", Messages.getInformationIcon());
+        if (outDirFile != null) {
+            return outDirFile;
+        }
+
+        return parent;
     }
 
     @Override
