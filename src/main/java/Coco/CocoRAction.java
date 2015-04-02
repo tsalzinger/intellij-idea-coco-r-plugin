@@ -7,10 +7,9 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -24,7 +23,10 @@ public class CocoRAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         final Project project = getEventProject(e);
         final List<CocoFile> bnfFiles = getFiles(e);
-        if (project == null || bnfFiles.isEmpty()) return;
+        if (project == null || bnfFiles.isEmpty()) {
+            return;
+        }
+
         PsiDocumentManager.getInstance(project).commitAllDocuments();
         FileDocumentManager.getInstance().saveAllDocuments();
 
@@ -49,11 +51,20 @@ public class CocoRAction extends AnAction {
     }
 
     private void generate(CocoFile file) {
+        String filePackage = null;
+        PsiDirectory containingDirectory = file.getContainingDirectory();
+        if (containingDirectory != null) {
+            PsiPackage psiFilePackage = JavaDirectoryService.getInstance().getPackage(containingDirectory);
+            if (psiFilePackage != null) {
+                filePackage = psiFilePackage.getQualifiedName();
+            }
+        }
+
         // TODO use correct output directory
         String path = file.getVirtualFile().getParent().getPath();
         String filePath = file.getVirtualFile().getPath();
 
-        String nsName = null, frameDir = null, outDir = null, ddtString = null;
+        String frameDir = null, outDir = path, ddtString = null;
 
         Scanner scanner = new Scanner(filePath);
         Parser parser = new Parser(scanner);
@@ -65,10 +76,12 @@ public class CocoRAction extends AnAction {
 
         parser.tab.srcName = filePath;
         parser.tab.srcDir = path;
-        parser.tab.nsName = nsName;
+        parser.tab.nsName = filePackage;
         parser.tab.frameDir = (frameDir != null) ? frameDir : path;
         parser.tab.outDir = (outDir != null) ? outDir : path;
-        if (ddtString != null) parser.tab.SetDDT(ddtString);
+        if (ddtString != null) {
+            parser.tab.SetDDT(ddtString);
+        }
 
         parser.Parse();
 
@@ -79,7 +92,7 @@ public class CocoRAction extends AnAction {
         if (parser.errors.count > 0) {
             Messages.showMessageDialog(file.getProject(), parser.errors.count + " errors occured", "Error", Messages.getErrorIcon());
         } else {
-            // todo sync virtual file system
+            VfsUtil.markDirtyAndRefresh(false, true, true, file.getVirtualFile().getParent());
             Messages.showMessageDialog(file.getProject(), "Scanner and Parser successfuly generated", "Success", Messages.getInformationIcon());
         }
 
