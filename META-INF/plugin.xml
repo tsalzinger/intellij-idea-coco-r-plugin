@@ -81,7 +81,8 @@
     </extensions>
     <actions>
         <group id="coco.Generate">
-            <action id="at.jku.ssw.coco.intellij.RunCocoR" class="Coco.CocoRAction" text="Run _Coco/R"
+            <action id="at.jku.ssw.coco.intellij.RunCocoR" class="at.jku.ssw.coco.intellij.action.CocoRAction"
+                    text="Run _Coco/R"
                     description="Runs Coco/R on the given .ATG file"
                     icon="/at/jku/ssw/coco/intellij/icons/coco-ico.gif">
             </action>

@@ -1,5 +1,6 @@
-package Coco;
+package at.jku.ssw.coco.intellij.action;
 
+import Coco.*;
 import at.jku.ssw.coco.intellij.psi.CocoFile;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -136,10 +137,14 @@ public class CocoRAction extends AnAction {
         Scanner scanner = new Scanner(filePath);
         Parser parser = new Parser(scanner);
 
+        final IntellijErrors intellijErrors = new IntellijErrors();
+        parser.errors = intellijErrors;
+
         parser.trace = new Trace(path);
         parser.tab = new Tab(parser);
         parser.dfa = new DFA(parser);
         parser.pgen = new ParserGen(parser);
+
 
         parser.tab.srcName = filePath;
         parser.tab.srcDir = path;
@@ -150,23 +155,27 @@ public class CocoRAction extends AnAction {
             parser.tab.SetDDT(ddtString);
         }
 
-        parser.Parse();
-
-        parser.trace.Close();
-        // todo show error / success to user
-        System.out.println(parser.errors.count + " errors detected");
-
-        if (parser.errors.count > 0) {
-            Messages.showMessageDialog(file.getProject(), parser.errors.count + " errors occured", "Error", Messages.getErrorIcon());
+        try {
+            parser.Parse();
+        } catch (RuntimeException e) {
+            Messages.showMessageDialog(file.getProject(), e.getMessage(), "Error", Messages.getErrorIcon());
             return null;
         }
 
-        Messages.showMessageDialog(file.getProject(), "Scanner and Parser successfuly generated", "Success", Messages.getInformationIcon());
-        if (outDirFile != null) {
-            return outDirFile;
+        parser.trace.Close();
+
+        if (intellijErrors.getErrorCount() > 0) {
+            Messages.showMessageDialog(file.getProject(), intellijErrors.getErrorMessage(), "Error", Messages.getErrorIcon());
+            return null;
         }
 
-        return parent;
+        if (intellijErrors.getWarningCount() > 0) {
+            Messages.showMessageDialog(file.getProject(), intellijErrors.getWarningMessage(), "Warning", Messages.getWarningIcon());
+        } else {
+            Messages.showMessageDialog(file.getProject(), "Scanner and Parser successfully generated", "Success", Messages.getInformationIcon());
+        }
+
+        return outDirFile != null ? outDirFile : parent;
     }
 
     @Override
