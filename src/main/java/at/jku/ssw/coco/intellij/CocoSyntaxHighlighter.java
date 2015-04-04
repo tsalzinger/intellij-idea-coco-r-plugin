@@ -84,6 +84,8 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
         } else if (
                 tokenType.equals(CocoTypes.SEM_ACTION_START) ||
                 tokenType.equals(CocoTypes.SEM_ACTION_END) ||
+                        tokenType.equals(CocoTypes.ATTRIBUTES_START) ||
+                        tokenType.equals(CocoTypes.ATTRIBUTES_END) ||
                 tokenType.equals(CocoTypes.GREATER_THEN) ||
                 tokenType.equals(CocoTypes.SMALLER_THEN)) {
             return MARKUP_TAG_KEYS;

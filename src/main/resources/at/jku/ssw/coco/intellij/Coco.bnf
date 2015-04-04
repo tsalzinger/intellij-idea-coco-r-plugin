@@ -69,6 +69,8 @@
         SMALLER_THEN='<'
         SEM_ACTION_START='(.'
         SEM_ACTION_END='.)'
+        ATTRIBUTES_START='<.'
+        ATTRIBUTES_END='.>'
         PIPE='|'
         GREATER_THEN='>'
 
@@ -161,10 +163,16 @@ Factor ::= ['WEAK'] Symbol [ActualAttributes]
 | "SYNC"
 | SemAction
 LocalDecl ::= SemAction
-FormalAttributes ::= '<' ['out'] FormalAttributesParameter {AdditionalFormalAttributesParameter}* '>' {pin = 1}
+FormalAttributes ::= SimpleFormalAttributes | ExtendedFormalAttributes
+private SimpleFormalAttributes ::= '<' FormalAttributesBody '>' {pin = 1}
+private ExtendedFormalAttributes ::= "<." FormalAttributesBody ".>" {pin = 1}
+private FormalAttributesBody ::= ['out'] FormalAttributesParameter {AdditionalFormalAttributesParameter}*
 private FormalAttributesParameter ::= JavaTypeReference JavaTypeReference {pin = 1}
 private AdditionalFormalAttributesParameter ::= ',' FormalAttributesParameter {pin = 1}
-ActualAttributes ::= '<' ['out'] JavaTypeReference {AdditionalActualAttributesParameter}* '>' {pin = 1}
+ActualAttributes ::= SimpleActualAttributes | ExtendedActualAttributes
+private SimpleActualAttributes ::= '<' ActualAttributesBody '>' {pin = 1}
+private ExtendedActualAttributes ::= "<." ActualAttributesBody ".>" {pin = 1}
+private ActualAttributesBody ::= ['out'] JavaTypeReference {AdditionalActualAttributesParameter}*
 private AdditionalActualAttributesParameter ::= ',' ident {pin = 1}
 private JavaTypeReference ::= ident {JavaSubTypeReference}* {pin = 1}
 private JavaSubTypeReference ::= '.' ident {pin = 1}

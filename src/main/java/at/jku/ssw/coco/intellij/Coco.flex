@@ -68,6 +68,8 @@ ANY_CHAR=.
   ")"                  { return PAR_CLOSE; }
   "["                  { return BRACK_OPEN; }
   "]"                  { return BRACK_CLOSE; }
+  "<."                 { return ATTRIBUTES_START; }
+  ".>"                 { return ATTRIBUTES_END; }
   "<"                  { return SMALLER_THEN; }
   "(."                 { return SEM_ACTION_START; }
   ".)"                 { return SEM_ACTION_END; }
