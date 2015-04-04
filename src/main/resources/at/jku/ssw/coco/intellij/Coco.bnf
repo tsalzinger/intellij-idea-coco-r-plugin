@@ -36,6 +36,7 @@
         BLOCK_COMMENT='regexp:/\*([^\*]|\*+[^/\*])*\*+/'
 
         KEYWORD_ANY='ANY'
+        KEYWORD_CASE='CASE'
         KEYWORD_CHARACTERS='CHARACTERS'
         KEYWORD_COMPILER='COMPILER'
         KEYWORD_COMMENTS='COMMENTS'
@@ -149,7 +150,7 @@ SemAction ::= "(." ArbitraryStatements ".)"
 Comments ::= CommentDecl {CommentDecl}*
 CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"] {pin = 1}
 
-WhiteSpaceDecl ::= "IGNORE" Set {pin=1}
+WhiteSpaceDecl ::= "IGNORE" (Set | "CASE") {pin=1}
 
 ParserSpecification ::= "PRODUCTIONS" {Production}* {pin = 1}
 Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.' {pin = 1}

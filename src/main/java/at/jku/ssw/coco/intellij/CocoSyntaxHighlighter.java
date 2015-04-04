@@ -90,6 +90,7 @@ public class CocoSyntaxHighlighter extends SyntaxHighlighterBase {
                 tokenType.equals(CocoTypes.SMALLER_THEN)) {
             return MARKUP_TAG_KEYS;
         } else if (tokenType.equals(CocoTypes.KEYWORD_ANY) ||
+                tokenType.equals(CocoTypes.KEYWORD_CASE) ||
                 tokenType.equals(CocoTypes.KEYWORD_CHARACTERS) ||
                 tokenType.equals(CocoTypes.KEYWORD_COMPILER) ||
                 tokenType.equals(CocoTypes.KEYWORD_COMMENTS) ||

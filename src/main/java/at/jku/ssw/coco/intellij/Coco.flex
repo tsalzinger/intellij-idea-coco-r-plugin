@@ -39,6 +39,7 @@ ANY_CHAR=.
   {WHITE_SPACE}        { return com.intellij.psi.TokenType.WHITE_SPACE; }
 
   "ANY"                { return KEYWORD_ANY; }
+  "CASE"               { return KEYWORD_CASE; }
   "CHARACTERS"         { return KEYWORD_CHARACTERS; }
   "COMPILER"           { return KEYWORD_COMPILER; }
   "COMMENTS"           { return KEYWORD_COMMENTS; }
