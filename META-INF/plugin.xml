@@ -43,6 +43,8 @@
     ]]>
     </change-notes>
 
+    <depends>com.intellij.modules.java</depends>
+
     <idea-version since-build="131"/>
 
     <extensions defaultExtensionNs="com.intellij">
