@@ -51,8 +51,8 @@ public class CocoAnnotator implements Annotator {
                     holder.createErrorAnnotation(ident.getTextRange(), "Unresolved Character '" + characterReferenceName + "'");
                 }
             }
-        } else if (element instanceof HasCocoTokenOrProductionReference) {
-            HasCocoTokenOrProductionReference cocoElement = (HasCocoTokenOrProductionReference) element;
+        } else if (element instanceof CocoFactor) {
+            CocoFactor cocoElement = (CocoFactor) element;
             PsiElement ident = cocoElement.getNameIdentifier();
             if (ident != null) {
                 String referenceName = cocoElement.getName();
@@ -72,8 +72,12 @@ public class CocoAnnotator implements Annotator {
                 } else if (production != null) {
                     Annotation annotation = holder.createInfoAnnotation(ident, null);
                     annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+
+                    if (production.getFormalAttributes() != null && cocoElement.getActualAttributes() == null) {
+                        holder.createErrorAnnotation(ident.getTextRange(), "Production '" + referenceName + "' defines formal attributes");
+                    }
                 } else {
-                    holder.createErrorAnnotation(ident.getTextRange(), "Unresolved Token or Production'" + referenceName + "'");
+                    holder.createErrorAnnotation(ident.getTextRange(), "Unresolved Token or Production '" + referenceName + "'");
                 }
             }
         } else if (element instanceof CocoCompiler) {
