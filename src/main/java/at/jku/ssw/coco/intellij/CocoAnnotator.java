@@ -75,6 +75,8 @@ public class CocoAnnotator implements Annotator {
 
                     if (production.getFormalAttributes() != null && cocoElement.getActualAttributes() == null) {
                         holder.createErrorAnnotation(ident.getTextRange(), "Production '" + referenceName + "' defines formal attributes");
+                    } else if (production.getFormalAttributes() == null && cocoElement.getActualAttributes() != null) {
+                        holder.createErrorAnnotation(cocoElement.getActualAttributes().getTextRange(), "Production '" + referenceName + "' doesn't define formal attributes");
                     }
                 } else {
                     holder.createErrorAnnotation(ident.getTextRange(), "Unresolved Token or Production '" + referenceName + "'");
