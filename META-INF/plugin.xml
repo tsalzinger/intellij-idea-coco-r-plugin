@@ -1,5 +1,5 @@
 <idea-plugin version="2">
-    <id>at.jku.ssw.coco.intellij</id>
+    <id>at.scheinecker.intellij.coco</id>
     <name>Coco/R</name>
     <version>1.0-alpha-20150411</version>
     <vendor email="tscheinecker@gmail.com" url="https://github.com/tscheinecker">Thomas Scheinecker</vendor>
@@ -50,42 +50,45 @@
     <idea-version since-build="131"/>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileTypeFactory implementation="at.jku.ssw.coco.intellij.CocoFileTypeFactory"/>
-        <lang.parserDefinition language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoParserDefinition"/>
+        <fileTypeFactory implementation="at.scheinecker.intellij.coco.CocoFileTypeFactory"/>
+        <lang.parserDefinition language="Cocol/R"
+                               implementationClass="at.scheinecker.intellij.coco.CocoParserDefinition"/>
         <lang.syntaxHighlighterFactory key="Cocol/R"
-                                       implementationClass="at.jku.ssw.coco.intellij.CocoSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="at.jku.ssw.coco.intellij.CocoColorSettingsPage"/>
-        <lang.braceMatcher language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoBraceMatcher"/>
+                                       implementationClass="at.scheinecker.intellij.coco.CocoSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="at.scheinecker.intellij.coco.CocoColorSettingsPage"/>
+        <lang.braceMatcher language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoBraceMatcher"/>
 
         <completion.contributor language="Cocol/R"
-                                implementationClass="at.jku.ssw.coco.intellij.CocoCompletionContributor"/>
-        <psi.referenceContributor implementation="at.jku.ssw.coco.intellij.reference.CocoReferenceContributor"/>
+                                implementationClass="at.scheinecker.intellij.coco.CocoCompletionContributor"/>
+        <psi.referenceContributor implementation="at.scheinecker.intellij.coco.reference.CocoReferenceContributor"/>
         <lang.findUsagesProvider language="Cocol/R"
-                                 implementationClass="at.jku.ssw.coco.intellij.CocoFindUsagesProvider"/>
+                                 implementationClass="at.scheinecker.intellij.coco.CocoFindUsagesProvider"/>
 
 
-        <lang.refactoringSupport language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoRefactoringProvider"/>
+        <lang.refactoringSupport language="Cocol/R"
+                                 implementationClass="at.scheinecker.intellij.coco.CocoRefactoringProvider"/>
         <codeInsight.lineMarkerProvider language="Cocol/R"
-                                        implementationClass="at.jku.ssw.coco.intellij.CocoLineMarkerProvider"/>
+                                        implementationClass="at.scheinecker.intellij.coco.CocoLineMarkerProvider"/>
 
-        <lang.psiStructureViewFactory language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.structure.CocoStructureViewFactory"/>
+        <lang.psiStructureViewFactory language="Cocol/R"
+                                      implementationClass="at.scheinecker.intellij.coco.structure.CocoStructureViewFactory"/>
 
 
         <gotoSymbolContributor
-                implementation="at.jku.ssw.coco.intellij.symbolcontributor.CocoChooseByNameTokenContributor"/>
+                implementation="at.scheinecker.intellij.coco.symbolcontributor.CocoChooseByNameTokenContributor"/>
         <gotoSymbolContributor
-                implementation="at.jku.ssw.coco.intellij.symbolcontributor.CocoChooseByNameCharacterContributor"/>
+                implementation="at.scheinecker.intellij.coco.symbolcontributor.CocoChooseByNameCharacterContributor"/>
         <gotoSymbolContributor
-                implementation="at.jku.ssw.coco.intellij.symbolcontributor.CocoChooseByNameProductionContributor"/>
+                implementation="at.scheinecker.intellij.coco.symbolcontributor.CocoChooseByNameProductionContributor"/>
 
-        <annotator language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoAnnotator"/>
+        <annotator language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoAnnotator"/>
 
-        <lang.commenter language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoCommenter"/>
-        <lang.foldingBuilder language="Cocol/R" implementationClass="at.jku.ssw.coco.intellij.CocoFoldingBuilder"/>
+        <lang.commenter language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoCommenter"/>
+        <lang.foldingBuilder language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoFoldingBuilder"/>
     </extensions>
     <actions>
         <group id="coco.Generate">
-            <action id="at.jku.ssw.coco.intellij.RunCocoR" class="at.jku.ssw.coco.intellij.action.CocoRAction"
+            <action id="at.jku.ssw.coco.intellij.RunCocoR" class="at.scheinecker.intellij.coco.action.CocoRAction"
                     text="Run _Coco/R"
                     description="Runs Coco/R on the given .ATG file"
                     icon="/at/jku/ssw/coco/intellij/icons/coco-ico.gif">

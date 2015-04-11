@@ -1,0 +1,208 @@
+{
+    parserClass="at.scheinecker.intellij.coco.parser.CocoParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Coco"
+    psiImplClassSuffix="Impl"
+    psiPackage="at.scheinecker.intellij.coco.psi"
+    psiImplPackage="at.scheinecker.intellij.coco.psi.impl"
+
+    elementTypeHolderClass="at.scheinecker.intellij.coco.psi.CocoTypes"
+    elementTypeClass="at.scheinecker.intellij.coco.psi.CocoElementType"
+    tokenTypeClass="at.scheinecker.intellij.coco.psi.CocoTokenType"
+
+    psiImplUtilClass="at.scheinecker.intellij.coco.psi.impl.CocoPsiImplUtil"
+
+    mixin("End|BasicSet|TokenFactor|Factor")="at.scheinecker.intellij.coco.psi.impl.CocoReferencingType"
+    implements("End")="at.scheinecker.intellij.coco.psi.HasCocoCompilerReference"
+    implements("BasicSet|TokenFactor")="at.scheinecker.intellij.coco.psi.HasCocoCharacterReference"
+    implements("Factor")="at.scheinecker.intellij.coco.psi.HasCocoTokenOrProductionReference"
+    implements("Compiler|SetDecl|TokenDecl|Production")="at.scheinecker.intellij.coco.psi.CocoNamedElement"
+    methods("Compiler|End|BasicSet|TokenFactor|Factor|SetDecl|TokenDecl|Production")=[
+        getName
+        setName
+        getNameIdentifier
+        getPresentation
+        getTextOffset
+    ]
+
+    tokens=[
+        string='regexp:"(\\\\|\\"|[^\"\n])*"'
+        char="regexp:'(\\u(\p{XDigit}{4})|\\.|.)'"
+
+        WHITE_SPACE='regexp:\s+'
+        LINE_COMMENT='regexp://.*'
+        BLOCK_COMMENT='regexp:/\*([^\*]|\*+[^/\*])*\*+/'
+
+        KEYWORD_ANY='ANY'
+        KEYWORD_CASE='CASE'
+        KEYWORD_CHARACTERS='CHARACTERS'
+        KEYWORD_COMPILER='COMPILER'
+        KEYWORD_COMMENTS='COMMENTS'
+        KEYWORD_CONTEXT='CONTEXT'
+        KEYWORD_END='END'
+        KEYWORD_FROM='FROM'
+        KEYWORD_IF='IF'
+        KEYWORD_IGNORE='IGNORE'
+        KEYWORD_IGNORECASE='IGNORECASE'
+        KEYWORD_IMPORT='import'
+        KEYWORD_NESTED='NESTED'
+        KEYWORD_OUT='out'
+        KEYWORD_PRAGMAS='PRAGMAS'
+        KEYWORD_PRODUCTIONS='PRODUCTIONS'
+        KEYWORD_SYNC='SYNC'
+        KEYWORD_TO='TO'
+        KEYWORD_TOKENS='TOKENS'
+        KEYWORD_WEAK='WEAK'
+
+        TERMINATOR='.'
+        PLUS='+'
+        MINUS='-'
+        RANGE='..'
+        ASSIGNMENT='='
+        CURL_OPEN='{'
+        CURL_CLOSE='}'
+        PAR_OPEN='('
+        PAR_CLOSE=')'
+        BRACK_OPEN='['
+        BRACK_CLOSE=']'
+        SMALLER_THEN='<'
+        SEM_ACTION_START='(.'
+        SEM_ACTION_END='.)'
+        ATTRIBUTES_START='<.'
+        ATTRIBUTES_END='.>'
+        PIPE='|'
+        GREATER_THEN='>'
+
+        number='regexp:\p{Digit}+'
+        ident='regexp:\p{Alpha}\p{Alnum}*'
+        ANY_CHAR='regexp:.'
+    ]
+}
+
+Cocol ::=
+    {Directives}*
+    [Imports]
+    Compiler
+    [GlobalFieldsAndMethods]
+    ScannerSpecification
+    ParserSpecification
+    End
+
+Directives ::= "$package" "=" ident {'.' ident}*
+    | "$checkEOF" "=" ("true" | "false")
+    | "$" ident
+
+Compiler ::= "COMPILER" ident {pin=1}
+
+Imports ::= JavaCode
+//
+GlobalFieldsAndMethods ::= JavaCode
+
+private JavaCode ::= {JavaSymbols}*
+ANY ::= JavaSymbols
+ArbitraryText ::= (ident | string | char | number | ANY_CHAR | '.' | "out")*
+ArbitraryStatements ::= {JavaSymbols}*
+private JavaSymbols ::= (ident | string | char | number | ANY_CHAR | Symbols | JavaComparator | JavaBooleanOperator | '!' | '.' | "import" | "out") {pin(".*")=1 name = "Java Code"}
+
+//ScannerSpecification =
+// ["IGNORECASE"]
+// ["CHARACTERS" {SetDecl}]
+// ["TOKENS" {TokenDecl}]
+// ["PRAGMAS" {PragmaDecl}]
+// {CommentDecl}
+// {WhiteSpaceDecl}.
+
+ScannerSpecification ::=
+    ["IGNORECASE"]
+    [Characters]
+    [Tokens]
+    [Pragmas]
+    [Comments]
+    {WhiteSpaceDecl}*
+
+Characters ::= "CHARACTERS" {SetDecl}*
+
+SetDecl ::= ident '=' Set '.' {pin=1}
+
+Set ::= BasicSet {('+'|'-') BasicSet}*
+BasicSet ::= string | ident | char [".." char] | "ANY"
+
+Tokens ::= "TOKENS" {TokenDecl}* {pin=1}
+TokenDecl ::= Symbol [TokenAssignment]
+private TokenAssignment ::= '=' TokenExpr '.' {pin=1}
+
+TokenExpr ::= TokenTerm {TokenTermOption}* {pin=1}
+private TokenTermOption ::= '|' TokenTerm {pin=1}
+TokenTerm ::= TokenFactor {TokenFactor}* [TokenContext]
+private TokenContext ::= "CONTEXT" '(' TokenExpr ')' {pin=1}
+TokenFactor ::= Symbol
+    | TokenFactor_parenthesis
+    | TokenFactor_bracket
+    | TokenFactor_brace
+
+private TokenFactor_parenthesis ::= '(' TokenExpr ')' {pin=1}
+private TokenFactor_bracket ::= '[' TokenExpr ']' {pin=1}
+private TokenFactor_brace ::= '{' TokenExpr '}' {pin=1}
+private Symbol ::= ident | string | char
+
+
+Pragmas ::= "PRAGMAS" {PragmaDecl}*
+PragmaDecl ::= TokenDecl [SemAction]
+SemAction ::= "(." ArbitraryStatements ".)"
+
+Comments ::= CommentDecl {CommentDecl}*
+CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"] {pin = 1}
+
+WhiteSpaceDecl ::= "IGNORE" (Set | "CASE") {pin=1}
+
+ParserSpecification ::= "PRODUCTIONS" {Production}* {pin = 1}
+Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.' {pin = 1}
+Expression ::= Term {'|' Term}*
+Term ::= [[Resolver] Factor {Factor}*]
+Factor ::= ['WEAK'] Symbol [ActualAttributes]
+    | '(' Expression ')'
+    | '[' Expression ']'
+    | '{' Expression '}'
+| "ANY"
+| "SYNC"
+| SemAction
+LocalDecl ::= SemAction
+FormalAttributes ::= SimpleFormalAttributes | ExtendedFormalAttributes
+private SimpleFormalAttributes ::= '<' FormalAttributesBody '>' {pin = 1}
+private ExtendedFormalAttributes ::= "<." FormalAttributesBody ".>" {pin = 1}
+private FormalAttributesBody ::= ['out'] FormalAttributesParameter {AdditionalFormalAttributesParameter}*
+private FormalAttributesParameter ::= JavaTypeReference JavaTypeReference {pin = 1}
+private AdditionalFormalAttributesParameter ::= ',' FormalAttributesParameter {pin = 1}
+ActualAttributes ::= SimpleActualAttributes | ExtendedActualAttributes
+private SimpleActualAttributes ::= '<' ActualAttributesBody '>' {pin = 1}
+private ExtendedActualAttributes ::= "<." ActualAttributesBody ".>" {pin = 1}
+private ActualAttributesBody ::= ['out'] JavaTypeReference {AdditionalActualAttributesParameter}*
+private AdditionalActualAttributesParameter ::= ',' ident {pin = 1}
+private JavaTypeReference ::= ident {JavaSubTypeReference}* {pin = 1}
+private JavaSubTypeReference ::= '.' ident {pin = 1}
+
+Resolver ::= "IF" '(' {JavaBooleanExpression}* ')' {pin=2}
+
+End ::= "END" ident '.' {pin=1}
+
+private Symbols ::= '+' | '-'  | '=' | '(' | ')' | '<' | '>' | '{' | '}' | '[' | ']' | '..' {name = "Symbols"}
+
+// JAVA
+private JavaOperators ::= '+' | '-' | '*' | '/' | '%'
+private JavaBoolean ::= 'true' | 'false' | ('(' JavaBoolean ')')
+private JavaComparator ::= '==' | '!=' | '>=' | '>' | '<=' | '<'
+private JavaBooleanOperator ::= '&&' | '||' | '&' | '|'
+private JavaBooleanExpression ::= (((JavaBoolean | JavaExpression) [JavaComparator JavaExpression]) [JavaBooleanOperator JavaBooleanExpression]) | '!' JavaBooleanExpression
+
+private JavaVariable ::= (ident|string) {JavaSubTypeReference}*
+private JavaMethodCall ::= JavaVariable JavaMethodParameters
+private JavaMethodParameters ::= '()' | JavaMethodParametersList
+private JavaMethodParametersList ::= '(' JavaExpression {JavaAdditionalParameters}*')' {pin = 1}
+private JavaAdditionalParameters ::= ',' JavaExpression {pin = 1}
+private JavaValueExpression ::= (JavaNewObject | JavaMethodCall | JavaVariable) {'.' (JavaMethodCall | JavaVariable)}*
+private JavaNewObject ::= 'new' JavaTypeReference JavaMethodParameters {pin = 1}
+private JavaShortIf ::= JavaValueExpression '?' JavaValueExpression ':' JavaValueExpression {pin = 2}
+private JavaExpression ::= (JavaShortIf | JavaValueExpression | number | GroupedJavaExpression) [JavaOperators JavaBooleanExpression]
+private GroupedJavaExpression ::= '(' JavaBooleanExpression ')' {pin=1}
