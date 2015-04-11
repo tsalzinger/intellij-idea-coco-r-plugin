@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>at.jku.ssw.coco.intellij</id>
     <name>Coco/R</name>
-    <version>1.0-alpha-20150329</version>
+    <version>1.0-alpha-20150411</version>
     <vendor email="tscheinecker@gmail.com" url="https://github.com/tscheinecker">Thomas Scheinecker</vendor>
 
     <description><![CDATA[
@@ -15,8 +15,14 @@
         <br>
         <ul>
             <li>Syntax Highlighting</li>
-            <li>Basic error handling (parser only)</li>
+            <li>Basic error handling (unexpected elements)</li>
+            <li>Reference check (report unresolvable references to characters, tokens and productions)</li>
+            <li>Declaration order check (report references to characters and tokens declared after usage)</li>
+            <li>Attributes check (productions have to be used with or without attributes according to declaration)</li>
             <li>Generate Scanner and Parser via menu action</li>
+            <li>Generate Scanner / Parser into target folder</li>
+            <li>Use source package for Scanner / Parser generation</li>
+            <li>Show errors during Scanner / Parser generation to user</li>
             <li>Basic code completion</li>
             <li>Structure View</li>
             <li>Find usages</li>
@@ -32,12 +38,8 @@
         <p>
         TODO:<br>
         <ul>
-            <li>Generate Scanner / Parser into target folder</li>
-            <li>Allow package definition for Scanner / Parser generation</li>
-            <li>Show errors during Scanner / Parser generation to user</li>
-            <li>Correct lexing / parsing of IF expression (parenthesis inside expressions break parsing)</li>
+            <li>Show errors during Scanner / Parser generation in console window</li>
             <li>Better error recovery during parsing</li>
-            <li>Check that productions with formal attributes are used with actual attributes every time</li>
         </ul>
         </p>
     ]]>
