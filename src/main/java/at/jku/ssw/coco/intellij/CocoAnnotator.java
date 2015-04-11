@@ -128,7 +128,7 @@ public class CocoAnnotator implements Annotator {
                     }
 
                     Annotation annotation = holder.createWeakWarningAnnotation(ident, warningText);
-                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT);
+                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.LINE_COMMENT);
                 } else {
                     Annotation annotation = holder.createInfoAnnotation(ident, null);
                     annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
