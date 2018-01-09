@@ -85,13 +85,14 @@
 
         <lang.commenter language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoCommenter"/>
         <lang.foldingBuilder language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoFoldingBuilder"/>
+        <languageInjector implementation="at.scheinecker.intellij.coco.CocoJavaInjector"/>
     </extensions>
     <actions>
         <group id="coco.Generate">
             <action id="at.jku.ssw.coco.intellij.RunCocoR" class="at.scheinecker.intellij.coco.action.CocoRAction"
                     text="Run _Coco/R"
                     description="Runs Coco/R on the given .ATG file"
-                    icon="/at/jku/ssw/coco/intellij/icons/coco-ico.gif">
+                    icon="/at/scheinecker/intellij/coco/icons/coco-ico.gif">
             </action>
             <separator/>
             <add-to-group group-id="ToolsMenu" anchor="before"

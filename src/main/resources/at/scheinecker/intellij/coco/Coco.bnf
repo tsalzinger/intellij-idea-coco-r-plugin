@@ -15,10 +15,12 @@
     psiImplUtilClass="at.scheinecker.intellij.coco.psi.impl.CocoPsiImplUtil"
 
     mixin("End|BasicSet|TokenFactor|Factor")="at.scheinecker.intellij.coco.psi.impl.CocoReferencingType"
+    mixin("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="at.scheinecker.intellij.coco.psi.impl.CocoJavaType"
     implements("End")="at.scheinecker.intellij.coco.psi.HasCocoCompilerReference"
     implements("BasicSet|TokenFactor")="at.scheinecker.intellij.coco.psi.HasCocoCharacterReference"
     implements("Factor")="at.scheinecker.intellij.coco.psi.HasCocoTokenOrProductionReference"
     implements("Compiler|SetDecl|TokenDecl|Production")="at.scheinecker.intellij.coco.psi.CocoNamedElement"
+    implements("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="com.intellij.psi.PsiLanguageInjectionHost"
     methods("Compiler|End|BasicSet|TokenFactor|Factor|SetDecl|TokenDecl|Production")=[
         getName
         setName

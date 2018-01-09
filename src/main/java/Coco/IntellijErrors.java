@@ -1,91 +1,255 @@
 package Coco;
 
+import at.scheinecker.intellij.coco.CocoIcons;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Thomas on 03/04/2015.
  */
 public class IntellijErrors extends Errors {
-    private int errorCount = 0;
-    private int warningCount = 0;
-
-    final StringBuilder syntactialErrors = new StringBuilder();
-    final StringBuilder semanticErrorsWithLineInfo = new StringBuilder();
-    final StringBuilder semanticErrors = new StringBuilder();
-    final StringBuilder warningsWithLineInfo = new StringBuilder();
-    final StringBuilder warnings = new StringBuilder();
-
-    public String getErrorMessage() {
-        StringBuilder errorMessage = new StringBuilder();
-        errorMessage.append(errorCount);
-        errorMessage.append(" errors occured!\n");
-        errorMessage.append("\n");
-        if (syntactialErrors.length() > 0) {
-            errorMessage.append("Syntax errors\n");
-            errorMessage.append(syntactialErrors);
-        }
-        if (semanticErrors.length() > 0 || semanticErrorsWithLineInfo.length() > 0) {
-            errorMessage.append("Semantic errors\n");
-            errorMessage.append(semanticErrors);
-            errorMessage.append(semanticErrorsWithLineInfo);
-        }
-
-        return errorMessage.toString();
-    }
-
-    public String getWarningMessage() {
-        return String.valueOf(warningCount) + " warnings!\n\n" + warnings + warningsWithLineInfo;
-    }
+    final List<Notification> errors = new ArrayList<>();
+    final List<Notification> warnings = new ArrayList<>();
 
     @Override
-    public void SynErr(int line, int column, int error) {
-        errorCount++;
-        syntactialErrors.append(line);
-        syntactialErrors.append(":");
-        syntactialErrors.append(column);
-        syntactialErrors.append(" - ");
-        syntactialErrors.append(error);
-        syntactialErrors.append("\n");
+    public void SynErr(int line, int column, int errorCode) {
+        String errorMessage;
+        switch (errorCode) {
+            case 0:
+                errorMessage = "EOF expected";
+                break;
+            case 1:
+                errorMessage = "ident expected";
+                break;
+            case 2:
+                errorMessage = "number expected";
+                break;
+            case 3:
+                errorMessage = "string expected";
+                break;
+            case 4:
+                errorMessage = "badString expected";
+                break;
+            case 5:
+                errorMessage = "char expected";
+                break;
+            case 6:
+                errorMessage = "\"COMPILER\" expected";
+                break;
+            case 7:
+                errorMessage = "\"IGNORECASE\" expected";
+                break;
+            case 8:
+                errorMessage = "\"CHARACTERS\" expected";
+                break;
+            case 9:
+                errorMessage = "\"TOKENS\" expected";
+                break;
+            case 10:
+                errorMessage = "\"PRAGMAS\" expected";
+                break;
+            case 11:
+                errorMessage = "\"COMMENTS\" expected";
+                break;
+            case 12:
+                errorMessage = "\"FROM\" expected";
+                break;
+            case 13:
+                errorMessage = "\"TO\" expected";
+                break;
+            case 14:
+                errorMessage = "\"NESTED\" expected";
+                break;
+            case 15:
+                errorMessage = "\"IGNORE\" expected";
+                break;
+            case 16:
+                errorMessage = "\"PRODUCTIONS\" expected";
+                break;
+            case 17:
+                errorMessage = "\"=\" expected";
+                break;
+            case 18:
+                errorMessage = "\".\" expected";
+                break;
+            case 19:
+                errorMessage = "\"END\" expected";
+                break;
+            case 20:
+                errorMessage = "\"+\" expected";
+                break;
+            case 21:
+                errorMessage = "\"-\" expected";
+                break;
+            case 22:
+                errorMessage = "\"..\" expected";
+                break;
+            case 23:
+                errorMessage = "\"ANY\" expected";
+                break;
+            case 24:
+                errorMessage = "\"<\" expected";
+                break;
+            case 25:
+                errorMessage = "\"^\" expected";
+                break;
+            case 26:
+                errorMessage = "\"out\" expected";
+                break;
+            case 27:
+                errorMessage = "\">\" expected";
+                break;
+            case 28:
+                errorMessage = "\",\" expected";
+                break;
+            case 29:
+                errorMessage = "\"<.\" expected";
+                break;
+            case 30:
+                errorMessage = "\".>\" expected";
+                break;
+            case 31:
+                errorMessage = "\"[\" expected";
+                break;
+            case 32:
+                errorMessage = "\"]\" expected";
+                break;
+            case 33:
+                errorMessage = "\"|\" expected";
+                break;
+            case 34:
+                errorMessage = "\"WEAK\" expected";
+                break;
+            case 35:
+                errorMessage = "\"(\" expected";
+                break;
+            case 36:
+                errorMessage = "\")\" expected";
+                break;
+            case 37:
+                errorMessage = "\"{\" expected";
+                break;
+            case 38:
+                errorMessage = "\"}\" expected";
+                break;
+            case 39:
+                errorMessage = "\"SYNC\" expected";
+                break;
+            case 40:
+                errorMessage = "\"IF\" expected";
+                break;
+            case 41:
+                errorMessage = "\"CONTEXT\" expected";
+                break;
+            case 42:
+                errorMessage = "\"(.\" expected";
+                break;
+            case 43:
+                errorMessage = "\".)\" expected";
+                break;
+            case 44:
+                errorMessage = "??? expected";
+                break;
+            case 45:
+                errorMessage = "this symbol not expected in Coco";
+                break;
+            case 46:
+                errorMessage = "this symbol not expected in TokenDecl";
+                break;
+            case 47:
+                errorMessage = "invalid TokenDecl";
+                break;
+            case 48:
+                errorMessage = "invalid AttrDecl";
+                break;
+            case 49:
+                errorMessage = "invalid AttrDecl";
+                break;
+            case 50:
+                errorMessage = "invalid AttrDecl";
+                break;
+            case 51:
+                errorMessage = "invalid AttrDecl";
+                break;
+            case 52:
+                errorMessage = "invalid AttrDecl";
+                break;
+            case 53:
+                errorMessage = "invalid SimSet";
+                break;
+            case 54:
+                errorMessage = "invalid Sym";
+                break;
+            case 55:
+                errorMessage = "invalid Term";
+                break;
+            case 56:
+                errorMessage = "invalid Factor";
+                break;
+            case 57:
+                errorMessage = "invalid Attribs";
+                break;
+            case 58:
+                errorMessage = "invalid Attribs";
+                break;
+            case 59:
+                errorMessage = "invalid Attribs";
+                break;
+            case 60:
+                errorMessage = "invalid Attribs";
+                break;
+            case 61:
+                errorMessage = "invalid Attribs";
+                break;
+            case 62:
+                errorMessage = "invalid TokenFactor";
+                break;
+            case 63:
+                errorMessage = "invalid Bracketed";
+                break;
+            default:
+                errorMessage = "error " + errorCode;
+        }
+
+        errors.add(new Notification("coco", CocoIcons.getFILE(), "Syntactic Error", null, errorMessage + " (" + line + ":" + column + ")", NotificationType.ERROR, null));
     }
 
     @Override
     public void SemErr(int line, int column, String error) {
-        errorCount++;
-        semanticErrorsWithLineInfo.append(line);
-        semanticErrorsWithLineInfo.append(":");
-        semanticErrorsWithLineInfo.append(column);
-        semanticErrorsWithLineInfo.append(" - ");
-        semanticErrorsWithLineInfo.append(error);
-        semanticErrorsWithLineInfo.append("\n");
+        errors.add(new Notification("coco", CocoIcons.getFILE(), "Semantic Error", null, error + " (" + line + ":" + column + ")", NotificationType.ERROR, null));
     }
 
     @Override
     public void SemErr(String error) {
-        errorCount++;
-        semanticErrors.append(error);
+        errors.add(new Notification("coco", CocoIcons.getFILE(), "Semantic Error", null, error, NotificationType.ERROR, null));
     }
 
     @Override
     public void Warning(int line, int column, String warning) {
-        warningCount++;
-        warningsWithLineInfo.append(line);
-        warningsWithLineInfo.append(":");
-        warningsWithLineInfo.append(column);
-        warningsWithLineInfo.append(" - ");
-        warningsWithLineInfo.append(warning);
-        warningsWithLineInfo.append("\n");
+        warnings.add(new Notification("coco", CocoIcons.getFILE(), null, null, warning + "(" + line + ":" + column + ")", NotificationType.WARNING, null));
     }
 
     @Override
     public void Warning(String warning) {
-        warningCount++;
-        warnings.append(warning);
-        warnings.append("\n");
+        warnings.add(new Notification("coco", CocoIcons.getFILE(), null, null, warning, NotificationType.WARNING, null));
     }
 
     public int getErrorCount() {
-        return errorCount;
+        return errors.size();
     }
 
     public int getWarningCount() {
-        return warningCount;
+        return warnings.size();
+    }
+
+    public List<Notification> getErrors() {
+        return errors;
+    }
+
+    public List<Notification> getWarnings() {
+        return warnings;
     }
 }

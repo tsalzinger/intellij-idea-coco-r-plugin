@@ -1,0 +1,3 @@
+package at.scheinecker.intellij.coco.psi
+
+interface HasCocoTokenOrProductionReference : HasCocoTokenReference, HasCocoProductionReference

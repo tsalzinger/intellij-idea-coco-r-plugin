@@ -28,8 +28,6 @@ public class AbstractLexerTest {
     protected void init(String content) {
         addInput(content);
         init();
-
-        CocoIcons.FILE.toString();
     }
 
     protected void addInput(String append) {
