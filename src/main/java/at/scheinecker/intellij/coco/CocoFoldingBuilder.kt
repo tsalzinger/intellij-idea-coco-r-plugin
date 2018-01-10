@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.Document
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import org.apache.commons.lang.StringUtils
 
 class CocoFoldingBuilder : FoldingBuilderEx() {
 
@@ -31,15 +30,13 @@ class CocoFoldingBuilder : FoldingBuilderEx() {
                 PsiComment::class.java
         )
                 .flatMap { PsiTreeUtil.findChildrenOfType(root, it) }
-                .filter { StringUtils.isNotBlank(it.text) }
+                .filter { containsNewline(it.text) }
                 .mapNotNull { FoldingDescriptor(it.node, it.textRange) }
                 .toTypedArray()
     }
 
     override fun getPlaceholderText(node: ASTNode): String? {
         val psiElement = node.psi ?: return null
-
-        val completeText = psiElement.text.trim { it <= ' ' }.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
         if (psiElement is CocoImports) {
             return "JAVA IMPORTS ..."
@@ -75,10 +72,7 @@ class CocoFoldingBuilder : FoldingBuilderEx() {
         }
 
         if (psiElement is PsiComment) {
-            return if (psiElement.text.startsWith("//")) {
-                "// ..."
-            } else "/* ... */"
-
+            return "/* ... */"
         }
 
         if (psiElement is CocoEnd) {
@@ -94,13 +88,15 @@ class CocoFoldingBuilder : FoldingBuilderEx() {
             return name!! + " ..."
         }
 
-        return if (completeText.size == 1) {
-            completeText[0] + "..."
-        } else "..."
-
+        return "${node.elementType} ..."
     }
 
     override fun isCollapsedByDefault(node: ASTNode): Boolean {
-        return node.text.contains("\n")
+        return containsNewline(node.text)
+    }
+
+    private fun containsNewline(text: String): Boolean {
+        val trimmed = text.trim('\n', '\r', '\t', ' ')
+        return trimmed.contains('\n') || trimmed.contains('\r')
     }
 }
