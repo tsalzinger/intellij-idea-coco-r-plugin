@@ -65,6 +65,10 @@ object CocoUtil {
         return findByName(findCharacterDeclarations(file), name)
     }
 
+    fun getDeclaredPackage(file: PsiFile): String? {
+        return PsiTreeUtil.getChildOfType(file, CocoPackageDirective::class.java)?.declaredPackage?.text?.trim();
+    }
+
     fun findProductions(file: PsiFile): List<CocoProduction> {
         val parserSpecification = PsiTreeUtil.getChildOfType(file, CocoParserSpecification::class.java) ?: return emptyList()
 

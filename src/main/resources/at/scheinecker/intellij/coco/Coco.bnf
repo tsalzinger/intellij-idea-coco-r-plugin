@@ -40,6 +40,7 @@
         KEYWORD_ANY='ANY'
         KEYWORD_CASE='CASE'
         KEYWORD_CHARACTERS='CHARACTERS'
+        KEYWORD_CHECK_EOF_DIRECTIVE='$checkEOF'
         KEYWORD_COMPILER='COMPILER'
         KEYWORD_COMMENTS='COMMENTS'
         KEYWORD_CONTEXT='CONTEXT'
@@ -51,6 +52,7 @@
         KEYWORD_IMPORT='import'
         KEYWORD_NESTED='NESTED'
         KEYWORD_OUT='out'
+        KEYWORD_PACKAGE_DIRECTIVE='$package'
         KEYWORD_PRAGMAS='PRAGMAS'
         KEYWORD_PRODUCTIONS='PRODUCTIONS'
         KEYWORD_SYNC='SYNC'
@@ -92,9 +94,14 @@ Cocol ::=
     ParserSpecification
     End
 
-Directives ::= "$package" "=" ident {'.' ident}*
-    | "$checkEOF" "=" ("true" | "false")
-    | "$" ident
+private Directives ::=  PackageDirective
+    | CheckEofDirective
+    | AnyDirective
+
+PackageDirective ::= "$package" "=" DeclaredPackage
+DeclaredPackage ::= ident {'.' ident}* {pin = 1}
+CheckEofDirective::= "$checkEOF" "=" ("true" | "false")
+AnyDirective ::= "$" ident
 
 Compiler ::= "COMPILER" ident {pin=1}
 
@@ -124,9 +131,12 @@ ScannerSpecification ::=
     [Comments]
     {WhiteSpaceDecl}*
 
-Characters ::= "CHARACTERS" {SetDecl}*
+Characters ::= "CHARACTERS" {SetDecl}* {pin=1 recoverWhile="CharactersRecover"}
+private CharactersRecover ::= !("TOKENS"|"PRAGMAS"|"COMMENTS"|"IGNORE"|"PRODUCTIONS"|"END")
 
-SetDecl ::= ident '=' Set '.' {pin=1}
+SetDecl ::= SetDeclStart Set '.' {pin=1 recoverWhile="SetDeclRecover"}
+private SetDeclStart ::= ident '=' {pin=1}
+private SetDeclRecover ::= !(SetDeclStart|"TOKENS"|"PRAGMAS"|"COMMENTS"|"IGNORE"|"PRODUCTIONS"|"END")
 
 Set ::= BasicSet {('+'|'-') BasicSet}*
 BasicSet ::= string | ident | char [".." char] | "ANY"

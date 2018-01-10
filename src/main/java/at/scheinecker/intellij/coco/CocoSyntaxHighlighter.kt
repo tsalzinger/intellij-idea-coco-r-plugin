@@ -55,6 +55,7 @@ class CocoSyntaxHighlighter : SyntaxHighlighter {
         } else if (tokenType == CocoTypes.KEYWORD_ANY ||
                 tokenType == CocoTypes.KEYWORD_CASE ||
                 tokenType == CocoTypes.KEYWORD_CHARACTERS ||
+                tokenType == CocoTypes.KEYWORD_CHECK_EOF_DIRECTIVE ||
                 tokenType == CocoTypes.KEYWORD_COMPILER ||
                 tokenType == CocoTypes.KEYWORD_COMMENTS ||
                 tokenType == CocoTypes.KEYWORD_CONTEXT ||
@@ -66,6 +67,7 @@ class CocoSyntaxHighlighter : SyntaxHighlighter {
                 tokenType == CocoTypes.KEYWORD_IMPORT ||
                 tokenType == CocoTypes.KEYWORD_NESTED ||
                 tokenType == CocoTypes.KEYWORD_OUT ||
+                tokenType == CocoTypes.KEYWORD_PACKAGE_DIRECTIVE ||
                 tokenType == CocoTypes.KEYWORD_PRAGMAS ||
                 tokenType == CocoTypes.KEYWORD_PRODUCTIONS ||
                 tokenType == CocoTypes.KEYWORD_SYNC ||

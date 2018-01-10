@@ -1,6 +1,7 @@
 package at.scheinecker.intellij.coco.action;
 
 import Coco.*;
+import at.scheinecker.intellij.coco.CocoUtil;
 import at.scheinecker.intellij.coco.psi.CocoFile;
 import com.intellij.compiler.CompilerMessageImpl;
 import com.intellij.compiler.impl.CompileContextImpl;
@@ -135,7 +136,8 @@ public class CocoRAction extends AnAction {
     }
 
     private Optional<VirtualFile> generate(@NotNull CocoFile file, @NotNull AnActionEvent actionEvent) {
-        final Optional<String> filePackage_ = extractPackageFromDirectory(file.getContainingDirectory());
+        final String declaredPackage = CocoUtil.INSTANCE.getDeclaredPackage(file.getContainingFile());
+        final Optional<String> filePackage_ = declaredPackage != null ? Optional.of(declaredPackage) : extractPackageFromDirectory(file.getContainingDirectory());
 
         Optional<VirtualFile> outDirFile_ = getGeneratedSourceFolders(file)
                 .stream()
@@ -169,7 +171,7 @@ public class CocoRAction extends AnAction {
         Scanner scanner = new Scanner(filePath);
         Parser parser = new Parser(scanner);
 
-        final IntellijErrors intellijErrors = new IntellijErrors();
+        final IntellijErrors intellijErrors = new IntellijErrors(parser);
         parser.errors = intellijErrors;
 
         parser.trace = new Trace(path);
@@ -208,8 +210,8 @@ public class CocoRAction extends AnAction {
             notify("Coco/R Compiler completed successfully", MessageType.INFO);
         }
 
+        final Project eventProject = getEventProject(actionEvent);
         SwingUtilities.invokeLater(() -> {
-            final Project eventProject = getEventProject(actionEvent);
 
             if (eventProject == null || eventProject.isDisposed()) {
                 return;

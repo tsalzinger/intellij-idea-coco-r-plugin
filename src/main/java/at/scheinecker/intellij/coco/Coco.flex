@@ -38,6 +38,8 @@ ANY_CHAR=.
 <YYINITIAL> {
   {WHITE_SPACE}        { return com.intellij.psi.TokenType.WHITE_SPACE; }
 
+  "$checkEOF"          { return KEYWORD_CHECK_EOF_DIRECTIVE; }
+  "$package"           { return KEYWORD_PACKAGE_DIRECTIVE; }
   "ANY"                { return KEYWORD_ANY; }
   "CASE"               { return KEYWORD_CASE; }
   "CHARACTERS"         { return KEYWORD_CHARACTERS; }
