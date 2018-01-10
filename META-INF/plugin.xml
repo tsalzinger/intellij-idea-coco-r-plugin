@@ -93,6 +93,7 @@
                     text="Run _Coco/R"
                     description="Runs Coco/R on the given .ATG file"
                     icon="/at/scheinecker/intellij/coco/icons/coco-ico.gif">
+                <keyboard-shortcut keymap="$default" first-keystroke="control shift G"/>
             </action>
             <separator/>
             <add-to-group group-id="ToolsMenu" anchor="before"
