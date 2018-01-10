@@ -12,7 +12,6 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.compiler.CompilationStatusListener;
 import com.intellij.openapi.compiler.CompilerMessageCategory;
@@ -39,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Thomas on 29/12/2014.
@@ -50,49 +50,46 @@ public class CocoRAction extends AnAction {
         final Project project = getEventProject(e);
         final List<CocoFile> bnfFiles = getFiles(e);
         if (project == null || bnfFiles.isEmpty()) {
+            // do nothing if no bnf file was selected
             return;
         }
 
+        // ensure all changes are actually persisted to the file system
         PsiDocumentManager.getInstance(project).commitAllDocuments();
         FileDocumentManager.getInstance().saveAllDocuments();
 
-
         for (CocoFile file : bnfFiles) {
-            VirtualFile result = new WriteAction<VirtualFile>() {
-                @Override
-                protected void run(@NotNull Result<VirtualFile> result) throws Throwable {
-                    result.setResult(generate(file, e));
-                }
-            }.execute().throwException().getResultObject();
-
-
-            if (result != null) {
-                VfsUtil.markDirtyAndRefresh(false, true, true, result);
-            }
+            WriteAction
+                    .compute(() -> generate(file, e))
+                    .ifPresent(this::markFileTreeAsDirtyAndReload);
         }
+    }
+
+    private void markFileTreeAsDirtyAndReload(final VirtualFile virtualFile) {
+        VfsUtil.markDirtyAndRefresh(false, true, true, virtualFile);
     }
 
     @NotNull
     private static List<CocoFile> getFiles(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
-        VirtualFile[] files = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
+        final Project project = getEventProject(e);
+        final VirtualFile[] files = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
         if (project == null || files == null) return Collections.emptyList();
         final PsiManager manager = PsiManager.getInstance(project);
         return ContainerUtil.mapNotNull(files, file -> {
-            PsiFile psiFile = manager.findFile(file);
+            final PsiFile psiFile = manager.findFile(file);
             return psiFile instanceof CocoFile ? (CocoFile) psiFile : null;
         });
     }
 
     @NotNull
     private List<SourceFolder> getGeneratedSourceFolders(@NotNull CocoFile file) {
-        Module module = ModuleUtil.findModuleForFile(file.getVirtualFile(), file.getProject());
+        final Module module = ModuleUtil.findModuleForFile(file.getVirtualFile(), file.getProject());
         if (module != null) {
-            List<SourceFolder> sourceFolders = new ArrayList<>();
+            final List<SourceFolder> sourceFolders = new ArrayList<>();
 
-            for (ContentEntry entry : ModuleRootManager.getInstance(module).getContentEntries()) {
-                for (SourceFolder folder : entry.getSourceFolders()) {
-                    JavaSourceRootProperties properties = folder.getJpsElement().getProperties(JavaModuleSourceRootTypes.SOURCES);
+            for (final ContentEntry entry : ModuleRootManager.getInstance(module).getContentEntries()) {
+                for (final SourceFolder folder : entry.getSourceFolders()) {
+                    final JavaSourceRootProperties properties = folder.getJpsElement().getProperties(JavaModuleSourceRootTypes.SOURCES);
                     if (properties != null && properties.isForGeneratedSources()) {
                         sourceFolders.add(folder);
                     }
@@ -104,44 +101,70 @@ public class CocoRAction extends AnAction {
         return Collections.emptyList();
     }
 
-    private VirtualFile generate(@NotNull CocoFile file, @NotNull AnActionEvent actionEvent) {
-        String filePackage = null;
-        PsiDirectory containingDirectory = file.getContainingDirectory();
-        if (containingDirectory != null) {
-            PsiPackage psiFilePackage = JavaDirectoryService.getInstance().getPackage(containingDirectory);
-            if (psiFilePackage != null) {
-                filePackage = psiFilePackage.getQualifiedName();
+    private Optional<String> extractPackageFromDirectory(final PsiDirectory psiDirectory) {
+        return Optional.ofNullable(psiDirectory)
+                .map(containingDirectory -> JavaDirectoryService.getInstance().getPackage(containingDirectory))
+                .map(PsiPackage::getQualifiedName);
+    }
+
+    private Optional<VirtualFile> findFrameDirectory(final VirtualFile virtualFile) {
+        VirtualFile frameDir = virtualFile;
+        VirtualFile parserFrame = null;
+        VirtualFile scannerFrame = null;
+        do {
+            frameDir = frameDir.getParent();
+            if (frameDir != null) {
+                parserFrame = frameDir.findChild("Parser.frame");
+                scannerFrame = frameDir.findChild("Scanner.frame");
             }
-        }
-        VirtualFile outDirFile = null;
-        List<SourceFolder> generatedSourceFolders = getGeneratedSourceFolders(file);
-        for (SourceFolder generatedSourceFolder : generatedSourceFolders) {
-            VirtualFile generatedSourceFolderFile = generatedSourceFolder.getFile();
-            if (generatedSourceFolderFile != null) {
-                outDirFile = generatedSourceFolderFile;
-                break;
+        } while (parserFrame == null && scannerFrame == null && frameDir != null);
+
+        if (parserFrame == null) {
+            if (scannerFrame == null) {
+                notify("Parser.frame and Scanner.frame file not found!", MessageType.ERROR);
+            } else {
+                notify("Parser.frame file not found!", MessageType.ERROR);
             }
+            return Optional.empty();
+        } else if (scannerFrame == null) {
+            notify("Scanner.frame file not found!", MessageType.ERROR);
+            return Optional.empty();
         }
 
-        if (outDirFile == null) {
-            List<VirtualFile> suitableDestinationSourceRoots = JavaProjectRootsUtil.getSuitableDestinationSourceRoots(file.getProject());
-            if (!suitableDestinationSourceRoots.isEmpty()) {
-                outDirFile = suitableDestinationSourceRoots.get(0);
-            }
+        return Optional.of(frameDir);
+    }
+
+    private Optional<VirtualFile> generate(@NotNull CocoFile file, @NotNull AnActionEvent actionEvent) {
+        final Optional<String> filePackage_ = extractPackageFromDirectory(file.getContainingDirectory());
+
+        Optional<VirtualFile> outDirFile_ = getGeneratedSourceFolders(file)
+                .stream()
+                .map(SourceFolder::getFile)
+                .findFirst();
+
+        if (!outDirFile_.isPresent()) {
+            outDirFile_ = JavaProjectRootsUtil.getSuitableDestinationSourceRoots(file.getProject())
+                    .stream()
+                    .findFirst();
         }
 
-        if (outDirFile != null && filePackage != null) {
+        if (outDirFile_.isPresent() && filePackage_.isPresent()) {
             try {
-                outDirFile = VfsUtil.createDirectoryIfMissing(outDirFile, filePackage.replace(".", "/"));
+                outDirFile_ = Optional.of(VfsUtil.createDirectoryIfMissing(outDirFile_.get(), filePackage_.get().replace(".", "/")));
             } catch (IOException ignore) {
             }
         }
 
-        VirtualFile parent = file.getVirtualFile().getParent();
+        final VirtualFile parent = file.getVirtualFile().getParent();
+        final Optional<VirtualFile> frameDirectory_ = findFrameDirectory(file.getVirtualFile());
+
+        if (!frameDirectory_.isPresent()) {
+            return Optional.empty();
+        }
+
+
         String path = parent.getPath();
         String filePath = file.getVirtualFile().getPath();
-
-        String frameDir = null, outDir = (outDirFile != null) ? outDirFile.getPath() : null, ddtString = null;
 
         Scanner scanner = new Scanner(filePath);
         Parser parser = new Parser(scanner);
@@ -157,27 +180,24 @@ public class CocoRAction extends AnAction {
 
         parser.tab.srcName = filePath;
         parser.tab.srcDir = path;
-        parser.tab.nsName = filePackage;
-        parser.tab.frameDir = (frameDir != null) ? frameDir : path;
-        parser.tab.outDir = (outDir != null) ? outDir : path;
-        if (ddtString != null) {
-            parser.tab.SetDDT(ddtString);
-        }
+        filePackage_.ifPresent(s -> parser.tab.nsName = s);
+        parser.tab.frameDir = frameDirectory_.get().getPath();
+        parser.tab.outDir = outDirFile_.map(VirtualFile::getPath).orElse(path);
 
         try {
             parser.Parse();
         } catch (RuntimeException e) {
             notify(e.getMessage(), MessageType.ERROR);
-            return null;
+            return Optional.empty();
         }
 
         parser.trace.Close();
 
         intellijErrors.getErrors()
-                .forEach(notification -> notify(notification.getContent(), MessageType.ERROR, true));
+                .forEach(notification -> notify(file.getVirtualFile().getName() + ": " + notification.getContent(), MessageType.ERROR, true));
 
         intellijErrors.getWarnings()
-                .forEach(notification -> notify(notification.getContent(), MessageType.WARNING, true));
+                .forEach(notification -> notify(file.getVirtualFile().getName() + ": " + notification.getContent(), MessageType.WARNING, true));
 
 
         if (intellijErrors.getErrorCount() != 0) {
@@ -224,7 +244,7 @@ public class CocoRAction extends AnAction {
                     cocoCompileContext);
         });
 
-        return outDirFile != null ? outDirFile : parent;
+        return outDirFile_;
     }
 
     @Override

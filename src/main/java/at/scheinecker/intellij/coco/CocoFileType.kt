@@ -13,7 +13,7 @@ class CocoFileType private constructor() : LanguageFileType(CocoLanguage.INSTANC
     }
 
     override fun getDescription(): String {
-        return "A Cocol/R compiler description file"
+        return "Cocol/R ATG file"
     }
 
     override fun getDefaultExtension(): String {
