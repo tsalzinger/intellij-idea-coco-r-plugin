@@ -7,9 +7,4 @@ import org.jetbrains.annotations.NonNls
 /**
  * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
  */
-class CocoTokenType(@NonNls debugName: String) : IElementType(debugName, CocoLanguage.INSTANCE) {
-
-    override fun toString(): String {
-        return "CocoTokenType." + super.toString()
-    }
-}
+class CocoTokenType(@NonNls debugName: String) : IElementType(debugName, CocoLanguage.INSTANCE)
