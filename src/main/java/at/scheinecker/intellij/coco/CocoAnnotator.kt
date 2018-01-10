@@ -94,7 +94,7 @@ class CocoAnnotator : Annotator {
                 if (first == null && element is CocoProduction) {
                     val compiler = CocoUtil.findCompiler(element.getContainingFile(), element.name)
                     if (compiler != null) {
-                        val annotation = holder.createInfoAnnotation(ident, "Main production for grammar")
+                        val annotation = holder.createInfoAnnotation(ident, "Entry point production for grammar")
                         annotation.textAttributes = DefaultLanguageHighlighterColors.INSTANCE_FIELD
                         return
                     }

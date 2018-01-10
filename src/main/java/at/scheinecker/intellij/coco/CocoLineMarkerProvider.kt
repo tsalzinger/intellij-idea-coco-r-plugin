@@ -14,8 +14,8 @@ class CocoLineMarkerProvider : RelatedItemLineMarkerProvider() {
                 val builder = NavigationGutterIconBuilder
                         .create(CocoIcons.FILE)
                         .setTarget(compiler)
-                        .setTooltipText("Navigate to the COMPILER definition")
-                result.add(builder.createLineMarkerInfo(element.ident!!))
+                        .setTooltipText("Entry point production for grammar")
+                result.add(builder.createLineMarkerInfo(element.ident))
             }
         }
     }
