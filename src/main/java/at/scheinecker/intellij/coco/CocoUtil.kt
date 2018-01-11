@@ -3,6 +3,7 @@ package at.scheinecker.intellij.coco
 import at.scheinecker.intellij.coco.psi.*
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
+import com.intellij.psi.JavaDirectoryService
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiNameIdentifierOwner
@@ -67,6 +68,19 @@ object CocoUtil {
 
     fun getDeclaredPackage(file: PsiFile): String? {
         return PsiTreeUtil.getChildOfType(file, CocoPackageDirective::class.java)?.declaredPackage?.text?.trim();
+    }
+
+    fun getTargetPackage(file: CocoFile): Optional<String> {
+        return getTargetPackage(file.containingFile)
+    }
+
+    fun getTargetPackage(file: PsiFile): Optional<String> {
+        val declaredPackage = getDeclaredPackage(file)
+        if (declaredPackage != null) {
+            return Optional.of(declaredPackage)
+        }
+
+        return Optional.ofNullable(JavaDirectoryService.getInstance().getPackage(file.containingDirectory!!)?.qualifiedName)
     }
 
     fun findProductions(file: PsiFile): List<CocoProduction> {

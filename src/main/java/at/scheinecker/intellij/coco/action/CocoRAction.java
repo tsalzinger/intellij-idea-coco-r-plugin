@@ -102,12 +102,6 @@ public class CocoRAction extends AnAction {
         return Collections.emptyList();
     }
 
-    private Optional<String> extractPackageFromDirectory(final PsiDirectory psiDirectory) {
-        return Optional.ofNullable(psiDirectory)
-                .map(containingDirectory -> JavaDirectoryService.getInstance().getPackage(containingDirectory))
-                .map(PsiPackage::getQualifiedName);
-    }
-
     private Optional<VirtualFile> findFrameDirectory(final VirtualFile virtualFile) {
         VirtualFile frameDir = virtualFile;
         VirtualFile parserFrame = null;
@@ -136,8 +130,7 @@ public class CocoRAction extends AnAction {
     }
 
     private Optional<VirtualFile> generate(@NotNull CocoFile file, @NotNull AnActionEvent actionEvent) {
-        final String declaredPackage = CocoUtil.INSTANCE.getDeclaredPackage(file.getContainingFile());
-        final Optional<String> filePackage_ = declaredPackage != null ? Optional.of(declaredPackage) : extractPackageFromDirectory(file.getContainingDirectory());
+        final Optional<String> filePackage_ = CocoUtil.INSTANCE.getTargetPackage(file);
 
         Optional<VirtualFile> outDirFile_ = getGeneratedSourceFolders(file)
                 .stream()
