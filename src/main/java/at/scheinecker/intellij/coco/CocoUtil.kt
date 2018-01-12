@@ -3,10 +3,7 @@ package at.scheinecker.intellij.coco
 import at.scheinecker.intellij.coco.psi.*
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
-import com.intellij.psi.JavaDirectoryService
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.*
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
@@ -32,8 +29,7 @@ object CocoUtil {
     }
 
     fun findCompilers(file: PsiFile): List<CocoCompiler> {
-        return findCompilers(file.project)
-                .filter { compiler -> file == compiler.containingFile }
+        return PsiTreeUtil.findChildrenOfType(file, CocoCompiler::class.java).toList();
     }
 
     fun findCompilers(project: Project?, name: String): List<CocoCompiler> {
@@ -100,6 +96,26 @@ object CocoUtil {
         val tokens = scannerSpecification.tokens ?: return emptyList()
 
         return tokens.tokenDeclList
+    }
+
+    fun findPragmaDecls(file: PsiFile): List<CocoPragmaDecl> {
+        val scannerSpecification = PsiTreeUtil.getChildOfType(file, CocoScannerSpecification::class.java) ?: return emptyList()
+
+        val pragmas = scannerSpecification.pragmas ?: return emptyList()
+
+        return pragmas.pragmaDeclList
+    }
+
+    fun findNearestCocoNamedElement(element: PsiElement): CocoNamedElement {
+        var searchElement: PsiElement? = element
+        while (searchElement != null) {
+            if (searchElement is CocoNamedElement) {
+                return searchElement
+            }
+            searchElement = searchElement.parent
+        }
+
+        throw NullPointerException("Couldn't find CocoNamedElement for element $element")
     }
 
     fun findProductions(project: Project?): List<CocoProduction> {
@@ -181,5 +197,9 @@ object CocoUtil {
         } else collection
                 .filter { item -> name == item.name }
 
+    }
+
+    fun findGlobalFieldsAndMethods(file: PsiFile): CocoGlobalFieldsAndMethods? {
+        return PsiTreeUtil.getChildOfType(file, CocoGlobalFieldsAndMethods::class.java)
     }
 }
