@@ -88,8 +88,13 @@
         <languageInjector implementation="at.scheinecker.intellij.coco.CocoJavaInjector"/>
     </extensions>
     <actions>
+        <action id="at.scheinecker.intellij.coco.action.NewAtgFileAction"
+                class="at.scheinecker.intellij.coco.action.NewAtgFileAction">
+            <add-to-group group-id="NewGroup"/>
+        </action>
         <group id="coco.Generate">
-            <action id="at.jku.ssw.coco.intellij.RunCocoR" class="at.scheinecker.intellij.coco.action.CocoRAction"
+            <action id="at.scheinecker.intellij.coco.action.CocoRAction"
+                    class="at.scheinecker.intellij.coco.action.CocoRAction"
                     text="Run _Coco/R"
                     description="Runs Coco/R on the given .ATG file"
                     icon="/at/scheinecker/intellij/coco/icons/coco-ico.gif">
