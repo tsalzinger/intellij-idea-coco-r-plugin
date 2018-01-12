@@ -17,10 +17,10 @@ class CocoAnnotator : Annotator {
             val compiler = CocoUtil.findCompiler(element.getContainingFile(), compilerName)
 
             if (compiler != null) {
-                val annotation = holder.createInfoAnnotation(ident.textRange, null)
+                val annotation = holder.createInfoAnnotation(ident, null)
                 annotation.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE)
             } else {
-                holder.createErrorAnnotation(ident.textRange, "Unresolved COMPILER '$compilerName'")
+                holder.createErrorAnnotation(ident, "Unresolved COMPILER '$compilerName'")
             }
         } else if (element is HasCocoCharacterReference) {
             val ident = element.nameIdentifier
@@ -39,7 +39,7 @@ class CocoAnnotator : Annotator {
                         annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD)
                     }
                 } else {
-                    holder.createErrorAnnotation(ident.textRange, "Unresolved Character '$characterReferenceName'")
+                    holder.createErrorAnnotation(ident, "Unresolved Character '$characterReferenceName'")
                 }
             }
         } else if (element is CocoFactor) {
@@ -64,12 +64,12 @@ class CocoAnnotator : Annotator {
                     annotation.textAttributes = DefaultLanguageHighlighterColors.INSTANCE_FIELD
 
                     if (production.formalAttributes != null && element.actualAttributes == null) {
-                        holder.createErrorAnnotation(ident.textRange, "Production '$referenceName' defines formal attributes")
+                        holder.createErrorAnnotation(ident, "Production '$referenceName' defines formal attributes")
                     } else if (production.formalAttributes == null && element.actualAttributes != null) {
-                        holder.createErrorAnnotation(element.actualAttributes!!.textRange, "Production '$referenceName' doesn't define formal attributes")
+                        holder.createErrorAnnotation(element.actualAttributes!!, "Production '$referenceName' doesn't define formal attributes")
                     }
                 } else {
-                    holder.createErrorAnnotation(ident.textRange, "Unresolved Token or Production '$referenceName'")
+                    holder.createErrorAnnotation(ident, "Unresolved Token or Production '$referenceName'")
                 }
             }
         } else if (element is CocoCompiler) {
