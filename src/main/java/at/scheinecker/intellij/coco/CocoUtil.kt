@@ -84,14 +84,14 @@ object CocoUtil {
     fun getParserClass(file: PsiFile): PsiClass? {
         val javaPsiFacade = ServiceManager.getService(file.project, JavaPsiFacade::class.java)
 
-        val parserClassName = "${getTargetPackage(file).map { "${it}." }.orElse("")}Parser"
+        val parserClassName = "${getTargetPackage(file).map { if (it.isEmpty()) it else "${it}." }.orElse("")}Parser"
         return javaPsiFacade.findClass(parserClassName, GlobalSearchScope.allScope(javaPsiFacade.project))
     }
 
     fun getJavaInfos(file: PsiClass) {
 
-        val instance = CodeSmellDetector.getInstance(file.project)
-        instance.findCodeSmells(listOf(file.containingFile.virtualFile))
+        CodeSmellDetector.getInstance(file.project)
+                .findCodeSmells(listOf(file.containingFile.virtualFile))
                 .filter { it.severity == HighlightSeverity.ERROR }
                 .forEach {
                     Notifications.Bus.notify(
