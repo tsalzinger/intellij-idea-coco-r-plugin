@@ -91,14 +91,16 @@ object CocoUtil {
     fun getJavaInfos(file: PsiClass) {
 
         val instance = CodeSmellDetector.getInstance(file.project)
-        val findCodeSmells = instance.findCodeSmells(listOf(file.containingFile.virtualFile))
-
-        for (findCodeSmell in findCodeSmells) {
-            Notifications.Bus.notify(CocoRAction.COCO_NOTIFICATION_GROUP.createNotification(
-                    "${findCodeSmell.description} [${findCodeSmell.startLine}:${findCodeSmell.startColumn}]",
-                    if (findCodeSmell.severity == HighlightSeverity.ERROR) MessageType.ERROR else MessageType.WARNING
-            ))
-        }
+        instance.findCodeSmells(listOf(file.containingFile.virtualFile))
+                .filter { it.severity == HighlightSeverity.ERROR }
+                .forEach {
+                    Notifications.Bus.notify(
+                            CocoRAction.COCO_NOTIFICATION_GROUP.createNotification(
+                                    "${it.description} [${it.startLine}:${it.startColumn}]",
+                                    MessageType.ERROR
+                            )
+                    )
+                }
     }
 
     fun findProductions(file: PsiFile): List<CocoProduction> {
