@@ -1,8 +1,14 @@
 package at.scheinecker.intellij.coco
 
+import at.scheinecker.intellij.coco.action.CocoRAction
 import at.scheinecker.intellij.coco.psi.*
+import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.notification.Notifications
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.MessageType
+import com.intellij.openapi.vcs.CodeSmellDetector
 import com.intellij.psi.*
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
@@ -66,10 +72,6 @@ object CocoUtil {
         return PsiTreeUtil.getChildOfType(file, CocoPackageDirective::class.java)?.declaredPackage?.text?.trim();
     }
 
-    fun getTargetPackage(file: CocoFile): Optional<String> {
-        return getTargetPackage(file.containingFile)
-    }
-
     fun getTargetPackage(file: PsiFile): Optional<String> {
         val declaredPackage = getDeclaredPackage(file)
         if (declaredPackage != null) {
@@ -77,6 +79,26 @@ object CocoUtil {
         }
 
         return Optional.ofNullable(JavaDirectoryService.getInstance().getPackage(file.containingDirectory!!)?.qualifiedName)
+    }
+
+    fun getParserClass(file: PsiFile): PsiClass? {
+        val javaPsiFacade = ServiceManager.getService(file.project, JavaPsiFacade::class.java)
+
+        val parserClassName = "${getTargetPackage(file).map { "${it}." }.orElse("")}Parser"
+        return javaPsiFacade.findClass(parserClassName, GlobalSearchScope.allScope(javaPsiFacade.project))
+    }
+
+    fun getJavaInfos(file: PsiClass) {
+
+        val instance = CodeSmellDetector.getInstance(file.project)
+        val findCodeSmells = instance.findCodeSmells(listOf(file.containingFile.virtualFile))
+
+        for (findCodeSmell in findCodeSmells) {
+            Notifications.Bus.notify(CocoRAction.COCO_NOTIFICATION_GROUP.createNotification(
+                    "${findCodeSmell.description} [${findCodeSmell.startLine}:${findCodeSmell.startColumn}]",
+                    if (findCodeSmell.severity == HighlightSeverity.ERROR) MessageType.ERROR else MessageType.WARNING
+            ))
+        }
     }
 
     fun findProductions(file: PsiFile): List<CocoProduction> {

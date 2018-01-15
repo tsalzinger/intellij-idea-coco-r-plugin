@@ -5,10 +5,7 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.components.ServiceManager
-import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiElement
-import com.intellij.psi.search.GlobalSearchScope
 
 class CocoLineMarkerProvider : RelatedItemLineMarkerProvider() {
     override fun collectNavigationMarkers(element: PsiElement, result: MutableCollection<in RelatedItemLineMarkerInfo<*>>) {
@@ -20,13 +17,7 @@ class CocoLineMarkerProvider : RelatedItemLineMarkerProvider() {
     }
 
     private fun addImplementedByMarker(element: CocoProduction, result: MutableCollection<in RelatedItemLineMarkerInfo<*>>) {
-        val javaPsiFacade = ServiceManager.getService(element.containingFile.project, JavaPsiFacade::class.java)
-
-        val parserClassName = "${CocoUtil.getTargetPackage(element.containingFile).map { "${it}." }.orElse("")}Parser"
-        val findMethod = javaPsiFacade.findClass(
-                parserClassName,
-                GlobalSearchScope.allScope(javaPsiFacade.project)
-        )?.findMethodsByName(element.name, false)?.firstOrNull()
+        val findMethod = CocoUtil.getParserClass(element.containingFile)?.findMethodsByName(element.name, false)?.firstOrNull()
 
         if (findMethod != null) {
             result.add(

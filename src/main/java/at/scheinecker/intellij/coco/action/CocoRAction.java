@@ -28,7 +28,10 @@ import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
@@ -45,7 +48,7 @@ import java.util.Optional;
  * Created by Thomas on 29/12/2014.
  */
 public class CocoRAction extends AnAction {
-    private static final NotificationGroup COCO_NOTIFICATION_GROUP = NotificationGroup.balloonGroup("Coco/R Compiler");
+    public static final NotificationGroup COCO_NOTIFICATION_GROUP = NotificationGroup.balloonGroup("Coco/R Compiler");
 
     public void actionPerformed(AnActionEvent e) {
         final Project project = getEventProject(e);
@@ -63,7 +66,12 @@ public class CocoRAction extends AnAction {
             WriteAction
                     .compute(() -> generate(file, e))
                     .ifPresent(this::markFileTreeAsDirtyAndReload);
+
+            PsiClass parserClass = CocoUtil.INSTANCE.getParserClass(file);
+            CocoUtil.INSTANCE.getJavaInfos(parserClass);
+
         }
+
     }
 
     private void markFileTreeAsDirtyAndReload(final VirtualFile virtualFile) {
@@ -164,7 +172,7 @@ public class CocoRAction extends AnAction {
         Scanner scanner = new Scanner(filePath);
         Parser parser = new Parser(scanner);
 
-        final IntellijErrors intellijErrors = new IntellijErrors(parser);
+        final IntellijErrors intellijErrors = new IntellijErrors();
         parser.errors = intellijErrors;
 
         parser.trace = new Trace(path);
