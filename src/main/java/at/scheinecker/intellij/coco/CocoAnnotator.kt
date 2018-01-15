@@ -66,13 +66,22 @@ class CocoAnnotator : Annotator {
                         val annotation = holder.createInfoAnnotation(ident, null)
                         annotation.textAttributes = DefaultLanguageHighlighterColors.INSTANCE_FIELD
 
-                        val formalAttributes = production.formalAttributes
-                        val hasFormalInputAttribues = formalAttributes != null && formalAttributes.text.trim('<', '>').trim().split(",").filter { !it.startsWith("out ") }.isNotEmpty()
+                        val formalAttributes = production.formalAttributes?.text.orEmpty().trim('<', '>').trim().split(",").filter { it.isNotEmpty() }
+                        val hasFormalOutputAttribute = formalAttributes.any { it.startsWith("out ") }
+                        val hasFormalInputAttributes = formalAttributes.any { !it.startsWith("out ") }
 
-                        if (hasFormalInputAttribues && element.actualAttributes == null) {
-                            holder.createErrorAnnotation(ident, "Production '$referenceName' defines formal attributes")
-                        } else if (!hasFormalInputAttribues && element.actualAttributes != null) {
-                            holder.createErrorAnnotation(element.actualAttributes!!, "Production '$referenceName' doesn't define formal attributes")
+                        val attributes = element.actualAttributes?.text.orEmpty().trim('<', '>').trim().split(",").filter { it.isNotEmpty() }
+                        val outputAttribute = attributes.any { it.startsWith("out ") }
+                        val inputAttributes = attributes.any { !it.startsWith("out ") }
+
+                        if (hasFormalInputAttributes && !inputAttributes) {
+                            holder.createErrorAnnotation(element, "Production '$referenceName' defines formal attributes")
+                        } else if (!hasFormalInputAttributes && inputAttributes) {
+                            holder.createErrorAnnotation(element, "Production '$referenceName' doesn't define formal attributes")
+                        }
+
+                        if (!hasFormalOutputAttribute && outputAttribute)  {
+                            holder.createErrorAnnotation(element, "Production '$referenceName' doesn't define an output attributes")
                         }
                     } else {
                         holder.createErrorAnnotation(ident, "Unresolved Token or Production '$referenceName'")
