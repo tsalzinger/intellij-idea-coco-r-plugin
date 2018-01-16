@@ -1,16 +1,15 @@
 package at.scheinecker.intellij.coco
 
-import at.scheinecker.intellij.coco.action.CocoRAction
 import at.scheinecker.intellij.coco.psi.*
+import com.intellij.codeInsight.CodeSmellInfo
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.notification.Notifications
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.vcs.CodeSmellDetector
 import com.intellij.psi.*
 import com.intellij.psi.search.FileTypeIndex
+import com.intellij.psi.search.FileTypeIndexImpl
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.indexing.FileBasedIndex
@@ -48,9 +47,8 @@ object CocoUtil {
             return emptyList()
         }
 
-        return FileBasedIndex
-                .getInstance()
-                .getContainingFiles<FileType, Void>(FileTypeIndex.NAME, CocoFileType.INSTANCE, GlobalSearchScope.allScope(project))
+        return FileTypeIndexImpl
+                .getFiles(CocoFileType.INSTANCE, GlobalSearchScope.allScope(project))
                 .mapNotNull { PsiManager.getInstance(project).findFile(it) as CocoFile? }
                 .flatMap { PsiTreeUtil.getChildrenOfType(it, CocoCompiler::class.java)?.asList() ?: emptyList() }
     }
@@ -88,19 +86,11 @@ object CocoUtil {
         return javaPsiFacade.findClass(parserClassName, GlobalSearchScope.allScope(javaPsiFacade.project))
     }
 
-    fun getJavaInfos(file: PsiClass) {
+    fun getJavaErrors(file: PsiClass): List<CodeSmellInfo> {
 
-        CodeSmellDetector.getInstance(file.project)
+        return CodeSmellDetector.getInstance(file.project)
                 .findCodeSmells(listOf(file.containingFile.virtualFile))
                 .filter { it.severity == HighlightSeverity.ERROR }
-                .forEach {
-                    Notifications.Bus.notify(
-                            CocoRAction.COCO_NOTIFICATION_GROUP.createNotification(
-                                    "${it.description} [${it.startLine}:${it.startColumn}]",
-                                    MessageType.ERROR
-                            )
-                    )
-                }
     }
 
     fun findProductions(file: PsiFile): List<CocoProduction> {

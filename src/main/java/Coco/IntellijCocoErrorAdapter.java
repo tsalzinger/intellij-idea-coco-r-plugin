@@ -1,8 +1,8 @@
 package Coco;
 
-import at.scheinecker.intellij.coco.CocoIcons;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
+import at.scheinecker.intellij.coco.action.CocoCompilerContext;
+import com.intellij.openapi.compiler.CompilerMessage;
+import com.intellij.openapi.compiler.CompilerMessageCategory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +10,16 @@ import java.util.List;
 /**
  * Created by Thomas on 03/04/2015.
  */
-public class IntellijErrors extends Errors {
-    final List<Notification> errors = new ArrayList<>();
-    final List<Notification> warnings = new ArrayList<>();
+public class IntellijCocoErrorAdapter extends Errors {
+    final List<CompilerMessage> errors = new ArrayList<>();
+    final List<CompilerMessage> warnings = new ArrayList<>();
+
+    private final CocoCompilerContext context;
+
+    public IntellijCocoErrorAdapter(final CocoCompilerContext context) {
+
+        this.context = context;
+    }
 
     @Override
     public void SynErr(int line, int column, int errorCode) {
@@ -214,27 +221,27 @@ public class IntellijErrors extends Errors {
                 errorMessage = "error " + errorCode;
         }
 
-        errors.add(new Notification("coco", CocoIcons.getFILE(), "Syntactic Error", null, errorMessage + " (" + line + ":" + column + ")", NotificationType.ERROR, null));
+        context.addCompilerMessage(CompilerMessageCategory.ERROR, errorMessage, line, column);
     }
 
     @Override
     public void SemErr(int line, int column, String error) {
-        errors.add(new Notification("coco", CocoIcons.getFILE(), "Semantic Error", null, error + " (" + line + ":" + column + ")", NotificationType.ERROR, null));
+        context.addCompilerMessage(CompilerMessageCategory.ERROR, error, line, column);
     }
 
     @Override
     public void SemErr(String error) {
-        errors.add(new Notification("coco", CocoIcons.getFILE(), "Semantic Error", null, error, NotificationType.ERROR, null));
+        context.addCompilerMessage(CompilerMessageCategory.ERROR, error);
     }
 
     @Override
     public void Warning(int line, int column, String warning) {
-        warnings.add(new Notification("coco", CocoIcons.getFILE(), null, null, warning + "(" + line + ":" + column + ")", NotificationType.WARNING, null));
+        context.addCompilerMessage(CompilerMessageCategory.WARNING, warning, line, column);
     }
 
     @Override
     public void Warning(String warning) {
-        warnings.add(new Notification("coco", CocoIcons.getFILE(), null, null, warning, NotificationType.WARNING, null));
+        context.addCompilerMessage(CompilerMessageCategory.WARNING, warning);
     }
 
     public int getErrorCount() {
@@ -245,11 +252,11 @@ public class IntellijErrors extends Errors {
         return warnings.size();
     }
 
-    public List<Notification> getErrors() {
+    public List<CompilerMessage> getErrors() {
         return errors;
     }
 
-    public List<Notification> getWarnings() {
+    public List<CompilerMessage> getWarnings() {
         return warnings;
     }
 }

@@ -1,12 +1,12 @@
 package at.scheinecker.intellij.coco.action;
 
 import Coco.*;
+import Coco.Scanner;
 import at.scheinecker.intellij.coco.CocoUtil;
 import at.scheinecker.intellij.coco.psi.CocoFile;
+import com.intellij.codeInsight.CodeSmellInfo;
 import com.intellij.compiler.CompilerMessageImpl;
-import com.intellij.compiler.impl.CompileContextImpl;
-import com.intellij.compiler.impl.FileSetCompileScope;
-import com.intellij.compiler.progress.CompilerTask;
+import com.intellij.compiler.ProblemsView;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.Notifications;
@@ -14,9 +14,8 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.openapi.compiler.CompilationStatusListener;
+import com.intellij.openapi.compiler.CompilerMessage;
 import com.intellij.openapi.compiler.CompilerMessageCategory;
-import com.intellij.openapi.compiler.CompilerTopics;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
@@ -37,12 +36,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.jetbrains.jps.model.java.JavaSourceRootProperties;
 
-import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by Thomas on 29/12/2014.
@@ -64,16 +59,32 @@ public class CocoRAction extends AnAction {
 
         for (CocoFile file : bnfFiles) {
             WriteAction
-                    .compute(() -> generate(file, e))
-                    .ifPresent(this::markFileTreeAsDirtyAndReload);
+                    .compute(() -> generate(file))
+                    .ifPresent(context -> {
+                        PsiClass parserClass = CocoUtil.INSTANCE.getParserClass(file);
+                        if (parserClass != null) {
+                            final List<CodeSmellInfo> javaErrors = CocoUtil.INSTANCE.getJavaErrors(parserClass);
 
-            PsiClass parserClass = CocoUtil.INSTANCE.getParserClass(file);
-            if (parserClass != null) {
-                CocoUtil.INSTANCE.getJavaInfos(parserClass);
-            }
+                            final List<CompilerMessage> compilerMessages = context.getCompilerMessages();
+                            for (CodeSmellInfo javaError : javaErrors) {
+                                compilerMessages.add(new CompilerMessageImpl(
+                                                context.getProject(),
+                                                CompilerMessageCategory.ERROR,
+                                                javaError.getDescription(),
+                                                parserClass.getContainingFile().getVirtualFile(),
+                                                javaError.getStartLine() + 1,
+                                                javaError.getStartColumn(),
+                                                null
+                                        )
+                                );
+                            }
+                        }
+
+                        markFileTreeAsDirtyAndReload(context.getOutputDir());
+                        showProblems(context);
+                    });
 
         }
-
     }
 
     private void markFileTreeAsDirtyAndReload(final VirtualFile virtualFile) {
@@ -139,7 +150,7 @@ public class CocoRAction extends AnAction {
         return Optional.of(frameDir);
     }
 
-    private Optional<VirtualFile> generate(@NotNull CocoFile file, @NotNull AnActionEvent actionEvent) {
+    private Optional<CocoCompilerContext> generate(@NotNull CocoFile file) {
         final Optional<String> filePackage_ = CocoUtil.INSTANCE.getTargetPackage(file);
 
         Optional<VirtualFile> outDirFile_ = getGeneratedSourceFolders(file)
@@ -168,14 +179,16 @@ public class CocoRAction extends AnAction {
         }
 
 
-        String path = parent.getPath();
-        String filePath = file.getVirtualFile().getPath();
+        final String path = parent.getPath();
+        final String outDir = outDirFile_.map(VirtualFile::getPath).orElse(path);
+        final String filePath = file.getVirtualFile().getPath();
 
-        Scanner scanner = new Scanner(filePath);
-        Parser parser = new Parser(scanner);
+        final Scanner scanner = new Scanner(filePath);
+        final Parser parser = new Parser(scanner);
 
-        final IntellijErrors intellijErrors = new IntellijErrors();
-        parser.errors = intellijErrors;
+        final CocoCompilerContext context = new CocoCompilerContext(file, outDirFile_.orElse(parent));
+
+        parser.errors = new IntellijCocoErrorAdapter(context);
 
         parser.trace = new Trace(path);
         parser.tab = new Tab(parser);
@@ -187,69 +200,44 @@ public class CocoRAction extends AnAction {
         parser.tab.srcDir = path;
         filePackage_.ifPresent(s -> parser.tab.nsName = s);
         parser.tab.frameDir = frameDirectory_.get().getPath();
-        parser.tab.outDir = outDirFile_.map(VirtualFile::getPath).orElse(path);
+        parser.tab.outDir = outDir;
 
-        try {
-            parser.Parse();
-        } catch (RuntimeException e) {
-            notify(e.getMessage(), MessageType.ERROR);
-            return Optional.empty();
-        }
+        parser.Parse();
 
         parser.trace.Close();
 
-        intellijErrors.getErrors()
-                .forEach(notification -> notify(file.getVirtualFile().getName() + ": " + notification.getContent(), MessageType.ERROR, true));
+        return Optional.of(context);
+    }
 
-        intellijErrors.getWarnings()
-                .forEach(notification -> notify(file.getVirtualFile().getName() + ": " + notification.getContent(), MessageType.WARNING, true));
+    private void showProblems(final CocoCompilerContext context) {
+        final Project project = context.getProject();
+        if (project != null && !project.isDisposed()) {
+            final ProblemsView view = ProblemsView.SERVICE.getInstance(project);
+            final UUID executionId = context.getExecutionId();
 
+            view.clearOldMessages(null, executionId);
 
-        if (intellijErrors.getErrorCount() != 0) {
-            notify("Coco/R Compiler completed with " + intellijErrors.getErrorCount() + " errors", MessageType.ERROR);
-        } else if (intellijErrors.getWarningCount() != 0) {
-            notify("Coco/R Compiler completed with " + intellijErrors.getWarningCount() + " warnings", MessageType.WARNING);
-        } else {
-            notify("Coco/R Compiler completed successfully", MessageType.INFO);
-        }
+            final List<CompilerMessage> compilerMessages = context.getCompilerMessages();
 
-        final Project eventProject = getEventProject(actionEvent);
-        SwingUtilities.invokeLater(() -> {
+            compilerMessages
+                    .forEach(message -> view.addMessage(message, executionId));
 
-            if (eventProject == null || eventProject.isDisposed()) {
-                return;
+            final VirtualFile inputFile = context.getInputFile();
+            String statusMessage = "Coco/R Compiler for '" + inputFile.getName() + "'  completed";
+            CompilerMessageCategory category = CompilerMessageCategory.INFORMATION;
+
+            if (context.getErrorsCount() != 0) {
+                statusMessage += " with " + context.getErrorsCount() + " errors and " + context.getWarningsCount() + " warnings";
+                category = CompilerMessageCategory.ERROR;
+            } else if (context.getWarningsCount() != 0) {
+                statusMessage += " with " + context.getWarningsCount() + " warnings";
+                category = CompilerMessageCategory.WARNING;
+            } else {
+                statusMessage += " successfully";
             }
 
-            final CompilationStatusListener publisher = eventProject.getMessageBus().syncPublisher(CompilerTopics.COMPILATION_STATUS);
-            final CompilerTask cocoCompilerTask = new CompilerTask(eventProject, "coco", true, false, false, true);
-            final CompileContextImpl cocoCompileContext = new CompileContextImpl(eventProject,
-                    cocoCompilerTask,
-                    new FileSetCompileScope(Collections.singleton(file.getVirtualFile()), Module.EMPTY_ARRAY),
-                    true,
-                    false
-            );
-
-            final Runnable r = () -> {
-                intellijErrors.getErrors().forEach(error -> {
-                    final CompilerMessageImpl errorMessage = new CompilerMessageImpl(eventProject, CompilerMessageCategory.ERROR, error.getContent(), file.getVirtualFile(), 0, 0, null);
-                    cocoCompilerTask.addMessage(errorMessage);
-//                    cocoCompileContext.addMessage(CompilerMessageCategory.ERROR, error.getContent(), file.getVirtualFile().getUrl(), 0, 0);
-                });
-
-                intellijErrors.getWarnings().forEach(warning -> {
-                    final CompilerMessageImpl warningMessage = new CompilerMessageImpl(eventProject, CompilerMessageCategory.WARNING, warning.getContent(), file.getVirtualFile(), 0, 0, null);
-                    cocoCompilerTask.addMessage(warningMessage);
-//                    cocoCompileContext.addMessage(CompilerMessageCategory.WARNING, warning.getContent(), file.getVirtualFile().getUrl(), 0, 0);
-                });
-            };
-
-            cocoCompilerTask.start(r, r);
-
-            publisher.compilationFinished(false, intellijErrors.getErrorCount(), intellijErrors.getWarningCount(),
-                    cocoCompileContext);
-        });
-
-        return outDirFile_;
+            view.addMessage(new CompilerMessageImpl(project, category, statusMessage), executionId);
+        }
     }
 
     @Override
