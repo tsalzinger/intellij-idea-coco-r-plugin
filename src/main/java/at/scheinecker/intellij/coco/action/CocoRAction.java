@@ -68,7 +68,9 @@ public class CocoRAction extends AnAction {
                     .ifPresent(this::markFileTreeAsDirtyAndReload);
 
             PsiClass parserClass = CocoUtil.INSTANCE.getParserClass(file);
-            CocoUtil.INSTANCE.getJavaInfos(parserClass);
+            if (parserClass != null) {
+                CocoUtil.INSTANCE.getJavaInfos(parserClass);
+            }
 
         }
 
