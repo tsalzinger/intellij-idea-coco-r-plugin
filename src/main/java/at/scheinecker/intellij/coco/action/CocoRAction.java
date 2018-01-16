@@ -27,6 +27,7 @@ import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
@@ -237,6 +238,10 @@ public class CocoRAction extends AnAction {
             }
 
             view.addMessage(new CompilerMessageImpl(project, category, statusMessage), executionId);
+
+            if (category != CompilerMessageCategory.INFORMATION) {
+                ToolWindowManager.getInstance(context.getProject()).getToolWindow("Problems").activate(null);
+            }
         }
     }
 
