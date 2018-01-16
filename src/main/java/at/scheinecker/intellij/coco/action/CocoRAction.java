@@ -62,6 +62,8 @@ public class CocoRAction extends AnAction {
             WriteAction
                     .compute(() -> generate(file))
                     .ifPresent(context -> {
+                        markFileTreeAsDirtyAndReload(context.getOutputDir());
+
                         PsiClass parserClass = CocoUtil.INSTANCE.getParserClass(file);
                         if (parserClass != null) {
                             final List<CodeSmellInfo> javaErrors = CocoUtil.INSTANCE.getJavaErrors(parserClass);
@@ -80,8 +82,6 @@ public class CocoRAction extends AnAction {
                                 );
                             }
                         }
-
-                        markFileTreeAsDirtyAndReload(context.getOutputDir());
                         showProblems(context);
                     });
 
