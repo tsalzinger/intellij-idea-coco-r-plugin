@@ -84,8 +84,7 @@ class CocoFoldingBuilder : FoldingBuilderEx() {
         }
 
         if (psiElement is CocoNamedElement) {
-            val name = psiElement.name
-            return name!! + " ..."
+            return "${psiElement.name ?: "??"} ..."
         }
 
         return "${node.elementType} ..."
