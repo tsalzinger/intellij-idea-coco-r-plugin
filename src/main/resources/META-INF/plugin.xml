@@ -1,12 +1,13 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>at.scheinecker.intellij.coco</id>
-    <name>Coco/R</name>
-    <version>1.0-alpha-20150411</version>
+    <name>Cocol/R and Coco/R</name>
+    <version>1.0.0-beta.2018-02-19</version>
     <vendor email="tscheinecker@gmail.com" url="https://github.com/tscheinecker">Thomas Scheinecker</vendor>
+    <category>Languages,Tools integration</category>
 
     <description><![CDATA[
       This plugin adds support for Cocol/R language and Coco/R compiler generator.<br>
-      For more details about Coco/R see <a href="http://www.ssw.uni-linz.ac.at/Research/Projects/Coco/">http://www.ssw.uni-linz.ac.at/Research/Projects/Coco/<a>
+      For more details about Coco/R see <a href="http://ssw.jku.at/coco/">http://ssw.jku.at/coco/<a>
     ]]></description>
 
     <change-notes><![CDATA[
@@ -14,31 +15,33 @@
         Current features:
         <br>
         <ul>
-            <li>Syntax Highlighting</li>
+            <li>Syntax Highlighting - Customizable via settings page</li>
+            <li>Commenter (Block and line comments)</li>
             <li>Basic error handling (unexpected elements)</li>
             <li>Reference check (report unresolvable references to characters, tokens and productions)</li>
             <li>Declaration order check (report references to characters and tokens declared after usage)</li>
             <li>Attributes check (productions have to be used with or without attributes according to declaration)</li>
             <li>Generate Scanner and Parser via menu action</li>
-            <li>Generate Scanner / Parser into target folder</li>
-            <li>Use source package for Scanner / Parser generation</li>
-            <li>Show errors during Scanner / Parser generation to user</li>
-            <li>Basic code completion</li>
+            <li>Automatic detection of appropriate output folder for generated Java classes</li>
+            <li>Automatic detection of package in case no $package directive is present)
+            <li>Code completion (Compiler, Character, Token, Pragma and Production names)</li>
             <li>Structure View</li>
             <li>Find usages</li>
             <li>Go to declaration</li>
-            <li>Go to symbol</li>
+            <li>Go to symbol / Symbol search</li>
+            <li>Go to generated code (for productions)</li>
             <li>Highlight unused characters, tokens, pragmas and productions</li>
             <li>Code Folding</li>
-            <li>Inplace rename refactorings</li>
-            <li>Brace matching for (), [], {}, <> and (..)</li>
+            <li>Inplace rename refactorings (Compiler, Characters, Tokens, Pragmas and Productions)</li>
+            <li>Brace matching for (), [], {}, <>, <..> and (..)</li>
+            <li>Warnings and Errors during Coco/R execution are shown within the Problems Tool Window</li>
+            <li>Java language injection including autocompletion support for declared Tokens, Pragmas and Productions</li>
         </ul>
         </p>
         <br>
         <p>
         TODO:<br>
         <ul>
-            <li>Show errors during Scanner / Parser generation in console window</li>
             <li>Better error recovery during parsing</li>
         </ul>
         </p>
@@ -53,7 +56,7 @@
         <fileTypeFactory implementation="at.scheinecker.intellij.coco.CocoFileTypeFactory"/>
         <lang.parserDefinition language="Cocol/R"
                                implementationClass="at.scheinecker.intellij.coco.CocoParserDefinition"/>
-        <lang.syntaxHighlighterFactory key="Cocol/R"
+        <lang.syntaxHighlighterFactory language="Cocol/R"
                                        implementationClass="at.scheinecker.intellij.coco.CocoSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="at.scheinecker.intellij.coco.CocoColorSettingsPage"/>
         <lang.braceMatcher language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoBraceMatcher"/>
@@ -93,6 +96,7 @@
             <add-to-group group-id="NewGroup"/>
         </action>
         <group id="coco.Generate">
+            <separator/>
             <action id="at.scheinecker.intellij.coco.action.CocoRAction"
                     class="at.scheinecker.intellij.coco.action.CocoRAction"
                     text="Run _Coco/R"
@@ -100,9 +104,8 @@
                     icon="/at/scheinecker/intellij/coco/icons/coco-ico.gif">
                 <keyboard-shortcut keymap="$default" first-keystroke="control shift G"/>
             </action>
-            <separator/>
             <add-to-group group-id="ToolsMenu" anchor="before"
-                          relative-to-action="com.intellij.tools.ExternalToolsGroup"/>
+                          relative-to-action="ExternalToolsGroup"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </group>
