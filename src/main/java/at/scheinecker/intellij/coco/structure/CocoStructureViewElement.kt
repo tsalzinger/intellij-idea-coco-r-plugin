@@ -17,10 +17,6 @@ import javax.swing.Icon
  */
 class CocoStructureViewElement(private val element: PsiElement) : StructureViewTreeElement, SortableTreeElement {
 
-    init {
-        println("${element.javaClass}")
-    }
-
     override fun getValue(): Any {
         return element
     }
