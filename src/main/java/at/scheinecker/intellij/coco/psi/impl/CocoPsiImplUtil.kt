@@ -1,8 +1,7 @@
 package at.scheinecker.intellij.coco.psi.impl
 
 import at.scheinecker.intellij.coco.CocoIcons
-import at.scheinecker.intellij.coco.psi.CocoCompiler
-import at.scheinecker.intellij.coco.psi.CocoTypes
+import at.scheinecker.intellij.coco.psi.*
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
@@ -47,6 +46,30 @@ object CocoPsiImplUtil {
         return object : ItemPresentation {
             override fun getPresentableText(): String? {
                 return element.name
+            }
+
+            override fun getLocationString(): String? {
+                return element.containingFile.name
+            }
+
+            override fun getIcon(unused: Boolean): Icon? {
+                return CocoIcons.FILE
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getPresentation(element: CocoDirectiveElement): ItemPresentation {
+        val name = when (element) {
+            is CocoPackageDirective -> "package ${element.text.substringAfter('=', "??")}"
+            is CocoCheckEofDirective -> (if (element.text.contains("true", true)) "" else "don't ") + "check EOF"
+            is CocoAnyDirective -> element.text
+            else -> null
+        }
+
+        return object : ItemPresentation {
+            override fun getPresentableText(): String? {
+                return name
             }
 
             override fun getLocationString(): String? {

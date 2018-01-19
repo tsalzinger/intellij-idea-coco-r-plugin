@@ -17,6 +17,10 @@ import javax.swing.Icon
  */
 class CocoStructureViewElement(private val element: PsiElement) : StructureViewTreeElement, SortableTreeElement {
 
+    init {
+        println("${element.javaClass}")
+    }
+
     override fun getValue(): Any {
         return element
     }
@@ -36,14 +40,16 @@ class CocoStructureViewElement(private val element: PsiElement) : StructureViewT
     }
 
     override fun getAlphaSortKey(): String {
-        if (element is PsiNamedElement) {
-            val name = element.name
-            if (name != null) {
-                return name
-            }
+
+        when (element) {
+            is CocoCompiler -> return "1"
+            is CocoScannerSpecification -> return "2"
+            is CocoParserSpecification -> return "3"
+            is CocoEnd -> return "4"
+            is PsiNamedElement -> return element.name.orEmpty()
         }
 
-        return ""
+        return element.text
     }
 
     private fun getPresentation(text: String?, type: String? = null, icon: Icon? = null): ItemPresentation {
@@ -67,64 +73,74 @@ class CocoStructureViewElement(private val element: PsiElement) : StructureViewT
         if (element is NavigationItem) {
             val presentation = (element as NavigationItem).presentation
             if (presentation != null) {
-                if (element is CocoFile) {
-                    return presentation
-                }
-
-                if (element is CocoSetDecl) {
-                    return if (element.getParent() is CocoCharacters) {
-                        getPresentation(presentation.presentableText, "Character")
-                    } else getPresentation(presentation.presentableText, "Pragma")
-
-                }
-
-                if (element is CocoTokenDecl) {
-                    return getPresentation(presentation.presentableText, "Token")
-                }
-
-                if (element is CocoProduction) {
-                    return getPresentation(presentation.presentableText, "Production")
-                }
-
-                if (element is CocoCompiler) {
-                    return getPresentation(presentation.presentableText, "Compiler", presentation.getIcon(false))
-                }
-
-                if (element is CocoEnd) {
-                    return getPresentation(presentation.presentableText, "End")
+                when (element) {
+                    is CocoFile -> {
+                        return presentation
+                    }
+                    is CocoDirectiveElement -> {
+                        return getPresentation(presentation.presentableText, "Directive")
+                    }
+                    is CocoSetDecl -> {
+                        return if (element.getParent() is CocoCharacters) {
+                            getPresentation(presentation.presentableText, "Character")
+                        } else getPresentation(presentation.presentableText, "Pragma")
+                    }
+                    is CocoTokenDecl -> {
+                        return getPresentation(presentation.presentableText, "Token")
+                    }
+                    is CocoProduction -> {
+                        return getPresentation(presentation.presentableText, "Production")
+                    }
+                    is CocoCompiler -> {
+                        return getPresentation(presentation.presentableText, "Compiler", presentation.getIcon(false))
+                    }
+                    is CocoEnd -> {
+                        return getPresentation(presentation.presentableText, "End")
+                    }
                 }
             }
         }
 
+        when (element) {
+            is CocoDirectives -> {
+                return getPresentation("Directives")
+            }
+        }
 
         if (element is CocoCommentDecl) {
             return getPresentation(element.getText(), "Comment")
         }
         if (element is CocoParserSpecification) {
-            return getPresentation("Productions")
+            return getPresentation("Productions (${element.productionList.size})")
         }
         if (element is CocoScannerSpecification) {
             return getPresentation("Scanner Specification")
         }
         if (element is CocoComments) {
-            return getPresentation("Comments")
+            return getPresentation("Comments (${element.commentDeclList.size})")
         }
         if (element is CocoCharacters) {
-            return getPresentation("Characters")
+            return getPresentation("Characters (${element.setDeclList.size})")
         }
         if (element is CocoTokens) {
-            return getPresentation("Tokens")
+            return getPresentation("Tokens (${element.tokenDeclList.size})")
         }
         if (element is CocoPragmas) {
-            return getPresentation("Pragmas")
+            return getPresentation("Pragmas (${element.pragmaDeclList.size})")
         }
 
         throw IllegalArgumentException("Illegal element of type '" + element.javaClass.simpleName + "' for structure view")
     }
 
     override fun getChildren(): Array<TreeElement> {
+//        TODO add support for directives!
         val treeElements = ArrayList<TreeElement>()
         if (element is CocoFile) {
+            val cocoDirectives = PsiTreeUtil.getChildOfType(element, CocoDirectives::class.java)
+            if (cocoDirectives != null && PsiTreeUtil.getChildrenOfType(cocoDirectives, CocoDirectiveElement::class.java) != null) {
+                treeElements.add(CocoStructureViewElement(cocoDirectives))
+            }
+
             val compilers = PsiTreeUtil.getChildrenOfType(element, CocoCompiler::class.java)
             if (compilers != null) {
                 for (compiler in compilers) {
@@ -168,6 +184,10 @@ class CocoStructureViewElement(private val element: PsiElement) : StructureViewT
             }
         } else if (element is CocoParserSpecification) {
             addToTreeElement(treeElements, element.productionList)
+        } else if (element is CocoDirectives) {
+            addToTreeElement(treeElements, element.packageDirectiveList)
+            addToTreeElement(treeElements, element.checkEofDirectiveList)
+            addToTreeElement(treeElements, element.anyDirectiveList)
         }
         return treeElements.toTypedArray()
     }

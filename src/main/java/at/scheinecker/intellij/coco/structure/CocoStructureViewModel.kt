@@ -23,6 +23,7 @@ class CocoStructureViewModel(file: CocoFile, editor: Editor?) : StructureViewMod
     override fun isAlwaysLeaf(element: StructureViewTreeElement): Boolean {
         val value = element.value
         return (value is CocoSetDecl
+                || value is CocoDirectiveElement
                 || value is CocoProduction
                 || value is CocoTokenDecl
                 || value is CocoCommentDecl
