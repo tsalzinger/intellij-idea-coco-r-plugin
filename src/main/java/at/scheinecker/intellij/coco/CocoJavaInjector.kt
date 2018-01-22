@@ -1,6 +1,8 @@
 package at.scheinecker.intellij.coco
 
 import at.scheinecker.intellij.coco.psi.*
+import at.scheinecker.intellij.coco.settings.CocoConfiguration
+import at.scheinecker.intellij.coco.settings.CocoInjectionMode
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.InjectedLanguagePlaces
@@ -9,6 +11,10 @@ import com.intellij.psi.PsiLanguageInjectionHost
 
 class CocoJavaInjector : LanguageInjector {
     override fun getLanguagesToInject(psiLanguageInjectionHost: PsiLanguageInjectionHost, injectedLanguagePlaces: InjectedLanguagePlaces) {
+        if (CocoConfiguration.getSettings(psiLanguageInjectionHost.project).injectionMode != CocoInjectionMode.SIMPLE) {
+            return
+        }
+
         val prefixBuilder = StringBuilder()
 
         CocoUtil.getTargetPackage(psiLanguageInjectionHost.containingFile.originalFile)
@@ -33,7 +39,8 @@ class CocoJavaInjector : LanguageInjector {
                 val cocoNamedElement = CocoUtil.findNearestCocoNamedElement(psiLanguageInjectionHost)
 
                 if (cocoNamedElement is CocoProduction) {
-                    prefixBuilder.append("\tvoid ${cocoNamedElement.name}(${cocoNamedElement.formalAttributes?.text?.trim('<', '>') ?: ""}) {\n")
+                    prefixBuilder.append("\tvoid ${cocoNamedElement.name}(${cocoNamedElement.formalAttributes?.text?.trim('<', '>')
+                            ?: ""}) {\n")
                 } else {
                     prefixBuilder.append("\tvoid ${cocoNamedElement.name}() {\n")
                 }

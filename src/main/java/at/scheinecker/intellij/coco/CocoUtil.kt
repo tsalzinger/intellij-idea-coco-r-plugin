@@ -54,7 +54,7 @@ object CocoUtil {
     }
 
     fun findCharacterDeclarations(file: PsiFile): List<CocoSetDecl> {
-        val scannerSpecification = PsiTreeUtil.getChildOfType(file, CocoScannerSpecification::class.java) ?: return emptyList()
+        val scannerSpecification = findScannerSpecification(file) ?: return emptyList()
 
         val characters = scannerSpecification.characters ?: return emptyList()
 
@@ -67,13 +67,20 @@ object CocoUtil {
     }
 
     fun getDeclaredPackage(file: PsiFile): String? {
-        return PsiTreeUtil.getChildOfType(file, CocoPackageDirective::class.java)?.declaredPackage?.text?.trim();
+        return PsiTreeUtil.getChildOfType(file, CocoCocoInjectorHost::class.java)?.directives?.packageDirectiveList?.firstOrNull()?.declaredPackage?.text?.trim()
     }
 
     fun getTargetPackage(file: PsiFile): Optional<String> {
+        if (file !is CocoFile) {
+            return Optional.empty()
+        }
         val declaredPackage = getDeclaredPackage(file)
         if (declaredPackage != null) {
             return Optional.of(declaredPackage)
+        }
+
+        if (file.containingDirectory == null) {
+            return Optional.empty()
         }
 
         return Optional.ofNullable(JavaDirectoryService.getInstance().getPackage(file.containingDirectory!!)?.qualifiedName)
@@ -94,9 +101,17 @@ object CocoUtil {
     }
 
     fun findProductions(file: PsiFile): List<CocoProduction> {
-        val parserSpecification = PsiTreeUtil.getChildOfType(file, CocoParserSpecification::class.java) ?: return emptyList()
+        val parserSpecification = findParserSpecification(file) ?: return emptyList()
 
         return parserSpecification.productionList
+    }
+
+    fun findScannerSpecification(file: PsiFile): CocoScannerSpecification? {
+        return PsiTreeUtil.getChildOfType(file, CocoCocoInjectorHost::class.java)?.scannerSpecification
+    }
+
+    fun findParserSpecification(file: PsiFile): CocoParserSpecification? {
+        return PsiTreeUtil.getChildOfType(file, CocoCocoInjectorHost::class.java)?.parserSpecification
     }
 
     @Contract("_, null -> null")
@@ -105,7 +120,7 @@ object CocoUtil {
     }
 
     fun findTokenDecls(file: PsiFile): List<CocoTokenDecl> {
-        val scannerSpecification = PsiTreeUtil.getChildOfType(file, CocoScannerSpecification::class.java) ?: return emptyList()
+        val scannerSpecification = findScannerSpecification(file) ?: return emptyList()
 
         val tokens = scannerSpecification.tokens ?: return emptyList()
 
@@ -113,7 +128,7 @@ object CocoUtil {
     }
 
     fun findPragmaDecls(file: PsiFile): List<CocoPragmaDecl> {
-        val scannerSpecification = PsiTreeUtil.getChildOfType(file, CocoScannerSpecification::class.java) ?: return emptyList()
+        val scannerSpecification = findScannerSpecification(file) ?: return emptyList()
 
         val pragmas = scannerSpecification.pragmas ?: return emptyList()
 

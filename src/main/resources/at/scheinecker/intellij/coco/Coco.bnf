@@ -25,6 +25,8 @@
     implements("Factor")="at.scheinecker.intellij.coco.psi.HasCocoTokenOrProductionReference"
     implements("Compiler|SetDecl|TokenDecl|PragmaDecl|Production")="at.scheinecker.intellij.coco.psi.CocoNamedElement"
     implements("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="com.intellij.psi.PsiLanguageInjectionHost"
+    implements("CocoInjectorHost")="com.intellij.psi.PsiLanguageInjectionHost"
+    mixin("CocoInjectorHost")="at.scheinecker.intellij.coco.psi.impl.CocoJavaType"
     methods("Compiler|End|BasicSet|TokenFactor|Factor|SetDecl|TokenDecl|PragmaDecl|Production")=[
         getName
         setName
@@ -89,7 +91,9 @@
     ]
 }
 
-Cocol ::=
+Cocol ::= CocoInjectorHost
+
+CocoInjectorHost ::=
     Directives
     [Imports]
     Compiler
@@ -184,19 +188,25 @@ Factor ::= ['WEAK'] Symbol [ActualAttributes]
 | "ANY"
 | "SYNC"
 | SemAction
-LocalDecl ::= SemAction
+private LocalDecl ::= SemAction
 FormalAttributes ::= SimpleFormalAttributes | ExtendedFormalAttributes
 private SimpleFormalAttributes ::= '<' FormalAttributesBody '>' {pin = 1}
 private ExtendedFormalAttributes ::= "<." FormalAttributesBody ".>" {pin = 1}
-private FormalAttributesBody ::= ['out'] FormalAttributesParameter {AdditionalFormalAttributesParameter}*
-private FormalAttributesParameter ::= JavaTypeReference JavaTypeReference {pin = 1}
+private FormalAttributesBody ::= FormalAttributesWithOutput | FormalInputAttributes
+FormalAttributesWithOutput ::= FormalOutputAttribute [',' FormalInputAttributes] {pin = 1}
+FormalInputAttributes ::= FormalAttributesParameter {AdditionalFormalAttributesParameter}* {pin = 1}
+//private FormalAttributeStart ::= FormalOutputAttribute | FormalAttributesParameter
+FormalOutputAttribute ::= 'out' FormalAttributesParameter {pin = 1}
+FormalAttributesParameter ::= JavaTypeReference JavaTypeReference {pin = 1}
 private AdditionalFormalAttributesParameter ::= ',' FormalAttributesParameter {pin = 1}
 ActualAttributes ::= SimpleActualAttributes | ExtendedActualAttributes
 private SimpleActualAttributes ::= '<' ActualAttributesBody '>' {pin = 1}
 private ExtendedActualAttributes ::= "<." ActualAttributesBody ".>" {pin = 1}
-private ActualAttributesBody ::= ['out'] JavaTypeReference {AdditionalActualAttributesParameter}*
+ActualAttributesBody ::= AttributeStart {AdditionalActualAttributesParameter}*  {pin = 1}
+private AttributeStart ::= AttributeAssignment | JavaTypeReference
+AttributeAssignment ::= 'out' JavaTypeReference {pin = 1}
 private AdditionalActualAttributesParameter ::= ',' ident {pin = 1}
-private JavaTypeReference ::= ident {JavaSubTypeReference}* {pin = 1}
+JavaTypeReference ::= ident {JavaSubTypeReference}* {pin = 1}
 private JavaSubTypeReference ::= '.' ident {pin = 1}
 
 Resolver ::= "IF" '(' {JavaBooleanExpression}* ')' {pin=2}

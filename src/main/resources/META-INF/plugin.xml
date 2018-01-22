@@ -88,7 +88,18 @@
 
         <lang.commenter language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoCommenter"/>
         <lang.foldingBuilder language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoFoldingBuilder"/>
+
         <languageInjector implementation="at.scheinecker.intellij.coco.CocoJavaInjector"/>
+        <multiHostInjector implementation="at.scheinecker.intellij.coco.CocoJavaMultiHostInjector"/>
+
+
+        <projectConfigurable groupId="language"
+                             instance="at.scheinecker.intellij.coco.settings.CocoSettingsConfigurable"
+                             id="coco.preferences"
+                             nonDefaultProject="true"
+                             displayName="Coco/R"/>
+        <projectService serviceInterface="at.scheinecker.intellij.coco.settings.CocoConfiguration"
+                        serviceImplementation="at.scheinecker.intellij.coco.settings.CocoConfiguration"/>
     </extensions>
     <actions>
         <action id="at.scheinecker.intellij.coco.action.NewAtgFileAction"

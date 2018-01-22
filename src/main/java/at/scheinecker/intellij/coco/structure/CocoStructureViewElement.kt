@@ -132,30 +132,32 @@ class CocoStructureViewElement(private val element: PsiElement) : StructureViewT
 //        TODO add support for directives!
         val treeElements = ArrayList<TreeElement>()
         if (element is CocoFile) {
-            val cocoDirectives = PsiTreeUtil.getChildOfType(element, CocoDirectives::class.java)
+            val injectionHost = PsiTreeUtil.getChildOfType(element, CocoCocoInjectorHost::class.java)
+
+            val cocoDirectives = PsiTreeUtil.getChildOfType(injectionHost, CocoDirectives::class.java)
             if (cocoDirectives != null && PsiTreeUtil.getChildrenOfType(cocoDirectives, CocoDirectiveElement::class.java) != null) {
                 treeElements.add(CocoStructureViewElement(cocoDirectives))
             }
 
-            val compilers = PsiTreeUtil.getChildrenOfType(element, CocoCompiler::class.java)
+            val compilers = PsiTreeUtil.getChildrenOfType(injectionHost, CocoCompiler::class.java)
             if (compilers != null) {
                 for (compiler in compilers) {
                     treeElements.add(CocoStructureViewElement(compiler))
                 }
             }
-            val scannerSpecifications = PsiTreeUtil.getChildrenOfType(element, CocoScannerSpecification::class.java)
+            val scannerSpecifications = PsiTreeUtil.getChildrenOfType(injectionHost, CocoScannerSpecification::class.java)
             if (scannerSpecifications != null) {
                 for (scannerSpecification in scannerSpecifications) {
                     treeElements.add(CocoStructureViewElement(scannerSpecification))
                 }
             }
-            val parserSpecifications = PsiTreeUtil.getChildrenOfType(element, CocoParserSpecification::class.java)
+            val parserSpecifications = PsiTreeUtil.getChildrenOfType(injectionHost, CocoParserSpecification::class.java)
             if (parserSpecifications != null) {
                 for (parserSpecification in parserSpecifications) {
                     treeElements.add(CocoStructureViewElement(parserSpecification))
                 }
             }
-            val ends = PsiTreeUtil.getChildrenOfType(element, CocoEnd::class.java)
+            val ends = PsiTreeUtil.getChildrenOfType(injectionHost, CocoEnd::class.java)
             if (ends != null) {
                 for (end in ends) {
                     treeElements.add(CocoStructureViewElement(end))
