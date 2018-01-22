@@ -170,7 +170,7 @@ private Symbol ::= ident | string | char
 
 Pragmas ::= "PRAGMAS" {PragmaDecl}*
 PragmaDecl ::= TokenDecl [SemAction]
-SemAction ::= "(." ArbitraryStatements ".)"
+SemAction ::= "(." ArbitraryStatements ".)" {pin = 1}
 
 Comments ::= CommentDecl {CommentDecl}*
 CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"] {pin = 1}
@@ -178,7 +178,7 @@ CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"] {pin = 1}
 WhiteSpaceDecl ::= "IGNORE" (Set | "CASE") {pin=1}
 
 ParserSpecification ::= "PRODUCTIONS" {Production}* {pin = 1}
-Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.' {pin = 1}
+Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.' {pin = 4}
 Expression ::= Term {'|' Term}*
 Term ::= [[Resolver] Factor {Factor}*]
 Factor ::= ['WEAK'] Symbol [ActualAttributes]

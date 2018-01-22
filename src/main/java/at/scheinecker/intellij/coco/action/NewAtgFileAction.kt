@@ -12,6 +12,68 @@ import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.util.IncorrectOperationException
 
+private val NEW_ATG_FILE_TEMPLATE = """
+// Set the name of your grammar here (and at the end of this grammar):
+COMPILER ${'$'}NAME
+
+// Add auxiliary methods and declaration here.
+
+
+// If you want your generated compiler case insensitive add the
+// keyword IGNORECASE here.
+
+
+CHARACTERS
+// Add character set declarations here.
+// Examples:
+//   letter = 'A'..'Z' + 'a'..'z'.
+//   digit = "0123456789".
+//   cr = '\r'.
+//   lf = '\n'.
+
+
+TOKENS
+// Add token declarations here.
+// Example:
+//   ident = letter {letter | digit}.
+//   number = digit {digit}.
+
+
+PRAGMAS
+// Add pragma declarations here.
+// Example:
+//   switch = '${'$'}' { digit | letter }. (. Optional semantic action .)
+
+
+// Add comments here.
+// Example for a multi-line block comment:
+//   COMMENTS FROM "/*" TO "*/" NESTED
+// Example for a single line comment:
+//   COMMENTS FROM "//" TO lf
+
+
+// Set the ignored characters (whitespaces) here, the blank character is
+// ignored by default.
+// Example, add line breaks to the ignore set.
+//   IGNORE cr + lf
+
+
+PRODUCTIONS
+
+// Add your productions here, one must have the same name as the grammar,
+// it will be the start symbol (entry point of your compiler).
+// Example:
+//   ${'$'}NAME = "BEGIN" { Statement } "END".
+//   Statement = ident "=" number { "+" number } .
+
+${'$'}NAME=
+.
+
+// End of your compiler specification, make sure the name here matches
+// the grammar name at the start of this grammar.
+END ${'$'}NAME.
+""".trimIndent()
+
 class NewAtgFileAction : CreateFileAction("Cocol/R ATG File", "Create new Cocol/R ATG File", CocoIcons.FILE) {
 
     override fun invokeDialog(project: Project, psiDirectory: PsiDirectory): Array<PsiElement> {
@@ -51,13 +113,7 @@ class NewAtgFileAction : CreateFileAction("Cocol/R ATG File", "Create new Cocol/
 
         // TODO - replace with registered file template
         val customFileTemplate = CustomFileTemplate("Cocol/R", "ATG")
-        customFileTemplate.text = """
-            COMPILER ${'$'}NAME
-            PRODUCTIONS
-                ${'$'}NAME = .
-            END ${'$'}NAME.
-        """.trimIndent()
-
+        customFileTemplate.text = NEW_ATG_FILE_TEMPLATE
 
         val properties = mutableMapOf<String?, Any>(Pair("NAME", compilerName))
         return arrayOf(FileTemplateUtil.createFromTemplate(customFileTemplate, fileName, properties, psiDirectory, null))
