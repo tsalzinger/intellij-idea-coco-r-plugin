@@ -31,11 +31,15 @@ import com.intellij.util.indexing.FileBasedIndex
 import org.apache.commons.lang.StringUtils
 import org.jetbrains.annotations.Contract
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 /**
  * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
  */
 private val LOG = Logger.getInstance(CocoUtil::class.java)
+
+private val javaErrorCache: ConcurrentMap<PsiFile, List<HighlightInfo>> = ConcurrentHashMap()
 
 object CocoUtil {
 
@@ -108,8 +112,16 @@ object CocoUtil {
         return javaPsiFacade.findClass(parserClassName, GlobalSearchScope.allScope(javaPsiFacade.project))
     }
 
-    fun getJavaErrors(psiClass: PsiClass): MutableList<HighlightInfo> {
-        val project = psiClass.project
+    fun getJavaErrors(file: PsiFile): List<HighlightInfo> {
+        return javaErrorCache[file].orEmpty()
+    }
+
+    fun analyzeJavaErrors(cocoFile: CocoFile): List<HighlightInfo> {
+        javaErrorCache.remove(cocoFile)
+
+        val parserClass = getParserClass(cocoFile) ?: return emptyList()
+
+        val project = parserClass.project
 
         val exception = Ref.create<Exception>()
         val results = mutableListOf<HighlightInfo>()
@@ -119,7 +131,7 @@ object CocoUtil {
                 try {
                     if (progress.isCanceled) throw ProcessCanceledException()
 
-                    val file = psiClass.containingFile.virtualFile
+                    val file = parserClass.containingFile.virtualFile
                     progress.text = "Processing ${file.presentableUrl}..."
                     progress.fraction = 1.0
 
@@ -138,6 +150,7 @@ object CocoUtil {
             ExceptionUtil.rethrowAllAsUnchecked(exception.get())
         }
 
+        javaErrorCache[cocoFile] = results
         return results
     }
 
@@ -153,7 +166,7 @@ object CocoUtil {
             }
         })
 
-        return ProgressManager.getInstance().runProcess(Computable<List<HighlightInfo>> outer@{
+        return ProgressManager.getInstance().runProcess(Computable<List<HighlightInfo>> outer@ {
             return@outer DumbService.getInstance(project).runReadActionInSmartMode(Computable<List<HighlightInfo>> {
                 val psiFile = PsiManager.getInstance(project).findFile(file)
                 val document = FileDocumentManager.getInstance().getDocument(file)
@@ -298,6 +311,6 @@ object CocoUtil {
     }
 
     fun findGlobalFieldsAndMethods(file: PsiFile): CocoGlobalFieldsAndMethods? {
-        return PsiTreeUtil.getChildOfType(file, CocoGlobalFieldsAndMethods::class.java)
+        return PsiTreeUtil.getChildOfType(file, CocoCocoInjectorHost::class.java)?.globalFieldsAndMethods
     }
 }

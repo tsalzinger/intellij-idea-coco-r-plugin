@@ -58,11 +58,8 @@
                                implementationClass="at.scheinecker.intellij.coco.CocoParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Cocol/R"
                                        implementationClass="at.scheinecker.intellij.coco.CocoSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="at.scheinecker.intellij.coco.CocoColorSettingsPage"/>
         <lang.braceMatcher language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoBraceMatcher"/>
 
-        <completion.contributor language="Cocol/R"
-                                implementationClass="at.scheinecker.intellij.coco.CocoCompletionContributor"/>
         <psi.referenceContributor implementation="at.scheinecker.intellij.coco.reference.CocoReferenceContributor"/>
         <lang.findUsagesProvider language="Cocol/R"
                                  implementationClass="at.scheinecker.intellij.coco.CocoFindUsagesProvider"/>
@@ -85,14 +82,16 @@
                 implementation="at.scheinecker.intellij.coco.symbolcontributor.CocoChooseByNameProductionContributor"/>
 
         <annotator language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoAnnotator"/>
+        <externalAnnotator language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoExternalAnnotator"/>
 
         <lang.commenter language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoCommenter"/>
         <lang.foldingBuilder language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoFoldingBuilder"/>
 
+        <!-- Java Injection -->
         <languageInjector implementation="at.scheinecker.intellij.coco.CocoJavaInjector"/>
         <multiHostInjector implementation="at.scheinecker.intellij.coco.CocoJavaMultiHostInjector"/>
 
-
+        <!-- Settings page -->
         <projectConfigurable groupId="language"
                              instance="at.scheinecker.intellij.coco.settings.CocoSettingsConfigurable"
                              id="coco.preferences"
@@ -100,6 +99,7 @@
                              displayName="Coco/R"/>
         <projectService serviceInterface="at.scheinecker.intellij.coco.settings.CocoConfiguration"
                         serviceImplementation="at.scheinecker.intellij.coco.settings.CocoConfiguration"/>
+        <colorSettingsPage implementation="at.scheinecker.intellij.coco.CocoColorSettingsPage"/>
     </extensions>
     <actions>
         <action id="at.scheinecker.intellij.coco.action.NewAtgFileAction"

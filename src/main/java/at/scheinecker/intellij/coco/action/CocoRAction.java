@@ -69,7 +69,7 @@ public class CocoRAction extends AnAction {
 
                         PsiClass parserClass = CocoUtil.INSTANCE.getParserClass(file);
                         if (parserClass != null) {
-                            final List<HighlightInfo> javaErrors = CocoUtil.INSTANCE.getJavaErrors(parserClass);
+                            final List<HighlightInfo> javaErrors = CocoUtil.INSTANCE.analyzeJavaErrors(file);
 
                             final VirtualFile virtualFile = parserClass.getContainingFile().getVirtualFile();
                             final Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
