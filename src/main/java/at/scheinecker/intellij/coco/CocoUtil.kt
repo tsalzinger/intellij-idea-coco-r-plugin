@@ -1,17 +1,32 @@
 package at.scheinecker.intellij.coco
 
 import at.scheinecker.intellij.coco.psi.*
-import com.intellij.codeInsight.CodeSmellInfo
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl
+import com.intellij.codeInsight.daemon.impl.DaemonProgressIndicator
+import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
+import com.intellij.openapi.progress.util.AbstractProgressIndicatorExBase
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vcs.CodeSmellDetector
+import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.Ref
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.wm.ex.ProgressIndicatorEx
 import com.intellij.psi.*
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.FileTypeIndexImpl
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.ExceptionUtil
 import com.intellij.util.indexing.FileBasedIndex
 import org.apache.commons.lang.StringUtils
 import org.jetbrains.annotations.Contract
@@ -20,6 +35,8 @@ import java.util.*
 /**
  * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
  */
+private val LOG = Logger.getInstance(CocoUtil::class.java)
+
 object CocoUtil {
 
     fun findCompilerNames(project: Project?): List<String> {
@@ -34,7 +51,7 @@ object CocoUtil {
     }
 
     fun findCompilers(file: PsiFile): List<CocoCompiler> {
-        return PsiTreeUtil.findChildrenOfType(file, CocoCompiler::class.java).toList();
+        return PsiTreeUtil.findChildrenOfType(file, CocoCompiler::class.java).toList()
     }
 
     fun findCompilers(project: Project?, name: String): List<CocoCompiler> {
@@ -79,11 +96,9 @@ object CocoUtil {
             return Optional.of(declaredPackage)
         }
 
-        if (file.containingDirectory == null) {
-            return Optional.empty()
-        }
+        val containingDirectory = file.containingDirectory ?: return Optional.empty()
 
-        return Optional.ofNullable(JavaDirectoryService.getInstance().getPackage(file.containingDirectory!!)?.qualifiedName)
+        return Optional.ofNullable(JavaDirectoryService.getInstance().getPackage(containingDirectory)?.qualifiedName)
     }
 
     fun getParserClass(file: PsiFile): PsiClass? {
@@ -93,12 +108,66 @@ object CocoUtil {
         return javaPsiFacade.findClass(parserClassName, GlobalSearchScope.allScope(javaPsiFacade.project))
     }
 
-    fun getJavaErrors(file: PsiClass): List<CodeSmellInfo> {
+    fun getJavaErrors(psiClass: PsiClass): MutableList<HighlightInfo> {
+        val project = psiClass.project
 
-        return CodeSmellDetector.getInstance(file.project)
-                .findCodeSmells(listOf(file.containingFile.virtualFile))
-                .filter { it.severity == HighlightSeverity.ERROR }
+        val exception = Ref.create<Exception>()
+        val results = mutableListOf<HighlightInfo>()
+
+        ProgressManager.getInstance().run(object : Task.Modal(project, "Analyzing generated parser code", true) {
+            override fun run(progress: ProgressIndicator) {
+                try {
+                    if (progress.isCanceled) throw ProcessCanceledException()
+
+                    val file = psiClass.containingFile.virtualFile
+                    progress.text = "Processing ${file.presentableUrl}..."
+                    progress.fraction = 1.0
+
+                    results.addAll(findCodeSmells(project, file, progress))
+                } catch (e: ProcessCanceledException) {
+                    exception.set(e)
+                } catch (e: Exception) {
+                    LOG.error(e)
+                    exception.set(e)
+                }
+
+            }
+        })
+
+        if (!exception.isNull) {
+            ExceptionUtil.rethrowAllAsUnchecked(exception.get())
+        }
+
+        return results
     }
+
+    private fun findCodeSmells(project: Project, file: VirtualFile, progress: ProgressIndicator): List<HighlightInfo> {
+        val codeAnalyzer = DaemonCodeAnalyzer.getInstance(project) as DaemonCodeAnalyzerImpl
+        val daemonIndicator = DaemonProgressIndicator()
+
+
+        (progress as ProgressIndicatorEx).addStateDelegate(object : AbstractProgressIndicatorExBase() {
+            override fun cancel() {
+                super.cancel()
+                daemonIndicator.cancel()
+            }
+        })
+
+        return ProgressManager.getInstance().runProcess(Computable<List<HighlightInfo>> outer@{
+            return@outer DumbService.getInstance(project).runReadActionInSmartMode(Computable<List<HighlightInfo>> {
+                val psiFile = PsiManager.getInstance(project).findFile(file)
+                val document = FileDocumentManager.getInstance().getDocument(file)
+                if (psiFile == null || document == null) {
+                    return@Computable emptyList()
+                }
+                return@Computable codeAnalyzer
+                        .runMainPasses(psiFile, document, daemonIndicator)
+                        .filter { it.severity == HighlightSeverity.ERROR }
+            })
+
+        }, daemonIndicator)
+    }
+
 
     fun findProductions(file: PsiFile): List<CocoProduction> {
         val parserSpecification = findParserSpecification(file) ?: return emptyList()

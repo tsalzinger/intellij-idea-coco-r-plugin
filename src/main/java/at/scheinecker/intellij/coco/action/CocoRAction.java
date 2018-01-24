@@ -4,7 +4,7 @@ import Coco.*;
 import Coco.Scanner;
 import at.scheinecker.intellij.coco.CocoUtil;
 import at.scheinecker.intellij.coco.psi.CocoFile;
-import com.intellij.codeInsight.CodeSmellInfo;
+import com.intellij.codeInsight.daemon.impl.HighlightInfo;
 import com.intellij.compiler.CompilerMessageImpl;
 import com.intellij.compiler.ProblemsView;
 import com.intellij.notification.Notification;
@@ -16,7 +16,9 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.compiler.CompilerMessage;
 import com.intellij.openapi.compiler.CompilerMessageCategory;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -67,21 +69,29 @@ public class CocoRAction extends AnAction {
 
                         PsiClass parserClass = CocoUtil.INSTANCE.getParserClass(file);
                         if (parserClass != null) {
-                            final List<CodeSmellInfo> javaErrors = CocoUtil.INSTANCE.getJavaErrors(parserClass);
+                            final List<HighlightInfo> javaErrors = CocoUtil.INSTANCE.getJavaErrors(parserClass);
 
-                            final List<CompilerMessage> compilerMessages = context.getCompilerMessages();
-                            for (CodeSmellInfo javaError : javaErrors) {
-                                compilerMessages.add(new CompilerMessageImpl(
-                                                context.getProject(),
-                                                CompilerMessageCategory.ERROR,
-                                                javaError.getDescription(),
-                                                parserClass.getContainingFile().getVirtualFile(),
-                                                javaError.getStartLine() + 1,
-                                                javaError.getStartColumn(),
-                                                null
-                                        )
-                                );
+                            final VirtualFile virtualFile = parserClass.getContainingFile().getVirtualFile();
+                            final Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+
+                            if (document != null) {
+                                final List<CompilerMessage> compilerMessages = context.getCompilerMessages();
+                                for (HighlightInfo javaError : javaErrors) {
+                                    final int startOffset = javaError.getStartOffset();
+                                    final int lineNumber = document.getLineNumber(startOffset);
+                                    compilerMessages.add(new CompilerMessageImpl(
+                                                    context.getProject(),
+                                                    CompilerMessageCategory.ERROR,
+                                                    javaError.getDescription(),
+                                                    virtualFile,
+                                                    lineNumber + 1,
+                                                    startOffset - document.getLineStartOffset(lineNumber) + 1,
+                                                    new OpenFileDescriptor(project, virtualFile, startOffset)
+                                            )
+                                    );
+                                }
                             }
+
                         }
                         showProblems(context);
                     });
