@@ -8,8 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import java.util.*
 
-class CocoCompilerContext(cocoFile: CocoFile, val outputDir: VirtualFile) {
-    val executionId: UUID
+class CocoCompilerContext(cocoFile: CocoFile, val outputDir: VirtualFile, val executionId: UUID) {
     val inputFile: VirtualFile
     val compilerMessages: MutableList<CompilerMessage> = mutableListOf()
     val project: Project?
@@ -22,7 +21,6 @@ class CocoCompilerContext(cocoFile: CocoFile, val outputDir: VirtualFile) {
 
     init {
         this.project = cocoFile.project
-        this.executionId = UUID.randomUUID()
         this.inputFile = cocoFile.virtualFile
     }
 

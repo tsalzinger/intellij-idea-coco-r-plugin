@@ -57,10 +57,11 @@ public class CocoRAction extends AnAction {
         // ensure all changes are actually persisted to the file system
         PsiDocumentManager.getInstance(project).commitAllDocuments();
         FileDocumentManager.getInstance().saveAllDocuments();
+        final UUID exeuctionId = UUID.randomUUID();
 
         for (CocoFile file : bnfFiles) {
             WriteAction
-                    .compute(() -> generate(file))
+                    .compute(() -> generate(file, exeuctionId))
                     .ifPresent(context -> {
                         markFileTreeAsDirtyAndReload(context.getOutputDir());
 
@@ -151,7 +152,7 @@ public class CocoRAction extends AnAction {
         return Optional.of(frameDir);
     }
 
-    private Optional<CocoCompilerContext> generate(@NotNull CocoFile file) {
+    private Optional<CocoCompilerContext> generate(@NotNull CocoFile file, @NotNull final UUID executionId) {
         final Optional<String> filePackage_ = CocoUtil.INSTANCE.getTargetPackage(file);
 
         Optional<VirtualFile> outDirFile_ = getGeneratedSourceFolders(file)
@@ -187,7 +188,7 @@ public class CocoRAction extends AnAction {
         final Scanner scanner = new Scanner(filePath);
         final Parser parser = new Parser(scanner);
 
-        final CocoCompilerContext context = new CocoCompilerContext(file, outDirFile_.orElse(parent));
+        final CocoCompilerContext context = new CocoCompilerContext(file, outDirFile_.orElse(parent), executionId);
 
         parser.errors = new IntellijCocoErrorAdapter(context);
 
