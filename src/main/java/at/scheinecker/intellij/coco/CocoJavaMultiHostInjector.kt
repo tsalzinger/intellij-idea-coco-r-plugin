@@ -39,7 +39,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
         val productions = context.parserSpecification.productionList
 
         if (cocoImports != null && cocoImports.textLength != 0) {
-            registrar.addPlace(targetPackage, null, context, TextRange.from(cocoImports.textOffset, cocoImports.textLength))
+            registrar.addPlace(prefix = targetPackage, element =  cocoImports)
             prefixBuilder = StringBuilder()
         }
 
@@ -49,19 +49,14 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
         appendSetDecls(prefixBuilder, scannerSpecification.tokens?.tokenDeclList.orEmpty())
         appendSetDecls(prefixBuilder, pragmas?.pragmaDeclList?.map { it.tokenDecl }.orEmpty(), 102)
         if (globalFieldsAndMethods != null && globalFieldsAndMethods.textLength != 0) {
-
-            val start = globalFieldsAndMethods.textOffset
-            registrar.addPlace(prefixBuilder.toString(), null, context, TextRange(start, globalFieldsAndMethods.nextSibling?.textOffset
-                    ?: context.textLength))
+            registrar.addPlace(prefix = prefixBuilder, element = globalFieldsAndMethods)
             prefixBuilder = StringBuilder()
         }
 
         prefixBuilder.append("\n\nvoid Get() {\n")
 
         pragmas?.pragmaDeclList?.mapNotNull { it.semAction?.arbitraryStatements }?.forEach {
-            val start = it.textOffset
-            registrar.addPlace(prefixBuilder.toString(), null, context, TextRange(start, it.nextSibling?.textOffset
-                    ?: context.textLength))
+            registrar.addPlace(prefix = prefixBuilder, element = it)
             prefixBuilder = StringBuilder()
         }
 
@@ -88,7 +83,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
 
             prefixBuilder.append("${it.name}(")
             if (parameterDeclaration != null) {
-                registrar.addPlace(prefixBuilder.toString(), null, context, TextRange.from(parameterDeclaration.textOffset, parameterDeclaration.textLength))
+                registrar.addPlace(prefix = prefixBuilder, element = parameterDeclaration)
                 prefixBuilder = StringBuilder()
             }
             prefixBuilder.append(") {\n")
@@ -98,7 +93,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
                 val formalAttributesParameter = formalOutputAttribute.formalOutputAttribute.formalAttributesParameter
                 if (formalAttributesParameter != null) {
                     prefixBuilder.append("\t")
-                    registrar.addPlace(prefixBuilder.toString(), ";\n", formalAttributesParameter)
+                    registrar.addPlace(prefixBuilder, ";\n", formalAttributesParameter)
                     prefixBuilder = StringBuilder()
                 }
             }
@@ -107,7 +102,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
             val localDeclaration = it.semAction?.arbitraryStatements
             if (localDeclaration != null) {
                 prefixBuilder.append("\t")
-                registrar.addPlace(prefixBuilder.toString(), "\n\tRecover();\n", context, TextRange.from(localDeclaration.textOffset, localDeclaration.textLength))
+                registrar.addPlace(prefixBuilder, "\n\tRecover();\n", localDeclaration)
                 prefixBuilder = StringBuilder()
             }
 
@@ -134,9 +129,8 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
                         prefixBuilder.append("${ident.text}(")
 
                         registrar.addPlace(
-                                prefixBuilder.toString(),
+                                prefixBuilder,
                                 ");\n",
-                                context,
                                 TextRange.from(
                                         parameters.textOffset + attributeAssignmentLength + additionalOffset,
                                         parameters.textLength - attributeAssignmentLength - additionalOffset
@@ -149,7 +143,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
                 val arbitraryStatements = it.semAction?.arbitraryStatements
                 if (arbitraryStatements != null) {
                     prefixBuilder.append("\t")
-                    registrar.addPlace(prefixBuilder.toString(),  "\n\tRecover();\n", arbitraryStatements)
+                    registrar.addPlace(prefixBuilder,  "\n\tRecover();\n", arbitraryStatements)
                     prefixBuilder = StringBuilder()
                 }
 
@@ -159,7 +153,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
                 val formalAttributesParameter = formalOutputAttribute.formalOutputAttribute.formalAttributesParameter
                 if (formalAttributesParameter != null && formalAttributesParameter.javaTypeReferenceList.size >= 2) {
                     prefixBuilder.append("return ")
-                    prefixBuilder.append(formalAttributesParameter.javaTypeReferenceList.get(1).text)
+                    prefixBuilder.append(formalAttributesParameter.javaTypeReferenceList[1].text)
                     prefixBuilder.append(";\n")
                 }
             }
@@ -168,7 +162,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
 
         }
 
-        registrar.addPlace(prefixBuilder.toString(), "}", context, TextRange.from(context.textLength, 0))
+        registrar.addPlace(prefixBuilder, "}", TextRange.from(context.textLength, 0))
 
         registrar.doneInjecting()
     }
@@ -178,10 +172,9 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
         return mutableListOf(CocoCocoInjectorHost::class.java)
     }
 
-    class LazyMultiHostRegistrarAdapter(val registrar: MultiHostRegistrar, val conetxt: PsiLanguageInjectionHost) : MultiHostRegistrar {
+    class LazyMultiHostRegistrarAdapter(val registrar: MultiHostRegistrar, val context: PsiLanguageInjectionHost) : MultiHostRegistrar {
         var language: Language? = null
         var started = false
-        val injected = StringBuilder()
 
         override fun startInjecting(language: Language): MultiHostRegistrar {
             this.language = language
@@ -198,15 +191,20 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
                 started = true
             }
 
-            injected.append(prefix.orEmpty())
-            injected.append(host.text.substring(rangeInsideHost.startOffset, rangeInsideHost.endOffset))
-            injected.append(suffix.orEmpty())
-            registrar.addPlace(prefix, suffix, host, rangeInsideHost)
+            registrar.addPlace(prefix, suffix, host, rangeInsideHost.shiftLeft(context.textOffset))
             return this
         }
 
         fun addPlace(prefix: String? = null, suffix: String? = null, element: PsiElement): MultiHostRegistrar {
-            return addPlace(prefix, suffix, conetxt, element.textRange)
+            return addPlace(prefix, suffix, context, element.textRange)
+        }
+
+        fun addPlace(prefix: StringBuilder? = null, suffix: String? = null, element: PsiElement): MultiHostRegistrar {
+            return addPlace(prefix.toString(), suffix, context, element.textRange)
+        }
+
+        fun addPlace(prefix: StringBuilder? = null, suffix: String? = null, rangeInsideHost: TextRange): MultiHostRegistrar {
+            return addPlace(prefix.toString(), suffix, context, rangeInsideHost)
         }
 
     }
