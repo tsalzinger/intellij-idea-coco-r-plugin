@@ -35,7 +35,7 @@ class CocoAnnotator : Annotator {
                         val referenceOffset = element.textRange.startOffset
 
                         if (referenceOffset < characterOffset) {
-                            holder.createErrorAnnotation(ident, "Character '$characterReferenceName' used before its defined")
+                            holder.createErrorAnnotation(ident, "Character '$characterReferenceName' used before it is defined")
                         } else {
                             val annotation = holder.createInfoAnnotation(ident, null)
                             annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD)
@@ -53,15 +53,8 @@ class CocoAnnotator : Annotator {
                     val production = CocoUtil.findProduction(element.getContainingFile(), referenceName)
 
                     if (tokenDecl != null) {
-                        val characterOffset = tokenDecl.textRange.startOffset
-                        val referenceOffset = element.textRange.startOffset
-
-                        if (referenceOffset < characterOffset) {
-                            holder.createWarningAnnotation(ident, "Token '$referenceName' used before its defined")
-                        } else {
-                            val annotation = holder.createInfoAnnotation(ident, null)
-                            annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD)
-                        }
+                        val annotation = holder.createInfoAnnotation(ident, null)
+                        annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD)
                     } else if (production != null) {
                         val annotation = holder.createInfoAnnotation(ident, null)
                         annotation.textAttributes = DefaultLanguageHighlighterColors.INSTANCE_FIELD
@@ -80,7 +73,7 @@ class CocoAnnotator : Annotator {
                             holder.createErrorAnnotation(element, "Production '$referenceName' doesn't define formal attributes")
                         }
 
-                        if (!hasFormalOutputAttribute && outputAttribute)  {
+                        if (!hasFormalOutputAttribute && outputAttribute) {
                             holder.createErrorAnnotation(element, "Production '$referenceName' doesn't define an output attributes")
                         }
                     } else {
