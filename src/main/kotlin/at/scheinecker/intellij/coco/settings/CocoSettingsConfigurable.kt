@@ -4,11 +4,12 @@ import com.intellij.openapi.options.BaseConfigurable
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
-import com.intellij.util.ui.JBUI
-import java.awt.Dimension
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
+import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.Panel
+import com.intellij.ui.layout.panel
+import com.intellij.util.ui.UIUtil
+import com.intellij.xml.util.XmlStringUtil
+import javax.swing.DefaultListCellRenderer
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -30,7 +31,7 @@ class CocoSettingsConfigurable(private val project: Project) : BaseConfigurable(
     }
 
     override fun apply() {
-        val injectionMode = getSelectedInjectionMode()                  
+        val injectionMode = getSelectedInjectionMode()
         val settings = CocoConfiguration.getSettings(project)
         if (injectionMode != null) {
             settings.injectionMode = injectionMode
@@ -39,37 +40,53 @@ class CocoSettingsConfigurable(private val project: Project) : BaseConfigurable(
         CocoConfiguration.saveSettings(project, settings)
     }
 
+
     override fun createComponent(): JComponent? {
-        val myPanel = object : JPanel(GridBagLayout()) {
-            override fun getPreferredSize(): Dimension {
-                return Dimension(-1, 400)
+        val injectionLevelCombo = ComboBox(CocoInjectionMode.values())
+        injectionLevelCombo.renderer = object : DefaultListCellRenderer() {
+            override fun setText(text: String?) {
+                super.setText(text?.toLowerCase())
             }
         }
 
-        val injectionSettings = JPanel(GridBagLayout())
+        val noteComponent = JBLabel("", UIUtil.ComponentStyle.REGULAR)
 
-        val injectionLevelCombo = ComboBox(CocoInjectionMode.values())
-        injectionLevelCombo.selectedItem = CocoConfiguration.getSettings(project).injectionMode
+        val notePanel = Panel()
+        notePanel.add(noteComponent)
 
-        injectionLevelCombo.actionListeners
+        val myPanel = panel {
+            row {
+                JLabel("Java Language Injection Mode:")()
+                injectionLevelCombo()
+            }
+            row {
+                notePanel()
+            }
+        }
 
-        val injectionLevelComboLabel = JLabel("Java Language Injection Mode")
-
-        injectionSettings.add(injectionLevelComboLabel,
-                GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, JBUI.insets(12, 6, 12, 0), 0, 0))
-        injectionSettings.add(injectionLevelCombo,
-                GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, JBUI.insets(6, 6, 12, 0), 0, 0))
-
-
-        val gridBagConstraints = GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.BOTH, Insets(0, 0, 0, 0), 0, 0)
-        myPanel.add(injectionSettings, gridBagConstraints)
-
-        this.myPanel = injectionSettings
+        this.myPanel = myPanel
         this.injectionLevelCombo = injectionLevelCombo
 
-        return injectionSettings
+        injectionLevelCombo.selectedItem = CocoConfiguration.getSettings(project).injectionMode
+        injectionLevelCombo.addActionListener {
+            if ("comboBoxChanged" == it.actionCommand) {
+                when (getSelectedInjectionMode()!!) {
+                    CocoInjectionMode.DISABLED -> {
+                        noteComponent.text = XmlStringUtil.wrapInHtml("Java language injection is disabled and no editor support will be provided.")
+                    }
+                    CocoInjectionMode.SIMPLE -> {
+                        noteComponent.text = XmlStringUtil.wrapInHtml("Simple mode will allow code completion of generated Tokens, but is otherwise limited to a per element injection. This means no completion of other Java injected areas will be possible.")
+                    }
+                    CocoInjectionMode.ADVANCED -> {
+                        noteComponent.text = XmlStringUtil.wrapInHtml("Advanced mode will allow code completion of linked injection areas. For example Semantic Actions within a Production will have access to the declared attributes (parameters).")
+                    }
+                }
+            }
+        }
 
+        return myPanel
     }
+
 
     override fun reset() {
         injectionLevelCombo?.selectedItem = getSettings().injectionMode
