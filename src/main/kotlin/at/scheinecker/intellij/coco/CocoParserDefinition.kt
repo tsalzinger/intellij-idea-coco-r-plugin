@@ -54,7 +54,14 @@ class CocoParserDefinition : ParserDefinition {
     }
 
     override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements {
-        return ParserDefinition.SpaceRequirements.MAY
+        return if (isDirectiveAssignment(left) || isDirectiveAssignment(right)) {
+            ParserDefinition.SpaceRequirements.MUST_NOT
+        } else ParserDefinition.SpaceRequirements.MAY
+    }
+
+    private fun isDirectiveAssignment(node: ASTNode): Boolean {
+        val treeParent = node.treeParent.elementType
+        return node.elementType == CocoTypes.ASSIGNMENT && (treeParent == CocoTypes.CHECK_EOF_DIRECTIVE || treeParent == CocoTypes.KEYWORD_PACKAGE_DIRECTIVE)
     }
 
     companion object {

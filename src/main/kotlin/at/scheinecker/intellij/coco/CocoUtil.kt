@@ -158,13 +158,14 @@ object CocoUtil {
         val codeAnalyzer = DaemonCodeAnalyzer.getInstance(project) as DaemonCodeAnalyzerImpl
         val daemonIndicator = DaemonProgressIndicator()
 
-
-        (progress as ProgressIndicatorEx).addStateDelegate(object : AbstractProgressIndicatorExBase() {
-            override fun cancel() {
-                super.cancel()
-                daemonIndicator.cancel()
-            }
-        })
+        if (progress is ProgressIndicatorEx) {
+            progress.addStateDelegate(object : AbstractProgressIndicatorExBase() {
+                override fun cancel() {
+                    super.cancel()
+                    daemonIndicator.cancel()
+                }
+            })
+        }
 
         return ProgressManager.getInstance().runProcess(Computable<List<HighlightInfo>> outer@ {
             return@outer DumbService.getInstance(project).runReadActionInSmartMode(Computable<List<HighlightInfo>> {

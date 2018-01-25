@@ -1,7 +1,7 @@
 <idea-plugin>
-    <id>at.scheinecker.intellij.coco</id>
-    <name>Cocol/R and Coco/R</name>
-    <version>1.0.0-beta.2018-02-19</version>
+    <id>io.scheinecker.intellij.coco</id>
+    <name>Coco/R</name>
+    <version>1.0.0</version>
     <vendor email="tscheinecker@gmail.com" url="https://github.com/tscheinecker">Thomas Scheinecker</vendor>
     <category>Languages,Tools integration</category>
 
@@ -17,40 +17,34 @@
         <ul>
             <li>Syntax Highlighting - Customizable via settings page</li>
             <li>Commenter (Block and line comments)</li>
-            <li>Basic error handling (unexpected elements)</li>
+            <li>Syntax Error highlighting (unexpected tokens)</li>
             <li>Reference check (report unresolvable references to characters, tokens and productions)</li>
             <li>Declaration order check (report references to characters and tokens declared after usage)</li>
             <li>Attributes check (productions have to be used with or without attributes according to declaration)</li>
-            <li>Generate Scanner and Parser via menu action</li>
-            <li>Automatic detection of appropriate output folder for generated Java classes</li>
-            <li>Automatic detection of package in case no $package directive is present)
-            <li>Code completion (Compiler, Character, Token, Pragma and Production names)</li>
+            <li>Highlight unused characters, tokens, pragmas and productions</li>
+            <li>Code Folding</li>
             <li>Structure View</li>
             <li>Find usages</li>
+            <li>Inplace rename refactorings (Compiler, Characters, Tokens, Pragmas and Productions)</li>
+            <li>Brace matching for (), [], {}, <>, <..> and (..)</li>
+            <li>Code completion (Compiler, Character, Token, Pragma and Production names)</li>
             <li>Go to declaration</li>
             <li>Go to symbol / Symbol search</li>
             <li>Go to generated code (for productions)</li>
-            <li>Highlight unused characters, tokens, pragmas and productions</li>
-            <li>Code Folding</li>
-            <li>Inplace rename refactorings (Compiler, Characters, Tokens, Pragmas and Productions)</li>
-            <li>Brace matching for (), [], {}, <>, <..> and (..)</li>
+            <li>Configurable Java language injection</li>
+            <li>Generate Scanner and Parser via menu action</li>
+            <li>Automatic detection of appropriate output folder for generated Java classes</li>
+            <li>Automatic detection of package in case no $package directive is present)
+            <li>Automatic detection of appropriate output root for generated Java classes</li>
             <li>Warnings and Errors during Coco/R execution are shown within the Problems Tool Window</li>
-            <li>Java language injection including autocompletion support for declared Tokens, Pragmas and Productions</li>
+            <li>Errors from generated Parser are mapped back to the grammar file</li>
         </ul>
-        </p>
-        <br>
-        <p>
-        TODO:<br>
-        <ul>
-            <li>Better error recovery during parsing</li>
-        </ul>
-        </p>
     ]]>
     </change-notes>
 
     <depends>com.intellij.modules.java</depends>
 
-    <idea-version since-build="131"/>
+    <idea-version since-build="173"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="at.scheinecker.intellij.coco.CocoFileTypeFactory"/>

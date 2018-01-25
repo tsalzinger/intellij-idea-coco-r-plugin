@@ -13,9 +13,10 @@ class CocoBraceMatcher : PairedBraceMatcher {
     private val pairs = arrayOf(
             BracePair(CocoTypes.PAR_OPEN, CocoTypes.PAR_CLOSE, false),
             BracePair(CocoTypes.BRACK_OPEN, CocoTypes.BRACK_CLOSE, false),
-            BracePair(CocoTypes.CURL_OPEN, CocoTypes.CURL_CLOSE, true),
+            BracePair(CocoTypes.CURL_OPEN, CocoTypes.CURL_CLOSE, false),
             BracePair(CocoTypes.SMALLER_THEN, CocoTypes.GREATER_THEN, false),
-            BracePair(CocoTypes.SEM_ACTION_START, CocoTypes.SEM_ACTION_END, true)
+            BracePair(CocoTypes.SEM_ACTION_START, CocoTypes.SEM_ACTION_END, false),
+            BracePair(CocoTypes.ASSIGNMENT, CocoTypes.TERMINATOR, false)
     )
 
     override fun getPairs(): Array<BracePair> {

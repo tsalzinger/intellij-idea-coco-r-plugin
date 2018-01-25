@@ -21,13 +21,10 @@ class CocoExternalAnnotator : ExternalAnnotator<CocoFile, List<HighlightInfo>>()
     }
 
     override fun apply(file: PsiFile, annotationResult: List<HighlightInfo>, holder: AnnotationHolder) {
-        println("${annotationResult.size} java errors found for ${file.virtualFile.presentableUrl}")
-
         val parserClass = CocoUtil.getParserClass(file) ?: return
 
         val virtualFile = parserClass.containingFile.virtualFile
         val document = FileDocumentManager.getInstance().getDocument(virtualFile) ?: return
-        val grammar = file.text
 
         val globalFieldsAndMethods = CocoUtil.findGlobalFieldsAndMethods(file)
 
