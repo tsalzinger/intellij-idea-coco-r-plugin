@@ -2,18 +2,18 @@
     <id>io.scheinecker.intellij.coco</id>
     <name>Coco/R</name>
     <version>1.0.0</version>
-    <vendor email="tscheinecker@gmail.com" url="https://github.com/tscheinecker">Thomas Scheinecker</vendor>
+    <vendor url="https://github.com/tscheinecker/intellij-idea-coco-r-plugin">Thomas Scheinecker</vendor>
     <category>Languages,Tools integration</category>
 
     <description><![CDATA[
       This plugin adds support for Cocol/R language and Coco/R compiler generator.<br>
-      For more details about Coco/R see <a href="http://ssw.jku.at/coco/">http://ssw.jku.at/coco/<a>
+      For more details about Coco/R please refer to <a href="http://ssw.jku.at/coco/">http://ssw.jku.at/coco/<a>.<br/>
+      Any bug reports should be filed on <a href="https://github.com/tscheinecker/intellij-idea-coco-r-plugin">GitHub</a>.
     ]]></description>
 
     <change-notes><![CDATA[
         <p>
-        Current features:
-        <br>
+        v1.0.0:
         <ul>
             <li>Syntax Highlighting - Customizable via settings page</li>
             <li>Commenter (Block and line comments)</li>
