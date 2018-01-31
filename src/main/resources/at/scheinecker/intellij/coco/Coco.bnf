@@ -12,14 +12,9 @@
     elementTypeClass="at.scheinecker.intellij.coco.psi.CocoElementType"
     tokenTypeClass="at.scheinecker.intellij.coco.psi.CocoTokenType"
 
-    psiImplUtilClass="at.scheinecker.intellij.coco.psi.impl.CocoPsiImplUtil"
-
     mixin("End|BasicSet|TokenFactor|Factor")="at.scheinecker.intellij.coco.psi.impl.CocoReferencingType"
     mixin("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="at.scheinecker.intellij.coco.psi.impl.CocoJavaType"
-    implements("PackageDirective|CheckEofDirective|AnyDirective")="at.scheinecker.intellij.coco.psi.CocoDirectiveElement"
-    methods("PackageDirective|CheckEofDirective|AnyDirective")=[
-        getPresentation
-    ]
+    mixin("PackageDirective|CheckEofDirective|AnyDirective")="at.scheinecker.intellij.coco.psi.CocoDirectiveElement"
     implements("End")="at.scheinecker.intellij.coco.psi.HasCocoCompilerReference"
     implements("BasicSet|TokenFactor")="at.scheinecker.intellij.coco.psi.HasCocoCharacterReference"
     implements("Factor")="at.scheinecker.intellij.coco.psi.HasCocoTokenOrProductionReference"
@@ -27,13 +22,8 @@
     implements("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="com.intellij.psi.PsiLanguageInjectionHost"
     implements("CocoInjectorHost")="com.intellij.psi.PsiLanguageInjectionHost"
     mixin("CocoInjectorHost")="at.scheinecker.intellij.coco.psi.impl.CocoJavaType"
-    methods("Compiler|End|BasicSet|TokenFactor|Factor|SetDecl|TokenDecl|PragmaDecl|Production")=[
-        getName
-        setName
-        getNameIdentifier
-        getPresentation
-        getTextOffset
-    ]
+    mixin("End|BasicSet|TokenFactor|Factor|SetDecl|TokenDecl|PragmaDecl|Production")="at.scheinecker.intellij.coco.psi.impl.CocoNamedElementBase"
+    mixin("Compiler")="at.scheinecker.intellij.coco.psi.impl.CocoCompilerBase"
 
     tokens=[
         string='regexp:"(\\\\|\\"|[^\"\n])*"'

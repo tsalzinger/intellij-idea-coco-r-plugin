@@ -60,10 +60,11 @@ object CocoPsiImplUtil {
 
     @JvmStatic
     fun getPresentation(element: CocoDirectiveElement): ItemPresentation {
+        val text = element.text
         val name = when (element) {
-            is CocoPackageDirective -> "package ${element.text.substringAfter('=', "??")}"
-            is CocoCheckEofDirective -> (if (element.text.contains("true", true)) "" else "don't ") + "check EOF"
-            is CocoAnyDirective -> element.text
+            is CocoPackageDirective -> "package ${text.substringAfter('=', "??")}"
+            is CocoCheckEofDirective -> (if (text.contains("true", true)) "" else "don't ") + "check EOF"
+            is CocoAnyDirective -> text
             else -> null
         }
 

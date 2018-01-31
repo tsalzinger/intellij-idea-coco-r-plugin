@@ -261,7 +261,6 @@ object CocoUtil {
         if (project == null) {
             return emptyList()
         }
-
         val virtualFiles = FileBasedIndex.getInstance().getContainingFiles<FileType, Void>(FileTypeIndex.NAME, CocoFileType.INSTANCE, GlobalSearchScope.allScope(project))
 
         val psiFiles = ArrayList<PsiFile>()

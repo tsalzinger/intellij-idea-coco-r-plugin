@@ -1,7 +1,6 @@
 <idea-plugin>
     <id>io.scheinecker.intellij.coco</id>
     <name>Coco/R</name>
-    <version>1.0.0</version>
     <vendor url="https://github.com/tscheinecker/intellij-idea-coco-r-plugin">Thomas Scheinecker</vendor>
     <category>Languages,Tools integration</category>
 
@@ -43,8 +42,6 @@
     </change-notes>
 
     <depends>com.intellij.modules.java</depends>
-
-    <idea-version since-build="173"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="at.scheinecker.intellij.coco.CocoFileTypeFactory"/>
