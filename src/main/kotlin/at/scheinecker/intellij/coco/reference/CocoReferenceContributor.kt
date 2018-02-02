@@ -1,16 +1,10 @@
 package at.scheinecker.intellij.coco.reference
 
-import at.scheinecker.intellij.coco.psi.HasCocoCharacterReference
-import at.scheinecker.intellij.coco.psi.HasCocoCompilerReference
-import at.scheinecker.intellij.coco.psi.HasCocoProductionReference
-import at.scheinecker.intellij.coco.psi.HasCocoTokenReference
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.*
 import com.intellij.util.ProcessingContext
 import org.apache.commons.lang.StringUtils
-
-import java.util.function.BiFunction
 
 class CocoReferenceContributor : PsiReferenceContributor() {
     private fun getRelativeTextRange(element: PsiElement): TextRange {
@@ -19,14 +13,14 @@ class CocoReferenceContributor : PsiReferenceContributor() {
     }
 
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
-        register(registrar, HasCocoCompilerReference::class.java, BiFunction { element, textRange -> CocoCompilerReference(element, textRange) })
-        register(registrar, HasCocoCharacterReference::class.java, BiFunction { element, textRange -> CocoCharacterReference(element, textRange) })
-        register(registrar, HasCocoProductionReference::class.java, BiFunction { element, textRange -> CocoProductionReference(element, textRange) })
-        register(registrar, HasCocoTokenReference::class.java, BiFunction { element, textRange -> CocoTokenReference(element, textRange) })
+        register(registrar, ::CocoCompilerReference)
+        register(registrar, ::CocoCharacterReference)
+        register(registrar, ::CocoProductionReference)
+        register(registrar, ::CocoTokenReference)
     }
 
-    private fun <T : PsiNameIdentifierOwner> register(registrar: PsiReferenceRegistrar, hasIdentClass: Class<T>, psiReferenceProvider: BiFunction<T, TextRange, PsiReference>) {
-        registrar.registerReferenceProvider(PlatformPatterns.psiElement(hasIdentClass),
+    private inline fun <reified T : PsiNameIdentifierOwner> register(registrar: PsiReferenceRegistrar, crossinline psiReferenceProvider: (T, TextRange) -> PsiReference) {
+        registrar.registerReferenceProvider(PlatformPatterns.psiElement(T::class.java),
                 object : PsiReferenceProvider() {
                     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
                         val hasIdent = element as T
@@ -34,7 +28,7 @@ class CocoReferenceContributor : PsiReferenceContributor() {
 
                         if (ident != null) {
                             if (StringUtils.isNotBlank(hasIdent.name)) {
-                                return arrayOf(psiReferenceProvider.apply(hasIdent, getRelativeTextRange(ident)))
+                                return arrayOf(psiReferenceProvider.invoke(hasIdent, getRelativeTextRange(ident)))
                             }
                         }
 
