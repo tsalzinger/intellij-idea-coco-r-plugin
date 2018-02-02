@@ -1,5 +1,6 @@
 .idea/
 *.iml
-gen/
+.gradle/
+build/
 out/
 *.zip
