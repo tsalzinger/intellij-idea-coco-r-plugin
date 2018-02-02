@@ -28,7 +28,7 @@ plugins {
 }
 
 group = "io.scheinecker.intellij"
-version = "1.0.0"
+version = "1.0.1"
 
 apply {
     plugin("org.jetbrains.grammarkit")
@@ -99,6 +99,7 @@ intellij {
 
 tasks.withType<PatchPluginXmlTask> {
     version(project.version)
+    untilBuild("181.*")
 }
 
 tasks.withType<JavaCompile> {

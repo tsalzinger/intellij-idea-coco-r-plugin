@@ -6,8 +6,7 @@ Maintenance will be performed on a best effort basis.
 
 ## Plugin Installation
 
-The plugin is currently pending publishing within the official Jetbrains Plugin Repository, but the zip file can already be downloaded directly from GitHub.
-Please check the the [Releases](https://github.com/tscheinecker/intellij-idea-coco-r-plugin/releases) page for available versions.
+The plugin can be installed directly from the official Jetbrains Plugin Repository or via the zip file provided on the [Releases](https://github.com/tscheinecker/intellij-idea-coco-r-plugin/releases) page.
 
 ## Plugin features 
 
