@@ -12,6 +12,13 @@
 
     <change-notes><![CDATA[
         <p>
+        v1.0.1:
+        <ul>
+            <li>Fix changelog formatting</li>
+            <li>Allow plugin to be installed in IntelliJ IDEA 2018.1</li>
+        </ul>
+        </p>
+        <p>
         v1.0.0:
         <ul>
             <li>Syntax Highlighting - Customizable via settings page</li>
@@ -38,6 +45,7 @@
             <li>Warnings and Errors during Coco/R execution are shown within the Problems Tool Window</li>
             <li>Errors from generated Parser are mapped back to the grammar file</li>
         </ul>
+        </p>
     ]]>
     </change-notes>
 
