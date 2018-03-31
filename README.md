@@ -39,6 +39,16 @@ The plugin can be installed directly from the official Jetbrains Plugin Reposito
 Please refer to the attached PDF on the [Releases](https://github.com/tscheinecker/intellij-idea-coco-r-plugin/releases) page.
 Additional documentation (as part of the README or via Wiki) will be added in the future.  
 
+## IDE support limitations
+
+In it's current state the plugin is designed specifically for usage with the Java version of Coco/R.
+The language for global fields and methods, as well as semantic actions is always assumed to be Java, which will also be injected.
+Due to this fact the plugin currently cannot be used with any IDEs not including Java support (e.g. Rider, WebStorm, RubyMine, ...). 
+If you still want to use Coco/R in any of these IDEs or a non Java version of Coco/R you have some options:
+* **Send me a Pull request**
+* Be patient until I get around to decouple the plugins dependency from Java support
+* Or use https://github.com/azrdev/coco-idea-plugin/ as an alternative  
+
 ## License
 
 The plugin is licensed under the [GNU General Public License v3.0](./LICENSE)
