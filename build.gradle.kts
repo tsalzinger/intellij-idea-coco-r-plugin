@@ -15,20 +15,20 @@ buildscript {
         maven { setUrl("https://jitpack.io") }
     }
     dependencies {
-        classpath("com.github.hurricup:gradle-grammar-kit-plugin:2017.1.1")
+        classpath("com.github.hurricup:gradle-grammar-kit-plugin:2018.1.1")
     }
 }
 
 plugins {
     idea
     java
-    kotlin("jvm") version "1.2.20"
-    id("org.jetbrains.intellij") version "0.2.18"
+    kotlin("jvm") version "1.2.31"
+    id("org.jetbrains.intellij") version "0.3.1"
     id("de.undercouch.download") version "3.3.0"
 }
 
 group = "io.scheinecker.intellij"
-version = "1.0.1"
+version = "1.0.2-SNAPSHOT"
 
 apply {
     plugin("org.jetbrains.grammarkit")
@@ -47,11 +47,6 @@ idea {
     module {
         generatedSourceDirs.add(file("$buildDir/gen"))
     }
-}
-
-configure<GrammarKitPluginExtension> {
-    jflexRelease = "1.7.0"
-    grammarKitRelease = "2017.1.1"
 }
 
 val downloadCocoJar = task<Download>("downloadCocoJar") {
@@ -92,8 +87,9 @@ tasks.withType<KotlinCompile> {
         apiVersion = "1.2"
     }
 }
+
 intellij {
-    version = "IC-2017.3"
+    version = "IC-2018.1"
     downloadSources = true
 }
 
@@ -115,6 +111,10 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<PublishTask> {
+    val projectVersionString = "${project.version}"
+    if (projectVersionString.contains("-")) {
+        channels(projectVersionString.substring(projectVersionString.indexOf("-") + 1))
+    }
     username(project.findProperty("publishUsername"))
     password(project.findProperty("publishPassword"))
 }
