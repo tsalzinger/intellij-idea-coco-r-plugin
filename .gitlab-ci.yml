@@ -1,0 +1,43 @@
+stages:
+  - test
+  - build
+  - publish
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+test:
+  stage: test
+  tags:
+    - jdk8
+  cache:
+    paths:
+      - .gradle
+  script:
+    - ./gradlew clean test --no-daemon
+
+build:
+  stage: build
+  tags:
+    - jdk8
+  cache:
+    paths:
+      - .gradle
+    policy: pull
+  script:
+    - ./gradlew assemble --no-daemon
+  artifacts:
+    paths:
+      - build/distributions/*.zip
+
+publish:
+  stage: publish
+  tags:
+    - jdk8
+  cache:
+    paths:
+      - .gradle
+    policy: pull
+  script:
+    - ./gradlew publishPlugin -PpublishUsername=$JETBRAINS_USERNAME -PpublishPassword=$JETBRAINS_PASSWORD --no-daemon
+  when: manual
