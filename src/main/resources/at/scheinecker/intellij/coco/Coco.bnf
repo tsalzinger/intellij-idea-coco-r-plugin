@@ -13,7 +13,7 @@
     tokenTypeClass="at.scheinecker.intellij.coco.psi.CocoTokenType"
 
     mixin("End|BasicSet|TokenFactor|Factor")="at.scheinecker.intellij.coco.psi.impl.CocoReferencingType"
-    mixin("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="at.scheinecker.intellij.coco.psi.impl.CocoJavaType"
+    mixin("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="at.scheinecker.intellij.coco.psi.impl.CocoEmbeddedLanguageType"
     mixin("Directive")="at.scheinecker.intellij.coco.psi.CocoDirectiveElement"
     implements("End")="at.scheinecker.intellij.coco.psi.HasCocoCompilerReference"
     implements("BasicSet|TokenFactor")="at.scheinecker.intellij.coco.psi.HasCocoCharacterReference"
@@ -21,7 +21,7 @@
     implements("Compiler|SetDecl|TokenDecl|PragmaDecl|Production")="at.scheinecker.intellij.coco.psi.CocoNamedElement"
     implements("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="com.intellij.psi.PsiLanguageInjectionHost"
     implements("CocoInjectorHost")="com.intellij.psi.PsiLanguageInjectionHost"
-    mixin("CocoInjectorHost")="at.scheinecker.intellij.coco.psi.impl.CocoJavaType"
+    mixin("CocoInjectorHost")="at.scheinecker.intellij.coco.psi.impl.CocoEmbeddedLanguageType"
     mixin("End|BasicSet|TokenFactor|Factor|SetDecl|TokenDecl|PragmaDecl|Production")="at.scheinecker.intellij.coco.psi.impl.CocoNamedElementBase"
     mixin("Compiler")="at.scheinecker.intellij.coco.psi.impl.CocoCompilerBase"
 
@@ -47,7 +47,6 @@
         KEYWORD_IF='IF'
         KEYWORD_IGNORE='IGNORE'
         KEYWORD_IGNORECASE='IGNORECASE'
-        KEYWORD_IMPORT='import'
         KEYWORD_NESTED='NESTED'
         KEYWORD_OUT='out'
         KEYWORD_PRAGMAS='PRAGMAS'
@@ -79,6 +78,7 @@
         number='regexp:\p{Digit}+'
         ident='regexp:\p{Alpha}\p{Alnum}*'
         ANY_CHAR='regexp:.'
+        EMBEDDED_CODE='regexp:[^]'
     ]
 }
 
@@ -91,7 +91,7 @@ CocoInjectorHost ::=
     [GlobalFieldsAndMethods]
     ScannerSpecification
     ParserSpecification
-    End
+    End {pin=Compiler}
 
 Directives ::=  { Directive }* {pin = 1}
 
@@ -99,23 +99,9 @@ Directive ::= DIRECTIVE_NAME ['=' DIRECTIVE_VALUE] {pin = 1}
 
 Compiler ::= "COMPILER" ident {pin=1}
 
-Imports ::= JavaCode
-//
-GlobalFieldsAndMethods ::= JavaCode
+Imports ::= EmbeddedImports
 
-JavaCode ::= {JavaSymbols}*
-ANY ::= JavaSymbols
-ArbitraryText ::= (ident | string | char | number | ANY_CHAR | '.' | "out")*
-ArbitraryStatements ::= {JavaSymbols}*
-private JavaSymbols ::= (ident | string | char | number | ANY_CHAR | Symbols | JavaComparator | JavaBooleanOperator | '!' | '.' | "import" | "out") { name = "Java Code"}
-
-//ScannerSpecification =
-// ["IGNORECASE"]
-// ["CHARACTERS" {SetDecl}]
-// ["TOKENS" {TokenDecl}]
-// ["PRAGMAS" {PragmaDecl}]
-// {CommentDecl}
-// {WhiteSpaceDecl}.
+ArbitraryStatements ::= EmbeddedStatements
 
 ScannerSpecification ::=
     ["IGNORECASE"]
@@ -181,21 +167,18 @@ private ExtendedFormalAttributes ::= "<." FormalAttributesBody ".>" {pin = 1}
 private FormalAttributesBody ::= FormalAttributesWithOutput | FormalInputAttributes
 FormalAttributesWithOutput ::= FormalOutputAttribute [',' FormalInputAttributes] {pin = 1}
 FormalInputAttributes ::= FormalAttributesParameter {AdditionalFormalAttributesParameter}* {pin = 1}
-//private FormalAttributeStart ::= FormalOutputAttribute | FormalAttributesParameter
 FormalOutputAttribute ::= 'out' FormalAttributesParameter {pin = 1}
-FormalAttributesParameter ::= JavaTypeReference JavaTypeReference {pin = 1}
+FormalAttributesParameter ::= EmbeddedVariableDeclaration {pin = 1}
 private AdditionalFormalAttributesParameter ::= ',' FormalAttributesParameter {pin = 1}
 ActualAttributes ::= SimpleActualAttributes | ExtendedActualAttributes
 private SimpleActualAttributes ::= '<' ActualAttributesBody '>' {pin = 1}
 private ExtendedActualAttributes ::= "<." ActualAttributesBody ".>" {pin = 1}
 ActualAttributesBody ::= AttributeStart {AdditionalActualAttributesParameter}*  {pin = 1}
-private AttributeStart ::= AttributeAssignment | JavaTypeReference
-AttributeAssignment ::= 'out' JavaTypeReference {pin = 1}
+private AttributeStart ::= AttributeAssignment | EmbeddedVariableReference
+AttributeAssignment ::= 'out' EmbeddedVariableReference {pin = 1}
 private AdditionalActualAttributesParameter ::= ',' ident {pin = 1}
-JavaTypeReference ::= ident {JavaSubTypeReference}* {pin = 1}
-private JavaSubTypeReference ::= '.' ident {pin = 1}
 
-Resolver ::= "IF" '(' {JavaBooleanExpression}* ')' {pin=2}
+Resolver ::= "IF" '(' {EmbeddedBooleanExpression}* ')' {pin=2}
 
 End ::= "END" ident '.' {pin=1}
 
@@ -206,24 +189,3 @@ EmbeddedStatements ::= EMBEDDED_CODE
 EmbeddedVariableReference ::= EMBEDDED_CODE
 EmbeddedVariableDeclaration ::= EMBEDDED_CODE
 EmbeddedBooleanExpression ::= EMBEDDED_CODE
-
-
-private Symbols ::= '+' | '-'  | '=' | '(' | ')' | '<' | '>' | '{' | '}' | '[' | ']' | '..' {name = "Symbols"}
-
-// JAVA
-private JavaOperators ::= '+' | '-' | '*' | '/' | '%'
-private JavaBoolean ::= 'true' | 'false' | ('(' JavaBoolean ')')
-private JavaComparator ::= '==' | '!=' | '>=' | '>' | '<=' | '<'
-private JavaBooleanOperator ::= '&&' | '||' | '&' | '|'
-private JavaBooleanExpression ::= (((JavaBoolean | JavaExpression) [JavaComparator JavaExpression]) [JavaBooleanOperator JavaBooleanExpression]) | '!' JavaBooleanExpression
-
-private JavaVariable ::= (ident|string) {JavaSubTypeReference}*
-private JavaMethodCall ::= JavaVariable JavaMethodParameters
-private JavaMethodParameters ::= '()' | JavaMethodParametersList
-private JavaMethodParametersList ::= '(' JavaExpression {JavaAdditionalParameters}*')' {pin = 1}
-private JavaAdditionalParameters ::= ',' JavaExpression {pin = 1}
-private JavaValueExpression ::= (JavaNewObject | JavaMethodCall | JavaVariable) {'.' (JavaMethodCall | JavaVariable)}*
-private JavaNewObject ::= 'new' JavaTypeReference JavaMethodParameters {pin = 1}
-private JavaShortIf ::= JavaValueExpression '?' JavaValueExpression ':' JavaValueExpression {pin = 2}
-private JavaExpression ::= (JavaShortIf | JavaValueExpression | number | GroupedJavaExpression) [JavaOperators JavaBooleanExpression]
-private GroupedJavaExpression ::= '(' JavaBooleanExpression ')' {pin=1}

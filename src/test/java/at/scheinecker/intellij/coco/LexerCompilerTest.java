@@ -14,12 +14,13 @@ public class LexerCompilerTest extends AbstractLexerTest {
     @Test
     public void testSimpleCompiler() throws IOException {
         addInput("COMPILER Taste");
-        init("PRODUCTIONS");
+        init("PRODUCTIONS", CocoLexer.STATE_COMPILER);
 
         assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
+        assertElementTypeStrict(CocoTypes.EMBEDDED_CODE);
         assertElementTypeStrict(CocoTypes.KEYWORD_PRODUCTIONS);
     }
 
@@ -27,12 +28,14 @@ public class LexerCompilerTest extends AbstractLexerTest {
     public void testCompilerWithJavaCodeShort() throws IOException {
         addInput("COMPILER Taste");
         addInput("private String test = \"test\";");
-        init("PRODUCTIONS");
+        init("PRODUCTIONS", CocoLexer.STATE_COMPILER);
 
         assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        advanceUntil(CocoTypes.KEYWORD_PRODUCTIONS);
+        assertElementTypeStrict(TokenType.WHITE_SPACE);
+        assertElementTypeStrict(CocoTypes.EMBEDDED_CODE);
+        assertElementTypeStrict(CocoTypes.KEYWORD_PRODUCTIONS);
     }
 
     @Test
@@ -40,12 +43,14 @@ public class LexerCompilerTest extends AbstractLexerTest {
         addInput("COMPILER Taste");
         addInput("private String test = \"test\";");
         addInput("private String test = \"test\";");
-        init("PRODUCTIONS");
+        init("PRODUCTIONS", CocoLexer.STATE_COMPILER);
 
         assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        advanceUntil(CocoTypes.KEYWORD_PRODUCTIONS);
+        assertElementTypeStrict(TokenType.WHITE_SPACE);
+        assertElementTypeStrict(CocoTypes.EMBEDDED_CODE);
+        assertElementTypeStrict(CocoTypes.KEYWORD_PRODUCTIONS);
     }
 
     @Test
@@ -62,7 +67,9 @@ public class LexerCompilerTest extends AbstractLexerTest {
         assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        advanceUntil(CocoTypes.KEYWORD_PRODUCTIONS);
+        assertElementTypeStrict(TokenType.WHITE_SPACE);
+        assertElementTypeStrict(CocoTypes.EMBEDDED_CODE);
+        assertElementTypeStrict(CocoTypes.KEYWORD_PRODUCTIONS);
     }
 
     @Test
@@ -74,12 +81,14 @@ public class LexerCompilerTest extends AbstractLexerTest {
         addInput("/* and a block comment */");
         addInput("and some illegal code");
         addInput("private long abc = -1;");
-        init("IGNORECASE");
+        init("IGNORECASE", CocoLexer.STATE_COMPILER);
 
         assertElementTypeStrict(CocoTypes.KEYWORD_COMPILER);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.IDENT);
-        advanceUntil(CocoTypes.KEYWORD_IGNORECASE);
+        assertElementTypeStrict(TokenType.WHITE_SPACE);
+        assertElementTypeStrict(CocoTypes.EMBEDDED_CODE);
+        assertElementTypeStrict(CocoTypes.KEYWORD_IGNORECASE);
 
     }
 }

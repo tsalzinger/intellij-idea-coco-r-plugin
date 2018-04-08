@@ -45,7 +45,7 @@ public class LexerStringTest extends AbstractLexerTest {
 
     @Test
     public void testString() throws IOException {
-        init(string);
+        init(string, CocoLexer.STATE_COMPILER);
         assertElementTypeStrict(CocoTypes.STRING);
     }
 }

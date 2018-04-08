@@ -24,7 +24,9 @@ class CocoFoldingBuilder : FoldingBuilderEx() {
                 CocoPragmaDecl::class.java,
                 CocoComments::class.java,
                 CocoArbitraryStatements::class.java,
-                CocoArbitraryText::class.java,
+                CocoEmbeddedBooleanExpression::class.java,
+                CocoEmbeddedImports::class.java,
+                CocoEmbeddedStatements::class.java,
                 CocoProduction::class.java,
                 CocoEnd::class.java,
                 CocoParserSpecification::class.java,
@@ -43,8 +45,8 @@ class CocoFoldingBuilder : FoldingBuilderEx() {
 
         return when (psiElement) {
             is CocoDirectives -> "DIRECTIVES (${psiElement.directiveList.size}) ..."
-            is CocoImports -> "JAVA IMPORTS ..."
-            is CocoGlobalFieldsAndMethods -> "JAVA FIELDS AND METHODS ..."
+            is CocoImports -> "IMPORTS / INCLUDES ..."
+            is CocoGlobalFieldsAndMethods -> "GLOBAL FIELDS AND METHODS ..."
             is CocoComments -> "COMMENTS (${psiElement.commentDeclList.size}) ..."
             is CocoCharacters -> "CHARACTERS (${psiElement.setDeclList.size}) ..."
             is CocoTokens -> "TOKENS (${psiElement.tokenDeclList.size}) ..."

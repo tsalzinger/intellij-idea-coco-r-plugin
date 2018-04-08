@@ -13,7 +13,7 @@ public class LexerComplexStringTest extends AbstractLexerTest {
 
     @Test
     public void testEscapeStringLazyString() throws IOException {
-        init("\"\\\\\" \"second\"");
+        init("\"\\\\\" \"second\"", CocoLexer.STATE_COMPILER);
         assertElementTypeStrict(CocoTypes.STRING);
         assertElementTypeStrict(TokenType.WHITE_SPACE);
         assertElementTypeStrict(CocoTypes.STRING);

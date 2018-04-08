@@ -13,6 +13,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.util.PsiTreeUtil
+import java.util.regex.Pattern
 
 class CocoJavaMultiHostInjector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
@@ -35,18 +36,18 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
         val cocoImports = context.imports
         val globalFieldsAndMethods = context.globalFieldsAndMethods
         val scannerSpecification = context.scannerSpecification
-        val pragmas = scannerSpecification.pragmas
-        val productions = context.parserSpecification.productionList
+        val pragmas = scannerSpecification?.pragmas
+        val productions = context.parserSpecification?.productionList
 
         if (cocoImports != null && cocoImports.textLength != 0) {
-            registrar.addPlace(prefix = targetPackage, element =  cocoImports)
+            registrar.addPlace(prefix = targetPackage, element = cocoImports)
             prefixBuilder = StringBuilder()
         }
 
         prefixBuilder.append("class Parser {\n")
         prefixBuilder.append("\tvoid Recover() {/* generated */}\n")
         prefixBuilder.append("\tpublic static final int _EOF = 0;\n")
-        appendSetDecls(prefixBuilder, scannerSpecification.tokens?.tokenDeclList.orEmpty())
+        appendSetDecls(prefixBuilder, scannerSpecification?.tokens?.tokenDeclList.orEmpty())
         appendSetDecls(prefixBuilder, pragmas?.pragmaDeclList?.map { it.tokenDecl }.orEmpty(), 102)
         if (globalFieldsAndMethods != null && globalFieldsAndMethods.textLength != 0) {
             registrar.addPlace(prefix = prefixBuilder, element = globalFieldsAndMethods)
@@ -62,7 +63,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
 
         prefixBuilder.append("}\n")
 
-        productions.forEach {
+        productions?.forEach {
             //            val start = it.textOffset
             prefixBuilder.append("\n")
             var parameterDeclaration = it.formalAttributes?.formalInputAttributes
@@ -70,9 +71,15 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
 
             if (formalOutputAttribute != null) {
                 parameterDeclaration = formalOutputAttribute.formalInputAttributes
-                val formalAttributesParameter = formalOutputAttribute.formalOutputAttribute.formalAttributesParameter
-                if (formalAttributesParameter != null) {
-                    prefixBuilder.append(formalAttributesParameter.javaTypeReferenceList.first().text)
+                val embeddedVariableDeclaration = fromJavaVariableDeclaration(
+                        formalOutputAttribute
+                                .formalOutputAttribute
+                                .formalAttributesParameter
+                                ?.embeddedVariableDeclaration
+                                ?.text
+                )
+                if (embeddedVariableDeclaration != null) {
+                    prefixBuilder.append(embeddedVariableDeclaration.first)
                     prefixBuilder.append(" ")
                 } else {
                     prefixBuilder.append("void ")
@@ -117,7 +124,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
                     prefixBuilder.append("\t")
 
                     if (parameters != null) {
-                        val varName = attributeAssignment?.javaTypeReference
+                        val varName = attributeAssignment?.embeddedVariableReference
                         val attributeAssignmentLength = attributeAssignment?.textLength ?: 0
                         val additionalOffset = parameters.text.substring(attributeAssignmentLength).takeWhile { it == ' ' || it == '\t' || it == '\n' || it == '\n' || it == ',' }.length
 
@@ -143,7 +150,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
                 val arbitraryStatements = it.semAction?.arbitraryStatements
                 if (arbitraryStatements != null) {
                     prefixBuilder.append("\t")
-                    registrar.addPlace(prefixBuilder,  "\n\tRecover();\n", arbitraryStatements)
+                    registrar.addPlace(prefixBuilder, "\n\tRecover();\n", arbitraryStatements)
                     prefixBuilder = StringBuilder()
                 }
 
@@ -151,10 +158,13 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
 
             if (formalOutputAttribute != null) {
                 val formalAttributesParameter = formalOutputAttribute.formalOutputAttribute.formalAttributesParameter
-                if (formalAttributesParameter != null && formalAttributesParameter.javaTypeReferenceList.size >= 2) {
-                    prefixBuilder.append("return ")
-                    prefixBuilder.append(formalAttributesParameter.javaTypeReferenceList[1].text)
-                    prefixBuilder.append(";\n")
+                if (formalAttributesParameter != null) {
+                    val javaVariableDeclaration = fromJavaVariableDeclaration(formalAttributesParameter.embeddedVariableDeclaration.text)
+                    if (javaVariableDeclaration != null) {
+                        prefixBuilder.append("return ")
+                        prefixBuilder.append(javaVariableDeclaration.second)
+                        prefixBuilder.append(";\n")
+                    }
                 }
             }
 
@@ -165,6 +175,20 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
         registrar.addPlace(prefixBuilder, "}", TextRange.from(context.textLength, 0))
 
         registrar.doneInjecting()
+    }
+
+    private fun fromJavaVariableDeclaration(embeddedVariableDeclaration: String?): Pair<String, String>? {
+        if (embeddedVariableDeclaration == null) {
+            return null
+        }
+
+        val parts = embeddedVariableDeclaration.split(Pattern.compile("\\s+"))
+
+        if (parts.size == 2) {
+            return parts[0] to parts[1]
+        }
+
+        return null
     }
 
 

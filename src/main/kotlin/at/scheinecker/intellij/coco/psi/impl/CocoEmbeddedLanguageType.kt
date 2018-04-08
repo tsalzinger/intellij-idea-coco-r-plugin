@@ -8,7 +8,7 @@ import com.intellij.psi.PsiLanguageInjectionHost
 /**
  * Created by Thomas on 27/03/2015.
  */
-abstract class CocoJavaType(node: ASTNode) : ASTWrapperPsiElement(node), PsiLanguageInjectionHost {
+abstract class CocoEmbeddedLanguageType(node: ASTNode) : ASTWrapperPsiElement(node), PsiLanguageInjectionHost {
     override fun updateText(p0: String): PsiLanguageInjectionHost {
         return this
     }

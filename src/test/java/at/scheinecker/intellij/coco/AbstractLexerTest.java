@@ -25,9 +25,18 @@ public class AbstractLexerTest {
         input = new StringBuilder();
     }
 
+    protected void init(String content, int lexerState) {
+        addInput(content);
+        init(lexerState);
+    }
+
     protected void init(String content) {
         addInput(content);
         init();
+    }
+
+    protected void init(int lexerState) {
+        cocoLexer.reset(input.toString(), 0, input.length(), lexerState);
     }
 
     protected void addInput(String append) {
@@ -38,7 +47,7 @@ public class AbstractLexerTest {
     }
 
     protected void init() {
-        cocoLexer.reset(input.toString(), 0, input.length(), CocoLexer.YYINITIAL);
+        init(CocoLexer.YYINITIAL);
     }
 
     protected IElementType advanceUntil(IElementType elementType) throws IOException {
@@ -63,7 +72,7 @@ public class AbstractLexerTest {
                 advance = cocoLexer.advance();
             }
 
-            char[] currentInput = new char[cocoLexer.getTokenEnd()-cocoLexer.getTokenStart()];
+            char[] currentInput = new char[cocoLexer.getTokenEnd() - cocoLexer.getTokenStart()];
             input.getChars(cocoLexer.getTokenStart(), cocoLexer.getTokenEnd(), currentInput, 0);
 
             if (elementTypes.length == 1) {

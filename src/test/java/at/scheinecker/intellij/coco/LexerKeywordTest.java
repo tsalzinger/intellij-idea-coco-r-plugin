@@ -49,7 +49,7 @@ public class LexerKeywordTest extends AbstractLexerTest {
 
     @Test
     public void testToken() throws IOException {
-        init(token);
+        init(token, CocoLexer.STATE_COMPILER);
         assertElementTypeStrict(elementType);
     }
 }
