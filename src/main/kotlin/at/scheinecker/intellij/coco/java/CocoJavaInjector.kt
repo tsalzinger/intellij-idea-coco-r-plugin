@@ -1,5 +1,6 @@
-package at.scheinecker.intellij.coco
+package at.scheinecker.intellij.coco.java
 
+import at.scheinecker.intellij.coco.CocoUtil
 import at.scheinecker.intellij.coco.psi.*
 import at.scheinecker.intellij.coco.settings.CocoConfiguration
 import at.scheinecker.intellij.coco.settings.CocoInjectionMode
@@ -17,7 +18,7 @@ class CocoJavaInjector : LanguageInjector {
 
         val prefixBuilder = StringBuilder()
 
-        CocoUtil.getTargetPackage(psiLanguageInjectionHost.containingFile.originalFile)
+        CocoJavaUtil.getTargetPackage(psiLanguageInjectionHost.containingFile.originalFile)
                 .ifPresent { prefixBuilder.append("package $it;") }
 
         if (psiLanguageInjectionHost is CocoImports) {

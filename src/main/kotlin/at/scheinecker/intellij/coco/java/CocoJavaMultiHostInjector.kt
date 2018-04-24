@@ -1,4 +1,4 @@
-package at.scheinecker.intellij.coco
+package at.scheinecker.intellij.coco.java
 
 import at.scheinecker.intellij.coco.psi.CocoCocoInjectorHost
 import at.scheinecker.intellij.coco.psi.CocoFactor
@@ -28,7 +28,7 @@ class CocoJavaMultiHostInjector : MultiHostInjector {
 
         val psiFile = context.containingFile
         var prefixBuilder = StringBuilder()
-        val targetPackage = CocoUtil.getTargetPackage(psiFile).map { "package $it;\n\n" }.orElse("")
+        val targetPackage = CocoJavaUtil.getTargetPackage(psiFile).map { "package $it;\n\n" }.orElse("")
         prefixBuilder.append(targetPackage)
 
         registrar.startInjecting(JavaLanguage.INSTANCE)

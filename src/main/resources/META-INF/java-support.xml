@@ -1,0 +1,34 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="Cocol/R"
+                                        implementationClass="at.scheinecker.intellij.coco.java.CocoJavaLineMarkerProvider"/>
+
+        <externalAnnotator language="Cocol/R"
+                           implementationClass="at.scheinecker.intellij.coco.java.CocoJavaExternalAnnotator"/>
+
+        <languageInjector implementation="at.scheinecker.intellij.coco.java.CocoJavaInjector"/>
+        <multiHostInjector implementation="at.scheinecker.intellij.coco.java.CocoJavaMultiHostInjector"/>
+
+        <projectConfigurable groupId="language"
+                             instance="at.scheinecker.intellij.coco.settings.CocoSettingsConfigurable"
+                             id="coco.preferences"
+                             nonDefaultProject="true"
+                             displayName="Coco/R"/>
+    </extensions>
+    <actions>
+        <group id="coco.Generate">
+            <separator/>
+            <action id="at.scheinecker.intellij.coco.action.CocoRAction"
+                    class="at.scheinecker.intellij.coco.action.CocoRAction"
+                    text="Run _Coco/R"
+                    description="Runs Coco/R on the given .ATG file"
+                    icon="/at/scheinecker/intellij/coco/icons/coco-ico.gif">
+                <keyboard-shortcut keymap="$default" first-keystroke="control shift G"/>
+            </action>
+            <add-to-group group-id="ToolsMenu" anchor="before"
+                          relative-to-action="ExternalToolsGroup"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </group>
+    </actions>
+</idea-plugin>

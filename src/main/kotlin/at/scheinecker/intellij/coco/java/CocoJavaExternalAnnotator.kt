@@ -1,5 +1,6 @@
-package at.scheinecker.intellij.coco
+package at.scheinecker.intellij.coco.java
 
+import at.scheinecker.intellij.coco.CocoUtil
 import at.scheinecker.intellij.coco.psi.CocoFile
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.lang.annotation.AnnotationHolder
@@ -11,17 +12,17 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 
-class CocoExternalAnnotator : ExternalAnnotator<CocoFile, List<HighlightInfo>>() {
+class CocoJavaExternalAnnotator : ExternalAnnotator<CocoFile, List<HighlightInfo>>() {
     override fun collectInformation(file: PsiFile, editor: Editor, hasErrors: Boolean): CocoFile? {
         return file as? CocoFile
     }
 
     override fun doAnnotate(collectedInfo: CocoFile): List<HighlightInfo> {
-        return CocoUtil.getJavaErrors(collectedInfo)
+        return CocoJavaUtil.getJavaErrors(collectedInfo)
     }
 
     override fun apply(file: PsiFile, annotationResult: List<HighlightInfo>, holder: AnnotationHolder) {
-        val parserClass = CocoUtil.getParserClass(file) ?: return
+        val parserClass = CocoJavaUtil.getParserClass(file) ?: return
 
         val virtualFile = parserClass.containingFile.virtualFile
         val document = FileDocumentManager.getInstance().getDocument(virtualFile) ?: return

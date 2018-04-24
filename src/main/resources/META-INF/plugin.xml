@@ -28,14 +28,19 @@
                 <li>Code completion (Compiler, Character, Token, Pragma and Production names)</li>
                 <li>Go to declaration</li>
                 <li>Go to symbol / Symbol search</li>
-                <li>Go to generated code (for productions)</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Features for Java enabled IDEs:</strong>
+            <ul>
                 <li>Configurable Java language injection</li>
                 <li>Generate Scanner and Parser via menu action</li>
+                <li>Warnings and Errors during Coco/R execution are shown within the Problems Tool Window</li>
                 <li>Automatic detection of appropriate output folder for generated Java classes</li>
                 <li>Automatic detection of package in case no $package directive is present)
                 <li>Automatic detection of appropriate output root for generated Java classes</li>
-                <li>Warnings and Errors during Coco/R execution are shown within the Problems Tool Window</li>
                 <li>Errors from generated Parser are mapped back to the grammar file</li>
+                <li>Go to generated code (for productions)</li>
             </ul>
         </p>
     ]]></description>
@@ -44,11 +49,12 @@
         <ul>
             <li>Allow arbitrary directives (with and without a value)</li>
             <li>Show directives in structure view</li>
+            <li>Make Java support optional, allowing plugin usage outside of Intellij IDEA and Android Studio</li>
         </ul>
     ]]>
     </change-notes>
 
-    <depends>com.intellij.modules.java</depends>
+    <depends optional="true" config-file="java-support.xml">com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="at.scheinecker.intellij.coco.CocoFileTypeFactory"/>
@@ -80,21 +86,11 @@
                 implementation="at.scheinecker.intellij.coco.symbolcontributor.CocoChooseByNameProductionContributor"/>
 
         <annotator language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoAnnotator"/>
-        <externalAnnotator language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoExternalAnnotator"/>
 
         <lang.commenter language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoCommenter"/>
         <lang.foldingBuilder language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoFoldingBuilder"/>
 
-        <!-- Java Injection -->
-        <languageInjector implementation="at.scheinecker.intellij.coco.CocoJavaInjector"/>
-        <multiHostInjector implementation="at.scheinecker.intellij.coco.CocoJavaMultiHostInjector"/>
-
         <!-- Settings page -->
-        <projectConfigurable groupId="language"
-                             instance="at.scheinecker.intellij.coco.settings.CocoSettingsConfigurable"
-                             id="coco.preferences"
-                             nonDefaultProject="true"
-                             displayName="Coco/R"/>
         <projectService serviceInterface="at.scheinecker.intellij.coco.settings.CocoConfiguration"
                         serviceImplementation="at.scheinecker.intellij.coco.settings.CocoConfiguration"/>
         <colorSettingsPage implementation="at.scheinecker.intellij.coco.CocoColorSettingsPage"/>
@@ -104,19 +100,5 @@
                 class="at.scheinecker.intellij.coco.action.NewAtgFileAction">
             <add-to-group group-id="NewGroup"/>
         </action>
-        <group id="coco.Generate">
-            <separator/>
-            <action id="at.scheinecker.intellij.coco.action.CocoRAction"
-                    class="at.scheinecker.intellij.coco.action.CocoRAction"
-                    text="Run _Coco/R"
-                    description="Runs Coco/R on the given .ATG file"
-                    icon="/at/scheinecker/intellij/coco/icons/coco-ico.gif">
-                <keyboard-shortcut keymap="$default" first-keystroke="control shift G"/>
-            </action>
-            <add-to-group group-id="ToolsMenu" anchor="before"
-                          relative-to-action="ExternalToolsGroup"/>
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-        </group>
     </actions>
 </idea-plugin>

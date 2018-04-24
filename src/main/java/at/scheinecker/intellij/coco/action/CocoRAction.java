@@ -2,7 +2,7 @@ package at.scheinecker.intellij.coco.action;
 
 import Coco.*;
 import Coco.Scanner;
-import at.scheinecker.intellij.coco.CocoUtil;
+import at.scheinecker.intellij.coco.java.CocoJavaUtil;
 import at.scheinecker.intellij.coco.psi.CocoFile;
 import com.intellij.codeInsight.daemon.impl.HighlightInfo;
 import com.intellij.compiler.CompilerMessageImpl;
@@ -67,9 +67,9 @@ public class CocoRAction extends AnAction {
                     .ifPresent(context -> {
                         markFileTreeAsDirtyAndReload(context.getOutputDir());
 
-                        PsiClass parserClass = CocoUtil.INSTANCE.getParserClass(file);
+                        PsiClass parserClass = CocoJavaUtil.INSTANCE.getParserClass(file);
                         if (parserClass != null) {
-                            final List<HighlightInfo> javaErrors = CocoUtil.INSTANCE.analyzeJavaErrors(file);
+                            final List<HighlightInfo> javaErrors = CocoJavaUtil.INSTANCE.analyzeJavaErrors(file);
 
                             final VirtualFile virtualFile = parserClass.getContainingFile().getVirtualFile();
                             final Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
@@ -163,7 +163,7 @@ public class CocoRAction extends AnAction {
     }
 
     private Optional<CocoCompilerContext> generate(@NotNull CocoFile file, @NotNull final UUID executionId) {
-        final Optional<String> filePackage_ = CocoUtil.INSTANCE.getTargetPackage(file);
+        final Optional<String> filePackage_ = CocoJavaUtil.INSTANCE.getTargetPackage(file);
 
         Optional<VirtualFile> outDirFile_ = getGeneratedSourceFolders(file)
                 .stream()
