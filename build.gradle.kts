@@ -91,6 +91,7 @@ tasks.withType<KotlinCompile> {
 intellij {
     version = "IC-2018.1"
     downloadSources = true
+    setPlugins("PsiViewer:3.28.93")
 }
 
 tasks.withType<PatchPluginXmlTask> {
