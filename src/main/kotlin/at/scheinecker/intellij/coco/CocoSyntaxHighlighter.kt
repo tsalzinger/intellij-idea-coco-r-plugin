@@ -17,66 +17,55 @@ class CocoSyntaxHighlighter : SyntaxHighlighter {
     }
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
-        if (tokenType == CocoTypes.LINE_COMMENT) {
-            return LINE_COMMENT_KEYS
-        } else if (tokenType == CocoTypes.BLOCK_COMMENT) {
-            return BLOCK_COMMENT_KEYS
-        } else if (tokenType == CocoTypes.NUMBER) {
-            return NUMBER_KEYS
-        } else if (tokenType == CocoTypes.PAR_CLOSE || tokenType == CocoTypes.PAR_OPEN) {
-            return PARENTHESES_KEYS
-        } else if (tokenType == CocoTypes.BRACK_CLOSE || tokenType == CocoTypes.BRACK_OPEN) {
-            return BRACKETS_KEYS
-        } else if (tokenType == CocoTypes.CURL_CLOSE || tokenType == CocoTypes.CURL_OPEN) {
-            return BRACES_KEYS
-        } else if (tokenType == CocoTypes.STRING) {
-            return STRING_KEYS
-        } else if (tokenType == CocoTypes.CHAR) {
-            return CHAR_KEYS
-        } else if (tokenType == CocoTypes.SEM_ACTION) {
-            return SEM_ACTION_KEYS
-        } else if (tokenType == CocoTypes.IDENT) {
-            return IDENTIFIER_KEYS
-        } else if (tokenType == CocoTypes.TERMINATOR) {
-            return TERMINATOR_KEYS
-        } else if (tokenType == CocoTypes.PLUS
-                || tokenType == CocoTypes.MINUS
-                || tokenType == CocoTypes.ASSIGNMENT
-                || tokenType == CocoTypes.PIPE
-                || tokenType == CocoTypes.RANGE) {
-            return OPERATION_SIGN_KEYS
-        } else if (tokenType == CocoTypes.SEM_ACTION_START ||
-                tokenType == CocoTypes.SEM_ACTION_END ||
-                tokenType == CocoTypes.ATTRIBUTES_START ||
-                tokenType == CocoTypes.ATTRIBUTES_END ||
-                tokenType == CocoTypes.GREATER_THEN ||
-                tokenType == CocoTypes.SMALLER_THEN) {
-            return MARKUP_TAG_KEYS
-        } else if (tokenType == CocoTypes.KEYWORD_ANY ||
-                tokenType == CocoTypes.KEYWORD_CASE ||
-                tokenType == CocoTypes.KEYWORD_CHARACTERS ||
-                tokenType == CocoTypes.KEYWORD_CHECK_EOF_DIRECTIVE ||
-                tokenType == CocoTypes.KEYWORD_COMPILER ||
-                tokenType == CocoTypes.KEYWORD_COMMENTS ||
-                tokenType == CocoTypes.KEYWORD_CONTEXT ||
-                tokenType == CocoTypes.KEYWORD_END ||
-                tokenType == CocoTypes.KEYWORD_FROM ||
-                tokenType == CocoTypes.KEYWORD_IF ||
-                tokenType == CocoTypes.KEYWORD_IGNORE ||
-                tokenType == CocoTypes.KEYWORD_IGNORECASE ||
-                tokenType == CocoTypes.KEYWORD_IMPORT ||
-                tokenType == CocoTypes.KEYWORD_NESTED ||
-                tokenType == CocoTypes.KEYWORD_OUT ||
-                tokenType == CocoTypes.KEYWORD_PACKAGE_DIRECTIVE ||
-                tokenType == CocoTypes.KEYWORD_PRAGMAS ||
-                tokenType == CocoTypes.KEYWORD_PRODUCTIONS ||
-                tokenType == CocoTypes.KEYWORD_SYNC ||
-                tokenType == CocoTypes.KEYWORD_TO ||
-                tokenType == CocoTypes.KEYWORD_TOKENS ||
-                tokenType == CocoTypes.KEYWORD_WEAK) {
-            return KEYWORD_KEYS
+        when (tokenType) {
+            CocoTypes.LINE_COMMENT -> return LINE_COMMENT_KEYS
+            CocoTypes.BLOCK_COMMENT -> return BLOCK_COMMENT_KEYS
+            CocoTypes.NUMBER -> return NUMBER_KEYS
+            CocoTypes.PAR_CLOSE,
+            CocoTypes.PAR_OPEN -> return PARENTHESES_KEYS
+            CocoTypes.BRACK_CLOSE,
+            CocoTypes.BRACK_OPEN -> return BRACKETS_KEYS
+            CocoTypes.CURL_CLOSE,
+            CocoTypes.CURL_OPEN -> return BRACES_KEYS
+            CocoTypes.STRING -> return STRING_KEYS
+            CocoTypes.CHAR -> return CHAR_KEYS
+            CocoTypes.SEM_ACTION -> return SEM_ACTION_KEYS
+            CocoTypes.DIRECTIVE_VALUE,
+            CocoTypes.IDENT -> return IDENTIFIER_KEYS
+            CocoTypes.TERMINATOR -> return TERMINATOR_KEYS
+            CocoTypes.PLUS,
+            CocoTypes.MINUS,
+            CocoTypes.ASSIGNMENT,
+            CocoTypes.PIPE,
+            CocoTypes.RANGE -> return OPERATION_SIGN_KEYS
+            CocoTypes.SEM_ACTION_START,
+            CocoTypes.SEM_ACTION_END,
+            CocoTypes.ATTRIBUTES_START,
+            CocoTypes.ATTRIBUTES_END,
+            CocoTypes.GREATER_THEN,
+            CocoTypes.SMALLER_THEN -> return MARKUP_TAG_KEYS
+            CocoTypes.KEYWORD_ANY,
+            CocoTypes.DIRECTIVE_NAME,
+            CocoTypes.KEYWORD_CASE,
+            CocoTypes.KEYWORD_CHARACTERS,
+            CocoTypes.KEYWORD_COMPILER,
+            CocoTypes.KEYWORD_COMMENTS,
+            CocoTypes.KEYWORD_CONTEXT,
+            CocoTypes.KEYWORD_END,
+            CocoTypes.KEYWORD_FROM,
+            CocoTypes.KEYWORD_IF,
+            CocoTypes.KEYWORD_IGNORE,
+            CocoTypes.KEYWORD_IGNORECASE,
+            CocoTypes.KEYWORD_NESTED,
+            CocoTypes.KEYWORD_OUT,
+            CocoTypes.KEYWORD_PRAGMAS,
+            CocoTypes.KEYWORD_PRODUCTIONS,
+            CocoTypes.KEYWORD_SYNC,
+            CocoTypes.KEYWORD_TO,
+            CocoTypes.KEYWORD_TOKENS,
+            CocoTypes.KEYWORD_WEAK -> return KEYWORD_KEYS
+            else -> return emptyArray()
         }
-        return emptyArray()
     }
 
     companion object {

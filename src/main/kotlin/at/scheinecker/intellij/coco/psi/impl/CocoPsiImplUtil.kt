@@ -1,7 +1,9 @@
 package at.scheinecker.intellij.coco.psi.impl
 
 import at.scheinecker.intellij.coco.CocoIcons
-import at.scheinecker.intellij.coco.psi.*
+import at.scheinecker.intellij.coco.psi.CocoCompiler
+import at.scheinecker.intellij.coco.psi.CocoDirective
+import at.scheinecker.intellij.coco.psi.CocoTypes
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
@@ -59,18 +61,10 @@ object CocoPsiImplUtil {
     }
 
     @JvmStatic
-    fun getPresentation(element: CocoDirectiveElement): ItemPresentation {
-        val text = element.text
-        val name = when (element) {
-            is CocoPackageDirective -> "package ${text.substringAfter('=', "??")}"
-            is CocoCheckEofDirective -> (if (text.contains("true", true)) "" else "don't ") + "check EOF"
-            is CocoAnyDirective -> text
-            else -> null
-        }
-
+    fun getPresentation(element: CocoDirective): ItemPresentation {
         return object : ItemPresentation {
             override fun getPresentableText(): String? {
-                return name
+                return element.text
             }
 
             override fun getLocationString(): String? {

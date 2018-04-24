@@ -6,7 +6,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.NavigatablePsiElement
 
-abstract class CocoDirectiveElement(node: ASTNode) : ASTWrapperPsiElement(node), NavigatablePsiElement {
+abstract class CocoDirectiveElement(node: ASTNode) : ASTWrapperPsiElement(node), NavigatablePsiElement, CocoDirective {
     override fun getPresentation(): ItemPresentation? {
         return CocoPsiImplUtil.getPresentation(this)
     }

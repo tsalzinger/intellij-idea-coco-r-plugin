@@ -5,47 +5,46 @@
     <category>Languages,Tools integration</category>
 
     <description><![CDATA[
-      This plugin adds support for Cocol/R language and Coco/R compiler generator.<br>
-      For more details about Coco/R please refer to <a href="http://ssw.jku.at/coco/">http://ssw.jku.at/coco/<a>.<br/>
-      Any bug reports should be filed on <a href="https://github.com/tscheinecker/intellij-idea-coco-r-plugin">GitHub</a>.
+        <p>
+        This plugin adds support for Cocol/R language and Coco/R compiler generator.<br>
+        For more details about Coco/R please refer to <a href="http://ssw.jku.at/coco/">http://ssw.jku.at/coco/<a>.<br/>
+        Any bug reports should be filed on <a href="https://github.com/tscheinecker/intellij-idea-coco-r-plugin">GitHub</a>.
+        </p>
+        <p>
+            <strong>Features:</strong>
+            <ul>
+                <li>Syntax Highlighting - Customizable via settings page</li>
+                <li>Commenter (Block and line comments)</li>
+                <li>Syntax Error highlighting (unexpected tokens)</li>
+                <li>Reference check (report unresolvable references to characters, tokens and productions)</li>
+                <li>Declaration order check (report references to characters and tokens declared after usage)</li>
+                <li>Attributes check (productions have to be used with or without attributes according to declaration)</li>
+                <li>Highlight unused characters, tokens, pragmas and productions</li>
+                <li>Code Folding</li>
+                <li>Structure View</li>
+                <li>Find usages</li>
+                <li>Inplace rename refactorings (Compiler, Characters, Tokens, Pragmas and Productions)</li>
+                <li>Brace matching for (), [], {}, &lt;&gt;, &lt;..&gt; and (..)</li>
+                <li>Code completion (Compiler, Character, Token, Pragma and Production names)</li>
+                <li>Go to declaration</li>
+                <li>Go to symbol / Symbol search</li>
+                <li>Go to generated code (for productions)</li>
+                <li>Configurable Java language injection</li>
+                <li>Generate Scanner and Parser via menu action</li>
+                <li>Automatic detection of appropriate output folder for generated Java classes</li>
+                <li>Automatic detection of package in case no $package directive is present)
+                <li>Automatic detection of appropriate output root for generated Java classes</li>
+                <li>Warnings and Errors during Coco/R execution are shown within the Problems Tool Window</li>
+                <li>Errors from generated Parser are mapped back to the grammar file</li>
+            </ul>
+        </p>
     ]]></description>
 
     <change-notes><![CDATA[
-        <p>
-        v1.0.1:
         <ul>
-            <li>Fix changelog formatting</li>
-            <li>Allow plugin to be installed in IntelliJ IDEA 2018.1</li>
+            <li>Allow arbitrary directives (with and without a value)</li>
+            <li>Show directives in structure view</li>
         </ul>
-        </p>
-        <p>
-        v1.0.0:
-        <ul>
-            <li>Syntax Highlighting - Customizable via settings page</li>
-            <li>Commenter (Block and line comments)</li>
-            <li>Syntax Error highlighting (unexpected tokens)</li>
-            <li>Reference check (report unresolvable references to characters, tokens and productions)</li>
-            <li>Declaration order check (report references to characters and tokens declared after usage)</li>
-            <li>Attributes check (productions have to be used with or without attributes according to declaration)</li>
-            <li>Highlight unused characters, tokens, pragmas and productions</li>
-            <li>Code Folding</li>
-            <li>Structure View</li>
-            <li>Find usages</li>
-            <li>Inplace rename refactorings (Compiler, Characters, Tokens, Pragmas and Productions)</li>
-            <li>Brace matching for (), [], {}, <>, <..> and (..)</li>
-            <li>Code completion (Compiler, Character, Token, Pragma and Production names)</li>
-            <li>Go to declaration</li>
-            <li>Go to symbol / Symbol search</li>
-            <li>Go to generated code (for productions)</li>
-            <li>Configurable Java language injection</li>
-            <li>Generate Scanner and Parser via menu action</li>
-            <li>Automatic detection of appropriate output folder for generated Java classes</li>
-            <li>Automatic detection of package in case no $package directive is present)
-            <li>Automatic detection of appropriate output root for generated Java classes</li>
-            <li>Warnings and Errors during Coco/R execution are shown within the Problems Tool Window</li>
-            <li>Errors from generated Parser are mapped back to the grammar file</li>
-        </ul>
-        </p>
     ]]>
     </change-notes>
 

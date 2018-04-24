@@ -6,10 +6,14 @@ import static at.scheinecker.intellij.coco.psi.CocoTypes.*;
 %%
 
 %{
+  private boolean hasDirectiveValue = false;
+
   public CocoLexer() {
     this((java.io.Reader)null);
   }
 %}
+
+%s DIRECTIVE
 
 %public
 %class CocoLexer
@@ -24,7 +28,6 @@ escapesequences = (\\\' | \\\" | \\\\ | \\0 | \\r | \\n | \\t | \\v | \\f | \\a 
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
-//       \" ([^\"] | {escapesequences} | \\\" | " ")*  \"
 STRING=\"([^\"\n\\]|{escapesequences})*?\"
 CHAR='([^"'"]|{escapesequences}|" ")'
 WHITE_SPACE=[ \t\n\x0B\f\r]+
@@ -32,14 +35,15 @@ LINE_COMMENT="//".*
 BLOCK_COMMENT="/"\*([^\*]|\*+[^/\*])*\*+"/"
 NUMBER=[:digit:]+
 IDENT=[:letter:]([:letter:]|[:digit:])*
+DIRECTIVE_NAME=\$[:letter:]+
 ANY_CHAR=.
 
 %%
+
 <YYINITIAL> {
   {WHITE_SPACE}        { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  {DIRECTIVE_NAME}     { hasDirectiveValue = false; yybegin(DIRECTIVE); return DIRECTIVE_NAME; }
 
-  "$checkEOF"          { return KEYWORD_CHECK_EOF_DIRECTIVE; }
-  "$package"           { return KEYWORD_PACKAGE_DIRECTIVE; }
   "ANY"                { return KEYWORD_ANY; }
   "CASE"               { return KEYWORD_CASE; }
   "CHARACTERS"         { return KEYWORD_CHARACTERS; }
@@ -81,7 +85,6 @@ ANY_CHAR=.
 
   {STRING}             { return STRING; }
   {CHAR}               { return CHAR; }
-  {WHITE_SPACE}        { return WHITE_SPACE; }
   {LINE_COMMENT}       { return LINE_COMMENT; }
   {BLOCK_COMMENT}      { return BLOCK_COMMENT; }
   {NUMBER}             { return NUMBER; }
@@ -89,4 +92,10 @@ ANY_CHAR=.
   {ANY_CHAR}           { return ANY_CHAR; }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<DIRECTIVE> {
+  "="                  { return ASSIGNMENT; }
+  {WHITE_SPACE}        { yypushback(yylength()); yybegin(YYINITIAL); if (hasDirectiveValue) { return DIRECTIVE_VALUE; } }
+  [^]                  { hasDirectiveValue = true; }
 }

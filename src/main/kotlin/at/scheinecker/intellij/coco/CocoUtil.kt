@@ -88,7 +88,9 @@ object CocoUtil {
     }
 
     fun getDeclaredPackage(file: PsiFile): String? {
-        return PsiTreeUtil.getChildOfType(file, CocoCocoInjectorHost::class.java)?.directives?.packageDirectiveList?.firstOrNull()?.declaredPackage?.text?.trim()
+        return PsiTreeUtil.findChildOfType(file, CocoDirectives::class.java)?.directiveList?.find {
+            it.directiveName.text == "\$package"
+        }?.directiveValue?.text
     }
 
     fun getTargetPackage(file: PsiFile): Optional<String> {
@@ -167,7 +169,7 @@ object CocoUtil {
             })
         }
 
-        return ProgressManager.getInstance().runProcess(Computable<List<HighlightInfo>> outer@ {
+        return ProgressManager.getInstance().runProcess(Computable<List<HighlightInfo>> outer@{
             return@outer DumbService.getInstance(project).runReadActionInSmartMode(Computable<List<HighlightInfo>> {
                 val psiFile = PsiManager.getInstance(project).findFile(file)
                 val document = FileDocumentManager.getInstance().getDocument(file)

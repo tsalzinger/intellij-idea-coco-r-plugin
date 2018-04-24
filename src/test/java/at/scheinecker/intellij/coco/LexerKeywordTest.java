@@ -28,7 +28,6 @@ public class LexerKeywordTest extends AbstractLexerTest {
                 {"IF", CocoTypes.KEYWORD_IF},
                 {"IGNORE", CocoTypes.KEYWORD_IGNORE},
                 {"IGNORECASE", CocoTypes.KEYWORD_IGNORECASE},
-                {"import", CocoTypes.KEYWORD_IMPORT},
                 {"NESTED", CocoTypes.KEYWORD_NESTED},
                 {"out", CocoTypes.KEYWORD_OUT},
                 {"PRAGMAS", CocoTypes.KEYWORD_PRAGMAS},

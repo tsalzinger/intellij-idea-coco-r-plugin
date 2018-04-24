@@ -129,12 +129,11 @@ class CocoStructureViewElement(private val element: PsiElement) : StructureViewT
     }
 
     override fun getChildren(): Array<TreeElement> {
-//        TODO add support for directives!
         val treeElements = ArrayList<TreeElement>()
         if (element is CocoFile) {
             val injectionHost = PsiTreeUtil.getChildOfType(element, CocoCocoInjectorHost::class.java)
 
-            val cocoDirectives = PsiTreeUtil.getChildOfType(injectionHost, CocoDirectives::class.java)
+            val cocoDirectives = PsiTreeUtil.getChildOfType(element, CocoDirectives::class.java)
             if (cocoDirectives != null && PsiTreeUtil.getChildrenOfType(cocoDirectives, CocoDirectiveElement::class.java) != null) {
                 treeElements.add(CocoStructureViewElement(cocoDirectives))
             }
@@ -183,9 +182,7 @@ class CocoStructureViewElement(private val element: PsiElement) : StructureViewT
         } else if (element is CocoParserSpecification) {
             addToTreeElement(treeElements, element.productionList)
         } else if (element is CocoDirectives) {
-            addToTreeElement(treeElements, element.packageDirectiveList)
-            addToTreeElement(treeElements, element.checkEofDirectiveList)
-            addToTreeElement(treeElements, element.anyDirectiveList)
+            addToTreeElement(treeElements, element.directiveList)
         }
         return treeElements.toTypedArray()
     }
