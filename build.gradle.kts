@@ -9,21 +9,12 @@ import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.backend.common.onlyIf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { setUrl("https://jitpack.io") }
-    }
-    dependencies {
-        classpath("com.github.hurricup:gradle-grammar-kit-plugin:2018.1.1")
-    }
-}
-
 plugins {
     idea
     java
-    kotlin("jvm") version "1.2.31"
-    id("org.jetbrains.intellij") version "0.3.1"
+    kotlin("jvm") version "1.2.61"
+    id("org.jetbrains.intellij") version "0.3.7"
+    id("org.jetbrains.grammarkit") version "2018.1.7"
     id("de.undercouch.download") version "3.3.0"
 }
 
@@ -89,14 +80,14 @@ tasks.withType<KotlinCompile> {
 }
 
 intellij {
-    version = "IC-2018.1"
+    version = "IC-2018.2"
     downloadSources = true
     setPlugins("PsiViewer:3.28.93")
 }
 
 tasks.withType<PatchPluginXmlTask> {
     version(project.version)
-    untilBuild("181.*")
+    untilBuild("182.*")
 }
 
 tasks.withType<JavaCompile> {

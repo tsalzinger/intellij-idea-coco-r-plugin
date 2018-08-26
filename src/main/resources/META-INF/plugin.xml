@@ -7,7 +7,7 @@
     <description><![CDATA[
         <p>
         This plugin adds support for Cocol/R language and Coco/R compiler generator.<br>
-        For more details about Coco/R please refer to <a href="http://ssw.jku.at/coco/">http://ssw.jku.at/coco/<a>.<br/>
+            For more details about Coco/R please refer to <a href="http://ssw.jku.at/coco/">http://ssw.jku.at/coco/</a>.<br/>
         Any bug reports should be filed on <a href="https://github.com/tscheinecker/intellij-idea-coco-r-plugin">GitHub</a>.
         </p>
         <p>
@@ -37,7 +37,7 @@
                 <li>Generate Scanner and Parser via menu action</li>
                 <li>Warnings and Errors during Coco/R execution are shown within the Problems Tool Window</li>
                 <li>Automatic detection of appropriate output folder for generated Java classes</li>
-                <li>Automatic detection of package in case no $package directive is present)
+                <li>Automatic detection of package in case no $package directive is present</li>
                 <li>Automatic detection of appropriate output root for generated Java classes</li>
                 <li>Errors from generated Parser are mapped back to the grammar file</li>
                 <li>Go to generated code (for productions)</li>
@@ -47,9 +47,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Allow arbitrary directives (with and without a value)</li>
-            <li>Show directives in structure view</li>
-            <li>Make Java support optional, allowing plugin usage outside of Intellij IDEA and Android Studio</li>
+            <li>Ensure compatibility with 2018.2.*</li>
         </ul>
     ]]>
     </change-notes>
