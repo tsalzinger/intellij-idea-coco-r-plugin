@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     idea
     java
-    kotlin("jvm") version "1.2.61"
+    kotlin("jvm") version "1.3.21"
     id("org.jetbrains.intellij") version "0.3.7"
     id("org.jetbrains.grammarkit") version "2018.1.7"
     id("de.undercouch.download") version "3.3.0"
@@ -74,8 +74,8 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "1.8"
-        languageVersion = "1.2"
-        apiVersion = "1.2"
+        languageVersion = "1.3"
+        apiVersion = "1.3"
     }
 }
 
