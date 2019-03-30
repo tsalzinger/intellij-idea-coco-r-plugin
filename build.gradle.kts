@@ -1,4 +1,3 @@
-
 import de.undercouch.gradle.tasks.download.Download
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
@@ -27,8 +26,12 @@ configure<JavaPluginConvention> {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-java.sourceSets {
-    getByName("main").java.srcDirs("$buildDir/gen")
+sourceSets {
+    main {
+        java {
+            srcDirs("$buildDir/gen")
+        }
+    }
 }
 
 idea {
