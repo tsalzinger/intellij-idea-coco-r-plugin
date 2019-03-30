@@ -103,6 +103,5 @@ tasks.withType<PublishTask> {
     if (projectVersionString.contains("-")) {
         channels(projectVersionString.substring(projectVersionString.indexOf("-") + 1))
     }
-    username(project.findProperty("publishUsername"))
-    password(project.findProperty("publishPassword"))
+    token(project.findProperty("publishToken"))
 }
