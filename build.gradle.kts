@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "io.scheinecker.intellij"
-version = "1.2.0-SNAPSHOT"
+version = "1.2.0"
 
 apply {
     plugin("org.jetbrains.grammarkit")
