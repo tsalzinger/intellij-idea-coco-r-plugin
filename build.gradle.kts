@@ -9,8 +9,8 @@ plugins {
     idea
     java
     kotlin("jvm") version "1.3.21"
-    id("org.jetbrains.intellij") version "0.3.7"
-    id("org.jetbrains.grammarkit") version "2018.1.7"
+    id("org.jetbrains.intellij") version "0.4.7"
+    id("org.jetbrains.grammarkit") version "2018.3.1"
     id("de.undercouch.download") version "3.3.0"
 }
 
