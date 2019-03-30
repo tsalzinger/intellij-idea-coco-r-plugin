@@ -1,7 +1,6 @@
 package at.scheinecker.intellij.coco
 
 import at.scheinecker.intellij.coco.psi.*
-import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -10,7 +9,6 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.indexing.FileBasedIndex
 import org.apache.commons.lang.StringUtils
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -120,19 +118,11 @@ object CocoUtil {
         if (project == null) {
             return emptyList()
         }
-        val virtualFiles = FileBasedIndex.getInstance().getContainingFiles<FileType, Void>(FileTypeIndex.NAME, CocoFileType.INSTANCE, GlobalSearchScope.allScope(project))
 
-        val psiFiles = ArrayList<PsiFile>()
         val psiManager = PsiManager.getInstance(project)
 
-        for (virtualFile in virtualFiles) {
-            val file = psiManager.findFile(virtualFile)
-            if (file != null) {
-                psiFiles.add(file)
-            }
-        }
-
-        return psiFiles
+        return FileTypeIndex.getFiles(CocoFileType.INSTANCE, GlobalSearchScope.allScope(project))
+                .mapNotNull(psiManager::findFile)
     }
 
     fun findTokenDecls(project: Project?, name: String?): List<CocoTokenDecl> {
