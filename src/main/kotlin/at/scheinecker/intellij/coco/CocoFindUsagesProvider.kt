@@ -13,8 +13,11 @@ import com.intellij.psi.tree.TokenSet
  */
 class CocoFindUsagesProvider : FindUsagesProvider {
 
-    override fun getWordsScanner(): WordsScanner? {
-        return WORDS_SCANNER
+    override fun getWordsScanner(): WordsScanner {
+        return DefaultWordsScanner(FlexAdapter(CocoLexer()),
+                TokenSet.create(CocoTypes.IDENT),
+                TokenSet.create(CocoTypes.LINE_COMMENT, CocoTypes.BLOCK_COMMENT),
+                TokenSet.EMPTY)
     }
 
     override fun canFindUsagesFor(psiElement: PsiElement): Boolean {
@@ -57,12 +60,5 @@ class CocoFindUsagesProvider : FindUsagesProvider {
 
     override fun getNodeText(element: PsiElement, useFullName: Boolean): String {
         return element.text
-    }
-
-    companion object {
-        private val WORDS_SCANNER = DefaultWordsScanner(FlexAdapter(CocoLexer()),
-                TokenSet.create(CocoTypes.IDENT),
-                TokenSet.create(CocoTypes.LINE_COMMENT, CocoTypes.BLOCK_COMMENT),
-                TokenSet.EMPTY)
     }
 }

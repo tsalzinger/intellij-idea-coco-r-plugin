@@ -123,7 +123,7 @@ class NewAtgFileAction : CreateFileAction("Cocol/R ATG File", "Create new Cocol/
 
         @Throws(Exception::class)
         override fun create(fileName: String): Array<PsiElement> {
-            return super.create(ensureAtgFileEnding(fileName))
+            return super.create(ensureAtgFileEnding(fileName)!!)
         }
 
         override fun checkInput(fileName: String): Boolean {

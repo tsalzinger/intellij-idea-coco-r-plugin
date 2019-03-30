@@ -47,7 +47,8 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Ensure compatibility with 2018.2.*</li>
+            <li>Fix issue with reused WordScanner</li>
+            <li>Ensure compatibility with 2019.1.*</li>
         </ul>
     ]]>
     </change-notes>
