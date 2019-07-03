@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "io.scheinecker.intellij"
-version = "1.3.0"
+version = "1.4.0-SNAPSHOT"
 
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -102,8 +102,8 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<PublishTask> {
     val projectVersionString = "${project.version}"
-    if (projectVersionString.contains("-")) {
-        channels(projectVersionString.substring(projectVersionString.indexOf("-") + 1))
+    if (projectVersionString.contains("-SNAPSHOT")) {
+        channels("SNAPSHOT")
     }
     token(project.findProperty("publishToken"))
 }
