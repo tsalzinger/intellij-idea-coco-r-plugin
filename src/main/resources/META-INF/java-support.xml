@@ -1,16 +1,16 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider language="Cocol/R"
-                                        implementationClass="at.scheinecker.intellij.coco.java.CocoJavaLineMarkerProvider"/>
+                                        implementationClass="me.salzinger.intellij.coco.java.CocoJavaLineMarkerProvider"/>
 
         <externalAnnotator language="Cocol/R"
-                           implementationClass="at.scheinecker.intellij.coco.java.CocoJavaExternalAnnotator"/>
+                           implementationClass="me.salzinger.intellij.coco.java.CocoJavaExternalAnnotator"/>
 
-        <languageInjector implementation="at.scheinecker.intellij.coco.java.CocoJavaInjector"/>
-        <multiHostInjector implementation="at.scheinecker.intellij.coco.java.CocoJavaMultiHostInjector"/>
+        <languageInjector implementation="me.salzinger.intellij.coco.java.CocoJavaInjector"/>
+        <multiHostInjector implementation="me.salzinger.intellij.coco.java.CocoJavaMultiHostInjector"/>
 
         <projectConfigurable groupId="language"
-                             instance="at.scheinecker.intellij.coco.settings.CocoSettingsConfigurable"
+                             instance="me.salzinger.intellij.coco.settings.CocoSettingsConfigurable"
                              id="coco.preferences"
                              nonDefaultProject="true"
                              displayName="Coco/R"/>
@@ -18,11 +18,11 @@
     <actions>
         <group id="coco.Generate">
             <separator/>
-            <action id="at.scheinecker.intellij.coco.action.CocoRAction"
-                    class="at.scheinecker.intellij.coco.action.CocoRAction"
+            <action id="me.salzinger.intellij.coco.action.CocoRAction"
+                    class="me.salzinger.intellij.coco.action.CocoRAction"
                     text="Run _Coco/R"
                     description="Runs Coco/R on the given .ATG file"
-                    icon="/at/scheinecker/intellij/coco/icons/coco-ico.gif">
+                    icon="/me/salzinger/intellij/coco/icons/coco-ico.gif">
                 <keyboard-shortcut keymap="$default" first-keystroke="control shift G"/>
             </action>
             <add-to-group group-id="ToolsMenu" anchor="before"

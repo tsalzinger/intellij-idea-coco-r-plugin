@@ -49,15 +49,15 @@ val downloadCocoJar = task<Download>("downloadCocoJar") {
 }
 
 val generateCocoParser = task<GenerateParser>("generateCocoParser") {
-    source = "src/main/resources/at/scheinecker/intellij/coco/Coco.bnf"
+    source = "src/main/resources/me/salzinger/intellij/coco/Coco.bnf"
     targetRoot = "$buildDir/gen"
-    pathToParser = "/at/scheinecker/intellij/coco/parser/CocoParser.java"
-    pathToPsiRoot = "/at/scheinecker/intellij/coco/psi"
+    pathToParser = "/me/salzinger/intellij/coco/parser/CocoParser.java"
+    pathToPsiRoot = "/me/salzinger/intellij/coco/psi"
 }
 
 val generateCocoLexer = task<GenerateLexer>("generateCocoLexer") {
-    source = "src/main/kotlin/at/scheinecker/intellij/coco/Coco.flex"
-    targetDir = "$buildDir/gen/at/scheinecker/intellij/coco/"
+    source = "src/main/kotlin/me/salzinger/intellij/coco/Coco.flex"
+    targetDir = "$buildDir/gen/me/salzinger/intellij/coco/"
     targetClass = "CocoLexer"
     dependsOn(generateCocoParser)
 }

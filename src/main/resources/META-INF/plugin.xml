@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>io.scheinecker.intellij.coco</id>
     <name>Coco/R</name>
-    <vendor url="https://github.com/tscheinecker/intellij-idea-coco-r-plugin">Thomas Scheinecker</vendor>
+    <vendor url="https://github.com/tsalzinger/intellij-idea-coco-r-plugin">Thomas Salzinger</vendor>
     <category>Languages,Tools integration</category>
 
     <description><![CDATA[

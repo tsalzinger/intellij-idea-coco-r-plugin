@@ -1,0 +1,191 @@
+{
+    parserClass="me.salzinger.intellij.coco.parser.CocoParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Coco"
+    psiImplClassSuffix="Impl"
+    psiPackage="me.salzinger.intellij.coco.psi"
+    psiImplPackage="me.salzinger.intellij.coco.psi.impl"
+
+    elementTypeHolderClass="me.salzinger.intellij.coco.psi.CocoTypes"
+    elementTypeClass="me.salzinger.intellij.coco.psi.CocoElementType"
+    tokenTypeClass="me.salzinger.intellij.coco.psi.CocoTokenType"
+
+    mixin("End|BasicSet|TokenFactor|Factor")="me.salzinger.intellij.coco.psi.impl.CocoReferencingType"
+    mixin("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="me.salzinger.intellij.coco.psi.impl.CocoEmbeddedLanguageType"
+    mixin("Directive")="me.salzinger.intellij.coco.psi.CocoDirectiveElement"
+    implements("End")="me.salzinger.intellij.coco.psi.HasCocoCompilerReference"
+    implements("BasicSet|TokenFactor")="me.salzinger.intellij.coco.psi.HasCocoCharacterReference"
+    implements("Factor")="me.salzinger.intellij.coco.psi.HasCocoTokenOrProductionReference"
+    implements("Compiler|SetDecl|TokenDecl|PragmaDecl|Production")="me.salzinger.intellij.coco.psi.CocoNamedElement"
+    implements("Imports|GlobalFieldsAndMethods|ArbitraryStatements")="com.intellij.psi.PsiLanguageInjectionHost"
+    implements("CocoInjectorHost")="com.intellij.psi.PsiLanguageInjectionHost"
+    mixin("CocoInjectorHost")="me.salzinger.intellij.coco.psi.impl.CocoEmbeddedLanguageType"
+    mixin("End|BasicSet|TokenFactor|Factor|SetDecl|TokenDecl|PragmaDecl|Production")="me.salzinger.intellij.coco.psi.impl.CocoNamedElementBase"
+    mixin("Compiler")="me.salzinger.intellij.coco.psi.impl.CocoCompilerBase"
+
+    tokens=[
+        string='regexp:"(\\\\|\\"|[^\"\n])*"'
+        char="regexp:'(\\u(\p{XDigit}{4})|\\.|.)'"
+
+        WHITE_SPACE='regexp:\s+'
+        LINE_COMMENT='regexp://.*'
+        BLOCK_COMMENT='regexp:/\*([^\*]|\*+[^/\*])*\*+/'
+
+        DIRECTIVE_NAME='regexp://\${Alpha}+'
+        DIRECTIVE_VALUE='regexp:[^]'
+
+        KEYWORD_ANY='ANY'
+        KEYWORD_CASE='CASE'
+        KEYWORD_CHARACTERS='CHARACTERS'
+        KEYWORD_COMPILER='COMPILER'
+        KEYWORD_COMMENTS='COMMENTS'
+        KEYWORD_CONTEXT='CONTEXT'
+        KEYWORD_END='END'
+        KEYWORD_FROM='FROM'
+        KEYWORD_IF='IF'
+        KEYWORD_IGNORE='IGNORE'
+        KEYWORD_IGNORECASE='IGNORECASE'
+        KEYWORD_NESTED='NESTED'
+        KEYWORD_OUT='out'
+        KEYWORD_PRAGMAS='PRAGMAS'
+        KEYWORD_PRODUCTIONS='PRODUCTIONS'
+        KEYWORD_SYNC='SYNC'
+        KEYWORD_TO='TO'
+        KEYWORD_TOKENS='TOKENS'
+        KEYWORD_WEAK='WEAK'
+
+        TERMINATOR='.'
+        PLUS='+'
+        MINUS='-'
+        RANGE='..'
+        ASSIGNMENT='='
+        CURL_OPEN='{'
+        CURL_CLOSE='}'
+        PAR_OPEN='('
+        PAR_CLOSE=')'
+        BRACK_OPEN='['
+        BRACK_CLOSE=']'
+        SMALLER_THEN='<'
+        SEM_ACTION_START='(.'
+        SEM_ACTION_END='.)'
+        ATTRIBUTES_START='<.'
+        ATTRIBUTES_END='.>'
+        PIPE='|'
+        GREATER_THEN='>'
+
+        number='regexp:\p{Digit}+'
+        ident='regexp:\p{Alpha}\p{Alnum}*'
+        ANY_CHAR='regexp:.'
+        EMBEDDED_CODE='regexp:[^]'
+    ]
+}
+
+Cocol ::=
+    Directives CocoInjectorHost
+
+CocoInjectorHost ::=
+    [Imports]
+    Compiler
+    [GlobalFieldsAndMethods]
+    ScannerSpecification
+    ParserSpecification
+    End {pin=Compiler}
+
+Directives ::=  { Directive }* {pin = 1}
+
+Directive ::= DIRECTIVE_NAME ['=' DIRECTIVE_VALUE] {pin = 1}
+
+Compiler ::= "COMPILER" ident {pin=1}
+
+Imports ::= EmbeddedImports
+
+ArbitraryStatements ::= EmbeddedStatements
+
+ScannerSpecification ::=
+    ["IGNORECASE"]
+    [Characters]
+    [Tokens]
+    [Pragmas]
+    [Comments]
+    {WhiteSpaceDecl}*
+
+Characters ::= "CHARACTERS" {SetDecl}* {pin=1 recoverWhile="CharactersRecover"}
+private CharactersRecover ::= !("TOKENS"|"PRAGMAS"|"COMMENTS"|"IGNORE"|"PRODUCTIONS"|"END")
+
+SetDecl ::= SetDeclStart Set '.' {pin=1 recoverWhile="SetDeclRecover"}
+private SetDeclStart ::= ident '=' {pin=1}
+private SetDeclRecover ::= !(SetDeclStart|"TOKENS"|"PRAGMAS"|"COMMENTS"|"IGNORE"|"PRODUCTIONS"|"END")
+
+Set ::= BasicSet {('+'|'-') BasicSet}*
+BasicSet ::= string | ident | char [".." char] | "ANY"
+
+Tokens ::= "TOKENS" {TokenDecl}* {pin=1}
+TokenDecl ::= Symbol [TokenAssignment]
+private TokenAssignment ::= '=' TokenExpr '.' {pin=1}
+
+TokenExpr ::= TokenTerm {TokenTermOption}* {pin=1}
+private TokenTermOption ::= '|' TokenTerm {pin=1}
+TokenTerm ::= TokenFactor {TokenFactor}* [TokenContext]
+private TokenContext ::= "CONTEXT" '(' TokenExpr ')' {pin=1}
+TokenFactor ::= Symbol
+    | TokenFactor_parenthesis
+    | TokenFactor_bracket
+    | TokenFactor_brace
+
+private TokenFactor_parenthesis ::= '(' TokenExpr ')' {pin=1}
+private TokenFactor_bracket ::= '[' TokenExpr ']' {pin=1}
+private TokenFactor_brace ::= '{' TokenExpr '}' {pin=1}
+private Symbol ::= ident | string | char
+
+
+Pragmas ::= "PRAGMAS" {PragmaDecl}*
+PragmaDecl ::= TokenDecl [SemAction]
+SemAction ::= "(." ArbitraryStatements ".)" {pin = 1}
+
+Comments ::= CommentDecl {CommentDecl}*
+CommentDecl ::= "COMMENTS" "FROM" TokenExpr "TO" TokenExpr ["NESTED"] {pin = 1}
+
+WhiteSpaceDecl ::= "IGNORE" (Set | "CASE") {pin=1}
+
+ParserSpecification ::= "PRODUCTIONS" {Production}* {pin = 1}
+Production ::= ident [FormalAttributes] [LocalDecl] '=' Expression '.' {pin = 4}
+Expression ::= Term {'|' Term}*
+Term ::= [[Resolver] Factor {Factor}*]
+Factor ::= ['WEAK'] Symbol [ActualAttributes]
+    | '(' Expression ')'
+    | '[' Expression ']'
+    | '{' Expression '}'
+| "ANY"
+| "SYNC"
+| SemAction
+private LocalDecl ::= SemAction
+FormalAttributes ::= SimpleFormalAttributes | ExtendedFormalAttributes
+private SimpleFormalAttributes ::= '<' FormalAttributesBody '>' {pin = 1}
+private ExtendedFormalAttributes ::= "<." FormalAttributesBody ".>" {pin = 1}
+private FormalAttributesBody ::= FormalAttributesWithOutput | FormalInputAttributes
+FormalAttributesWithOutput ::= FormalOutputAttribute [',' FormalInputAttributes] {pin = 1}
+FormalInputAttributes ::= FormalAttributesParameter {AdditionalFormalAttributesParameter}* {pin = 1}
+FormalOutputAttribute ::= 'out' FormalAttributesParameter {pin = 1}
+FormalAttributesParameter ::= EmbeddedVariableDeclaration {pin = 1}
+private AdditionalFormalAttributesParameter ::= ',' FormalAttributesParameter {pin = 1}
+ActualAttributes ::= SimpleActualAttributes | ExtendedActualAttributes
+private SimpleActualAttributes ::= '<' ActualAttributesBody '>' {pin = 1}
+private ExtendedActualAttributes ::= "<." ActualAttributesBody ".>" {pin = 1}
+ActualAttributesBody ::= AttributeStart {AdditionalActualAttributesParameter}*  {pin = 1}
+private AttributeStart ::= AttributeAssignment | EmbeddedVariableReference
+AttributeAssignment ::= 'out' EmbeddedVariableReference {pin = 1}
+private AdditionalActualAttributesParameter ::= ',' ident {pin = 1}
+
+Resolver ::= "IF" '(' {EmbeddedBooleanExpression}* ')' {pin=2}
+
+End ::= "END" ident '.' {pin=1}
+
+// Embedded language
+GlobalFieldsAndMethods ::= EMBEDDED_CODE
+EmbeddedImports ::= EMBEDDED_CODE
+EmbeddedStatements ::= EMBEDDED_CODE
+EmbeddedVariableReference ::= EMBEDDED_CODE
+EmbeddedVariableDeclaration ::= EMBEDDED_CODE
+EmbeddedBooleanExpression ::= EMBEDDED_CODE

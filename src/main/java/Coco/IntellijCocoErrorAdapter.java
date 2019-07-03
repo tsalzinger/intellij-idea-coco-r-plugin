@@ -1,8 +1,8 @@
 package Coco;
 
-import at.scheinecker.intellij.coco.action.CocoCompilerContext;
 import com.intellij.openapi.compiler.CompilerMessage;
 import com.intellij.openapi.compiler.CompilerMessageCategory;
+import me.salzinger.intellij.coco.action.CocoCompilerContext;
 
 import java.util.ArrayList;
 import java.util.List;
