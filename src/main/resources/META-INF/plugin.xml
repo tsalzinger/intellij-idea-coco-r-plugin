@@ -47,8 +47,8 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Fix issue with reused WordScanner</li>
-            <li>Ensure compatibility with 2019.1.*</li>
+            <li>Ensure compatibility with 2019.2 EAP</li>
+            <li>Remove untilBuild restriction</li>
         </ul>
     ]]>
     </change-notes>
@@ -56,47 +56,47 @@
     <depends optional="true" config-file="java-support.xml">com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileTypeFactory implementation="at.scheinecker.intellij.coco.CocoFileTypeFactory"/>
+        <fileTypeFactory implementation="me.salzinger.intellij.coco.CocoFileTypeFactory"/>
         <lang.parserDefinition language="Cocol/R"
-                               implementationClass="at.scheinecker.intellij.coco.CocoParserDefinition"/>
+                               implementationClass="me.salzinger.intellij.coco.CocoParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Cocol/R"
-                                       implementationClass="at.scheinecker.intellij.coco.CocoSyntaxHighlighterFactory"/>
-        <lang.braceMatcher language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoBraceMatcher"/>
+                                       implementationClass="me.salzinger.intellij.coco.CocoSyntaxHighlighterFactory"/>
+        <lang.braceMatcher language="Cocol/R" implementationClass="me.salzinger.intellij.coco.CocoBraceMatcher"/>
 
-        <psi.referenceContributor implementation="at.scheinecker.intellij.coco.reference.CocoReferenceContributor"/>
+        <psi.referenceContributor implementation="me.salzinger.intellij.coco.reference.CocoReferenceContributor"/>
         <lang.findUsagesProvider language="Cocol/R"
-                                 implementationClass="at.scheinecker.intellij.coco.CocoFindUsagesProvider"/>
+                                 implementationClass="me.salzinger.intellij.coco.CocoFindUsagesProvider"/>
 
 
         <lang.refactoringSupport language="Cocol/R"
-                                 implementationClass="at.scheinecker.intellij.coco.CocoRefactoringProvider"/>
+                                 implementationClass="me.salzinger.intellij.coco.CocoRefactoringProvider"/>
         <codeInsight.lineMarkerProvider language="Cocol/R"
-                                        implementationClass="at.scheinecker.intellij.coco.CocoLineMarkerProvider"/>
+                                        implementationClass="me.salzinger.intellij.coco.CocoLineMarkerProvider"/>
 
         <lang.psiStructureViewFactory language="Cocol/R"
-                                      implementationClass="at.scheinecker.intellij.coco.structure.CocoStructureViewFactory"/>
+                                      implementationClass="me.salzinger.intellij.coco.structure.CocoStructureViewFactory"/>
 
 
         <gotoSymbolContributor
-                implementation="at.scheinecker.intellij.coco.symbolcontributor.CocoChooseByNameTokenContributor"/>
+                implementation="me.salzinger.intellij.coco.symbolcontributor.CocoChooseByNameTokenContributor"/>
         <gotoSymbolContributor
-                implementation="at.scheinecker.intellij.coco.symbolcontributor.CocoChooseByNameCharacterContributor"/>
+                implementation="me.salzinger.intellij.coco.symbolcontributor.CocoChooseByNameCharacterContributor"/>
         <gotoSymbolContributor
-                implementation="at.scheinecker.intellij.coco.symbolcontributor.CocoChooseByNameProductionContributor"/>
+                implementation="me.salzinger.intellij.coco.symbolcontributor.CocoChooseByNameProductionContributor"/>
 
-        <annotator language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoAnnotator"/>
+        <annotator language="Cocol/R" implementationClass="me.salzinger.intellij.coco.CocoAnnotator"/>
 
-        <lang.commenter language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoCommenter"/>
-        <lang.foldingBuilder language="Cocol/R" implementationClass="at.scheinecker.intellij.coco.CocoFoldingBuilder"/>
+        <lang.commenter language="Cocol/R" implementationClass="me.salzinger.intellij.coco.CocoCommenter"/>
+        <lang.foldingBuilder language="Cocol/R" implementationClass="me.salzinger.intellij.coco.CocoFoldingBuilder"/>
 
         <!-- Settings page -->
-        <projectService serviceInterface="at.scheinecker.intellij.coco.settings.CocoConfiguration"
-                        serviceImplementation="at.scheinecker.intellij.coco.settings.CocoConfiguration"/>
-        <colorSettingsPage implementation="at.scheinecker.intellij.coco.CocoColorSettingsPage"/>
+        <projectService serviceInterface="me.salzinger.intellij.coco.settings.CocoConfiguration"
+                        serviceImplementation="me.salzinger.intellij.coco.settings.CocoConfiguration"/>
+        <colorSettingsPage implementation="me.salzinger.intellij.coco.CocoColorSettingsPage"/>
     </extensions>
     <actions>
-        <action id="at.scheinecker.intellij.coco.action.NewAtgFileAction"
-                class="at.scheinecker.intellij.coco.action.NewAtgFileAction">
+        <action id="me.salzinger.intellij.coco.action.NewAtgFileAction"
+                class="me.salzinger.intellij.coco.action.NewAtgFileAction">
             <add-to-group group-id="NewGroup"/>
         </action>
     </actions>

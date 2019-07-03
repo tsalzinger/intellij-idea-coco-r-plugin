@@ -8,18 +8,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     idea
     java
-    kotlin("jvm") version "1.3.21"
-    id("org.jetbrains.intellij") version "0.4.7"
-    id("org.jetbrains.grammarkit") version "2018.3.1"
+    kotlin("jvm") version "1.3.40"
+    id("org.jetbrains.intellij") version "0.4.9"
+    id("org.jetbrains.grammarkit") version "2019.2"
     id("de.undercouch.download") version "3.3.0"
 }
 
 group = "io.scheinecker.intellij"
 version = "1.3.0-SNAPSHOT"
-
-apply {
-    plugin("org.jetbrains.grammarkit")
-}
 
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -67,6 +63,7 @@ repositories {
 }
 
 dependencies {
+    compile("org.jetbrains.kotlin:kotlin-stdlib")
     compile(fileTree("$buildDir/external-libs"))
     testCompile("junit:junit:4.12")
 }
@@ -80,14 +77,15 @@ tasks.withType<KotlinCompile> {
 }
 
 intellij {
-    version = "IC-2019.1"
+    version = "192.5438.14-EAP-SNAPSHOT"
+    type = "IC"
     downloadSources = true
-    setPlugins("PsiViewer:3.28.93")
+    setPlugins("java", "PsiViewer:3.28.93")
 }
 
 tasks.withType<PatchPluginXmlTask> {
     version(project.version)
-    untilBuild("191.*")
+    untilBuild(null)
 }
 
 tasks.withType<JavaCompile> {
