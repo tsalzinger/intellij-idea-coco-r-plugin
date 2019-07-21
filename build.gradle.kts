@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "io.scheinecker.intellij"
-version = "1.3.1-SNAPSHOT"
+version = "1.3.1"
 
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
