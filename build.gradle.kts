@@ -1,12 +1,8 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.gradle.api.JavaVersion.VERSION_1_8
-import org.gradle.kotlin.dsl.kotlin
-import org.jetbrains.grammarkit.GrammarKitPluginExtension
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.intellij.tasks.PublishTask
-import org.jetbrains.kotlin.backend.common.onlyIf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -19,7 +15,7 @@ plugins {
 }
 
 group = "io.scheinecker.intellij"
-version = "1.1.1"
+version = "1.1.2-SNAPSHOT"
 
 apply {
     plugin("org.jetbrains.grammarkit")
