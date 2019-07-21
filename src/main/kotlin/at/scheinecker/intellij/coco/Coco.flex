@@ -163,6 +163,11 @@ ANY_CHAR=.
                            return EMBEDDED_CODE;
                           }
                        }
+  <<EOF>>              {
+                         yybegin(STATE_COMPILER);
+                         return EMBEDDED_CODE;
+                        }
+
   // everything is valid in here
   [^]                  { }
 }
@@ -186,6 +191,12 @@ ANY_CHAR=.
   "CHARACTERS"         { yypushback(yylength()); yybegin(STATE_COMPILER); return EMBEDDED_CODE; }
   {LINE_COMMENT}       { globalsStarted = true; }
   {BLOCK_COMMENT}      { globalsStarted = true; }
+
+  <<EOF>>              {
+                         yybegin(STATE_COMPILER);
+                         return EMBEDDED_CODE;
+                       }
+
   [^]                  { globalsStarted = true; }
 }
 
