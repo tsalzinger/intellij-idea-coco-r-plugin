@@ -47,8 +47,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Ensure compatibility with 2019.2 EAP</li>
-            <li>Remove untilBuild restriction</li>
+            <li>Ensure compatibility with 2020.1 EAP</li>
         </ul>
     ]]>
     </change-notes>
@@ -56,7 +55,11 @@
     <depends optional="true" config-file="java-support.xml">com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileTypeFactory implementation="me.salzinger.intellij.coco.CocoFileTypeFactory"/>
+        <fileType name="Cocol/R file"
+                  language="Cocol/R"
+                  extensions="atg;coco;cocor;cocol"
+                  implementationClass="me.salzinger.intellij.coco.CocoFileType"
+        />
         <lang.parserDefinition language="Cocol/R"
                                implementationClass="me.salzinger.intellij.coco.CocoParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Cocol/R"
@@ -90,8 +93,8 @@
         <lang.foldingBuilder language="Cocol/R" implementationClass="me.salzinger.intellij.coco.CocoFoldingBuilder"/>
 
         <!-- Settings page -->
-        <projectService serviceInterface="me.salzinger.intellij.coco.settings.CocoConfiguration"
-                        serviceImplementation="me.salzinger.intellij.coco.settings.CocoConfiguration"/>
+        <projectService
+                serviceImplementation="me.salzinger.intellij.coco.settings.CocoConfiguration"/>
         <colorSettingsPage implementation="me.salzinger.intellij.coco.CocoColorSettingsPage"/>
     </extensions>
     <actions>

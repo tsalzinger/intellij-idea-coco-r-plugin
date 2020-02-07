@@ -8,10 +8,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     idea
     java
-    kotlin("jvm") version "1.3.40"
-    id("org.jetbrains.intellij") version "0.4.9"
-    id("org.jetbrains.grammarkit") version "2019.2"
-    id("de.undercouch.download") version "3.3.0"
+    kotlin("jvm") version "1.3.61"
+    id("org.jetbrains.intellij") version "0.4.16"
+    id("org.jetbrains.grammarkit") version "2020.1"
+    id("de.undercouch.download") version "4.0.4"
 }
 
 group = "io.scheinecker.intellij"
@@ -77,10 +77,10 @@ tasks.withType<KotlinCompile> {
 }
 
 intellij {
-    version = "192.5438.14-EAP-SNAPSHOT"
+    version = "IC-LATEST-EAP-SNAPSHOT"
     type = "IC"
     downloadSources = true
-    setPlugins("java", "PsiViewer:3.28.93")
+    setPlugins("java", "PsiViewer:201.3803.71-EAP-SNAPSHOT.1")
 }
 
 tasks.withType<PatchPluginXmlTask> {
