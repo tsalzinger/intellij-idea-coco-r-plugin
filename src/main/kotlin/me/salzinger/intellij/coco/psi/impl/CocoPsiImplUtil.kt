@@ -9,7 +9,7 @@ import me.salzinger.intellij.coco.CocoIcons
 import javax.swing.Icon
 
 /**
- * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
+ * @author Thomas Salzinger [tsalzinger@gmail.com](mailto:tsalzinger@gmail.com)
  */
 object CocoPsiImplUtil {
 

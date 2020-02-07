@@ -7,7 +7,7 @@ import me.salzinger.intellij.coco.CocoFileType
 import me.salzinger.intellij.coco.CocoLanguage
 
 /**
- * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
+ * @author Thomas Salzinger [tsalzinger@gmail.com](mailto:tsalzinger@gmail.com)
  */
 class CocoFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, CocoLanguage.INSTANCE) {
 

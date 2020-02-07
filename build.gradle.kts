@@ -14,7 +14,7 @@ plugins {
     id("de.undercouch.download") version "4.0.4"
 }
 
-group = "io.scheinecker.intellij"
+group = "me.salzinger.intellij"
 version = "1.4.0-SNAPSHOT"
 
 configure<JavaPluginConvention> {

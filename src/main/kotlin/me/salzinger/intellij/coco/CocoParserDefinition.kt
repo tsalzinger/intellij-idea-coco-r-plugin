@@ -15,7 +15,7 @@ import com.intellij.psi.tree.TokenSet
 import me.salzinger.intellij.coco.psi.CocoFile
 
 /**
- * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
+ * @author Thomas Salzinger [tsalzinger@gmail.com](mailto:tsalzinger@gmail.com)
  */
 class CocoParserDefinition : ParserDefinition {
 

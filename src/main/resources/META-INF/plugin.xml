@@ -8,7 +8,7 @@
         <p>
         This plugin adds support for Cocol/R language and Coco/R compiler generator.<br>
             For more details about Coco/R please refer to <a href="http://ssw.jku.at/coco/">http://ssw.jku.at/coco/</a>.<br/>
-        Any bug reports should be filed on <a href="https://github.com/tscheinecker/intellij-idea-coco-r-plugin">GitHub</a>.
+        Any bug reports should be filed on <a href="https://github.com/tsalzinger/intellij-idea-coco-r-plugin">GitHub</a>.
         </p>
         <p>
             <strong>Features:</strong>

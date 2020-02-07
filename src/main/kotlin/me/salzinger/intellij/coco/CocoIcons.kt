@@ -3,7 +3,7 @@ package me.salzinger.intellij.coco
 import com.intellij.openapi.util.IconLoader
 
 /**
- * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
+ * @author Thomas Salzinger [tsalzinger@gmail.com](mailto:tsalzinger@gmail.com)
  */
 object CocoIcons {
     @JvmStatic

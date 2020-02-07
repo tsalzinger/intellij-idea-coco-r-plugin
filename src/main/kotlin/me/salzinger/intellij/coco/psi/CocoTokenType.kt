@@ -5,6 +5,6 @@ import me.salzinger.intellij.coco.CocoLanguage
 import org.jetbrains.annotations.NonNls
 
 /**
- * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
+ * @author Thomas Salzinger [tsalzinger@gmail.com](mailto:tsalzinger@gmail.com)
  */
 class CocoTokenType(@NonNls debugName: String) : IElementType(debugName, CocoLanguage.INSTANCE)

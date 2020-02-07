@@ -6,7 +6,7 @@ Maintenance will be performed on a best effort basis.
 
 ## Plugin Installation
 
-The plugin can be installed directly from the official Jetbrains Plugin Repository or via the zip file provided on the [Releases](https://github.com/tscheinecker/intellij-idea-coco-r-plugin/releases) page.
+The plugin can be installed directly from the official Jetbrains Plugin Repository or via the zip file provided on the [Releases](https://github.com/tsalzinger/intellij-idea-coco-r-plugin/releases) page.
 
 ## Plugin features 
 
@@ -36,7 +36,7 @@ The plugin can be installed directly from the official Jetbrains Plugin Reposito
 
 ## Documentation
 
-Please refer to the attached PDF on the [Releases](https://github.com/tscheinecker/intellij-idea-coco-r-plugin/releases) page.
+Please refer to the attached PDF on the [Releases](https://github.com/tsalzinger/intellij-idea-coco-r-plugin/releases) page.
 Additional documentation (as part of the README or via Wiki) will be added in the future.  
 
 ## IDE support limitations

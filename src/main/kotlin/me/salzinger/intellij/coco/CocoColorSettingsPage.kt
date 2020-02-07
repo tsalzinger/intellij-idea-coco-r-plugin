@@ -9,7 +9,7 @@ import org.intellij.lang.annotations.Language
 import javax.swing.Icon
 
 /**
- * @author Thomas Scheinecker [tscheinecker@gmail.com](mailto:tscheinecker@gmail.com)
+ * @author Thomas Salzinger [tsalzinger@gmail.com](mailto:tsalzinger@gmail.com)
  */
 class CocoColorSettingsPage : ColorSettingsPage {
 
