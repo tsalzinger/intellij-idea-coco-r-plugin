@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "me.salzinger.intellij"
-version = "1.4.1-SNAPSHOT"
+version = "1.4.1"
 
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
