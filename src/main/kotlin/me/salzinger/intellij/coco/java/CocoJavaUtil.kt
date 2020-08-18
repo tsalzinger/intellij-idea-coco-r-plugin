@@ -6,7 +6,6 @@ import com.intellij.codeInsight.daemon.impl.DaemonProgressIndicator
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
@@ -16,18 +15,16 @@ import com.intellij.openapi.progress.util.AbstractProgressIndicatorExBase
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
-import com.intellij.openapi.util.Ref
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ex.ProgressIndicatorEx
 import com.intellij.psi.JavaDirectoryService
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.ExceptionUtil
-import me.salzinger.intellij.coco.CocoUtil
 import me.salzinger.intellij.coco.psi.CocoFile
 import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
@@ -36,8 +33,6 @@ import java.util.concurrent.ConcurrentMap
 /**
  * @author Thomas Salzinger [tsalzinger@gmail.com](mailto:tsalzinger@gmail.com)
  */
-private val LOG = Logger.getInstance(CocoUtil::class.java)
-
 private val javaErrorCache: ConcurrentMap<PsiFile, List<HighlightInfo>> = ConcurrentHashMap()
 
 object CocoJavaUtil {
@@ -55,14 +50,10 @@ object CocoJavaUtil {
         if (file !is CocoFile) {
             return Optional.empty()
         }
+
         val declaredPackage = getDeclaredPackage(file)
-        if (declaredPackage != null) {
-            return Optional.of(declaredPackage)
-        }
 
-        val containingDirectory = file.containingDirectory ?: return Optional.empty()
-
-        return Optional.ofNullable(JavaDirectoryService.getInstance().getPackage(containingDirectory)?.qualifiedName)
+        return Optional.ofNullable(declaredPackage ?: file.containingDirectory.toPackageName())
     }
 
     fun getParserClass(file: PsiFile): PsiClass? {
@@ -83,33 +74,26 @@ object CocoJavaUtil {
 
         val project = parserClass.project
 
-        val exception = Ref.create<Exception>()
-        val results = mutableListOf<HighlightInfo>()
+        val task = object : Task.WithResult<List<HighlightInfo>, Exception>(
+            project,
+            "Analyzing generated parser code",
+            true
+        ) {
+            override fun compute(progress: ProgressIndicator): List<HighlightInfo> {
+                if (progress.isCanceled) throw ProcessCanceledException()
 
-        ProgressManager.getInstance().run(object : Task.Modal(project, "Analyzing generated parser code", true) {
-            override fun run(progress: ProgressIndicator) {
-                try {
-                    if (progress.isCanceled) throw ProcessCanceledException()
+                val file = parserClass.containingFile.virtualFile
+                progress.text = "Processing ${file.presentableUrl}..."
 
-                    val file = parserClass.containingFile.virtualFile
-                    progress.text = "Processing ${file.presentableUrl}..."
-
-                    results.addAll(findCodeSmells(project, file, progress))
-                } catch (e: ProcessCanceledException) {
-                    exception.set(e)
-                } catch (e: Exception) {
-                    LOG.error(e)
-                    exception.set(e)
-                }
+                return findCodeSmells(project, file, progress)
             }
-        })
-
-        if (!exception.isNull) {
-            ExceptionUtil.rethrowAllAsUnchecked(exception.get())
         }
 
-        javaErrorCache[cocoFile] = results
-        return results
+        ProgressManager.getInstance().run(task)
+
+        return task.result.also {
+            javaErrorCache[cocoFile] = it
+        }
     }
 
     private fun findCodeSmells(project: Project, file: VirtualFile, progress: ProgressIndicator): List<HighlightInfo> {
@@ -142,5 +126,13 @@ object CocoJavaUtil {
             },
             daemonIndicator
         )
+    }
+
+    private fun PsiDirectory?.toPackageName(): String? {
+        return if (this == null) {
+            null
+        } else {
+            JavaDirectoryService.getInstance().getPackage(this)?.qualifiedName
+        }
     }
 }

@@ -6,7 +6,12 @@ import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.lexer.FlexAdapter
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
+import me.salzinger.intellij.coco.psi.CocoCompiler
 import me.salzinger.intellij.coco.psi.CocoNamedElement
+import me.salzinger.intellij.coco.psi.CocoPragmaDecl
+import me.salzinger.intellij.coco.psi.CocoProduction
+import me.salzinger.intellij.coco.psi.CocoSetDecl
+import me.salzinger.intellij.coco.psi.CocoTokenDecl
 
 /**
  * Created by Thomas on 28/03/2015.
@@ -34,21 +39,14 @@ class CocoFindUsagesProvider : FindUsagesProvider {
     }
 
     override fun getType(element: PsiElement): String {
-        if (element is me.salzinger.intellij.coco.psi.CocoTokenDecl) {
-            return "token"
+        return when (element) {
+            is CocoTokenDecl -> "token"
+            is CocoProduction -> "production"
+            is CocoSetDecl -> "character"
+            is CocoPragmaDecl -> "pragma"
+            is CocoCompiler -> "compiler"
+            else -> ""
         }
-        if (element is me.salzinger.intellij.coco.psi.CocoProduction) {
-            return "production"
-        }
-        if (element is me.salzinger.intellij.coco.psi.CocoSetDecl) {
-            return "character"
-        }
-        if (element is me.salzinger.intellij.coco.psi.CocoPragmaDecl) {
-            return "pragma"
-        }
-        return if (element is me.salzinger.intellij.coco.psi.CocoCompiler) {
-            "compiler"
-        } else ""
     }
 
     override fun getDescriptiveName(element: PsiElement): String {

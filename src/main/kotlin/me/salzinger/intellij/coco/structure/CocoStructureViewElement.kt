@@ -7,10 +7,24 @@ import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
-import com.intellij.psi.util.PsiTreeUtil
+import me.salzinger.intellij.coco.psi.CocoCharacters
+import me.salzinger.intellij.coco.psi.CocoCocoInjectorHost
+import me.salzinger.intellij.coco.psi.CocoCommentDecl
+import me.salzinger.intellij.coco.psi.CocoComments
+import me.salzinger.intellij.coco.psi.CocoCompiler
 import me.salzinger.intellij.coco.psi.CocoDirectiveElement
+import me.salzinger.intellij.coco.psi.CocoDirectives
+import me.salzinger.intellij.coco.psi.CocoEnd
 import me.salzinger.intellij.coco.psi.CocoFile
-import java.util.ArrayList
+import me.salzinger.intellij.coco.psi.CocoParserSpecification
+import me.salzinger.intellij.coco.psi.CocoPragmas
+import me.salzinger.intellij.coco.psi.CocoProduction
+import me.salzinger.intellij.coco.psi.CocoScannerSpecification
+import me.salzinger.intellij.coco.psi.CocoSetDecl
+import me.salzinger.intellij.coco.psi.CocoTokenDecl
+import me.salzinger.intellij.coco.psi.CocoTokens
+import me.salzinger.intellij.coco.psi.findChild
+import me.salzinger.intellij.coco.psi.findChildren
 import javax.swing.Icon
 
 /**
@@ -24,193 +38,157 @@ class CocoStructureViewElement(private val element: PsiElement) : StructureViewT
 
     override fun navigate(requestFocus: Boolean) {
         if (element is NavigationItem) {
-            (element as NavigationItem).navigate(requestFocus)
+            element.navigate(requestFocus)
         }
     }
 
     override fun canNavigate(): Boolean {
-        return element is NavigationItem && (element as NavigationItem).canNavigate()
+        return element is NavigationItem && element.canNavigate()
     }
 
     override fun canNavigateToSource(): Boolean {
-        return element is NavigationItem && (element as NavigationItem).canNavigateToSource()
+        return element is NavigationItem && element.canNavigateToSource()
     }
 
     override fun getAlphaSortKey(): String {
-
-        when (element) {
-            is me.salzinger.intellij.coco.psi.CocoCompiler -> return "1"
-            is me.salzinger.intellij.coco.psi.CocoScannerSpecification -> return "2"
-            is me.salzinger.intellij.coco.psi.CocoParserSpecification -> return "3"
-            is me.salzinger.intellij.coco.psi.CocoEnd -> return "4"
-            is PsiNamedElement -> return element.name.orEmpty()
-        }
-
-        return element.text
-    }
-
-    private fun getPresentation(text: String?, type: String? = null, icon: Icon? = null): ItemPresentation {
-        return object : ItemPresentation {
-            override fun getPresentableText(): String? {
-                return text
-            }
-
-            override fun getLocationString(): String? {
-                return type
-            }
-
-            override fun getIcon(unused: Boolean): Icon? {
-                return icon
-            }
+        return when (element) {
+            is CocoCompiler -> "1"
+            is CocoScannerSpecification -> "2"
+            is CocoParserSpecification -> "3"
+            is CocoEnd -> "4"
+            is PsiNamedElement -> element.name.orEmpty()
+            else -> element.text
         }
     }
 
     override fun getPresentation(): ItemPresentation {
-
         if (element is NavigationItem) {
-            val presentation = (element as NavigationItem).presentation
+            val presentation = getPresentation(element)
             if (presentation != null) {
-                when (element) {
-                    is CocoFile -> {
-                        return presentation
-                    }
-                    is CocoDirectiveElement -> {
-                        return getPresentation(presentation.presentableText, "Directive")
-                    }
-                    is me.salzinger.intellij.coco.psi.CocoSetDecl -> {
-                        return if (element.getParent() is me.salzinger.intellij.coco.psi.CocoCharacters) {
-                            getPresentation(presentation.presentableText, "Character")
-                        } else getPresentation(presentation.presentableText, "Pragma")
-                    }
-                    is me.salzinger.intellij.coco.psi.CocoTokenDecl -> {
-                        return getPresentation(presentation.presentableText, "Token")
-                    }
-                    is me.salzinger.intellij.coco.psi.CocoProduction -> {
-                        return getPresentation(presentation.presentableText, "Production")
-                    }
-                    is me.salzinger.intellij.coco.psi.CocoCompiler -> {
-                        return getPresentation(presentation.presentableText, "Compiler", presentation.getIcon(false))
-                    }
-                    is me.salzinger.intellij.coco.psi.CocoEnd -> {
-                        return getPresentation(presentation.presentableText, "End")
-                    }
-                }
+                return presentation
             }
         }
 
-        when (element) {
-            is me.salzinger.intellij.coco.psi.CocoDirectives -> {
-                return getPresentation("Directives")
+        return when (element) {
+            is CocoDirectives -> CocoItemPresentation("Directives")
+            is CocoCommentDecl -> CocoItemPresentation(element.getText(), "Comment")
+            is CocoParserSpecification -> CocoItemPresentation("Productions (${element.productionList.size})")
+            is CocoScannerSpecification -> CocoItemPresentation("Scanner Specification")
+            is CocoComments -> CocoItemPresentation("Comments (${element.commentDeclList.size})")
+            is CocoCharacters -> CocoItemPresentation("Characters (${element.setDeclList.size})")
+            is CocoTokens -> CocoItemPresentation("Tokens (${element.tokenDeclList.size})")
+            is CocoPragmas -> CocoItemPresentation("Pragmas (${element.pragmaDeclList.size})")
+            else -> {
+                throw IllegalArgumentException(
+                    "Illegal element of type '${element.javaClass.simpleName}' for structure view"
+                )
             }
         }
-
-        if (element is me.salzinger.intellij.coco.psi.CocoCommentDecl) {
-            return getPresentation(element.getText(), "Comment")
-        }
-        if (element is me.salzinger.intellij.coco.psi.CocoParserSpecification) {
-            return getPresentation("Productions (${element.productionList.size})")
-        }
-        if (element is me.salzinger.intellij.coco.psi.CocoScannerSpecification) {
-            return getPresentation("Scanner Specification")
-        }
-        if (element is me.salzinger.intellij.coco.psi.CocoComments) {
-            return getPresentation("Comments (${element.commentDeclList.size})")
-        }
-        if (element is me.salzinger.intellij.coco.psi.CocoCharacters) {
-            return getPresentation("Characters (${element.setDeclList.size})")
-        }
-        if (element is me.salzinger.intellij.coco.psi.CocoTokens) {
-            return getPresentation("Tokens (${element.tokenDeclList.size})")
-        }
-        if (element is me.salzinger.intellij.coco.psi.CocoPragmas) {
-            return getPresentation("Pragmas (${element.pragmaDeclList.size})")
-        }
-
-        throw IllegalArgumentException("Illegal element of type '" + element.javaClass.simpleName + "' for structure view")
     }
 
     override fun getChildren(): Array<TreeElement> {
-        val treeElements = ArrayList<TreeElement>()
-        if (element is CocoFile) {
-            val injectionHost =
-                PsiTreeUtil.getChildOfType(element, me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java)
+        val treeElements = mutableListOf<TreeElement>()
+        when (element) {
+            is CocoFile -> {
+                val injectionHost: CocoCocoInjectorHost? = element.findChild()
+                val cocoDirectives: CocoDirectives? = element.findChild()
+                val cocoDirectiveElements: List<CocoDirectiveElement> = cocoDirectives.findChildren()
 
-            val cocoDirectives =
-                PsiTreeUtil.getChildOfType(element, me.salzinger.intellij.coco.psi.CocoDirectives::class.java)
-            val cocoDirectiveElements = PsiTreeUtil.getChildrenOfType(
-                cocoDirectives,
-                CocoDirectiveElement::class.java
-            )
-            if (cocoDirectives != null && cocoDirectiveElements != null
-            ) {
-                treeElements.add(CocoStructureViewElement(cocoDirectives))
-            }
+                if (cocoDirectives != null && cocoDirectiveElements.isNotEmpty()) {
+                    treeElements.addIfNotNull(cocoDirectives)
+                }
 
-            val compilers =
-                PsiTreeUtil.getChildrenOfType(injectionHost, me.salzinger.intellij.coco.psi.CocoCompiler::class.java)
-            if (compilers != null) {
-                for (compiler in compilers) {
-                    treeElements.add(CocoStructureViewElement(compiler))
-                }
+                treeElements.addAll(injectionHost.findChildren<CocoCompiler>())
+                treeElements.addAll(injectionHost.findChildren<CocoScannerSpecification>())
+                treeElements.addAll(injectionHost.findChildren<CocoParserSpecification>())
+                treeElements.addAll(injectionHost.findChildren<CocoEnd>())
             }
-            val scannerSpecifications = PsiTreeUtil.getChildrenOfType(
-                injectionHost,
-                me.salzinger.intellij.coco.psi.CocoScannerSpecification::class.java
-            )
-            if (scannerSpecifications != null) {
-                for (scannerSpecification in scannerSpecifications) {
-                    treeElements.add(CocoStructureViewElement(scannerSpecification))
-                }
+            is CocoScannerSpecification -> {
+                val scannerSpecification = element
+                treeElements
+                    .addIfNotNull(scannerSpecification.comments)
+                    .addIfNotNull(scannerSpecification.characters)
+                    .addIfNotNull(scannerSpecification.tokens)
+                    .addIfNotNull(scannerSpecification.pragmas)
             }
-            val parserSpecifications = PsiTreeUtil.getChildrenOfType(
-                injectionHost,
-                me.salzinger.intellij.coco.psi.CocoParserSpecification::class.java
-            )
-            if (parserSpecifications != null) {
-                for (parserSpecification in parserSpecifications) {
-                    treeElements.add(CocoStructureViewElement(parserSpecification))
-                }
+            is CocoCharacters -> {
+                treeElements.addAll(element.setDeclList)
             }
-            val ends = PsiTreeUtil.getChildrenOfType(injectionHost, me.salzinger.intellij.coco.psi.CocoEnd::class.java)
-            if (ends != null) {
-                for (end in ends) {
-                    treeElements.add(CocoStructureViewElement(end))
-                }
+            is CocoComments -> {
+                treeElements.addAll(element.commentDeclList)
             }
-        } else if (element is me.salzinger.intellij.coco.psi.CocoScannerSpecification) {
-            val scannerSpecification = element
-            addToTreeElement(treeElements, scannerSpecification.comments)
-            addToTreeElement(treeElements, scannerSpecification.characters)
-            addToTreeElement(treeElements, scannerSpecification.tokens)
-            addToTreeElement(treeElements, scannerSpecification.pragmas)
-        } else if (element is me.salzinger.intellij.coco.psi.CocoCharacters) {
-            addToTreeElement(treeElements, element.setDeclList)
-        } else if (element is me.salzinger.intellij.coco.psi.CocoComments) {
-            addToTreeElement(treeElements, element.commentDeclList)
-        } else if (element is me.salzinger.intellij.coco.psi.CocoTokens) {
-            addToTreeElement(treeElements, element.tokenDeclList)
-        } else if (element is me.salzinger.intellij.coco.psi.CocoPragmas) {
-            val pragmaDeclList = element.pragmaDeclList
-            for (cocoPragmaDecl in pragmaDeclList) {
-                addToTreeElement(treeElements, cocoPragmaDecl.tokenDecl)
+            is CocoTokens -> {
+                treeElements.addAll(element.tokenDeclList)
             }
-        } else if (element is me.salzinger.intellij.coco.psi.CocoParserSpecification) {
-            addToTreeElement(treeElements, element.productionList)
-        } else if (element is me.salzinger.intellij.coco.psi.CocoDirectives) {
-            addToTreeElement(treeElements, element.directiveList)
+            is CocoPragmas -> {
+                treeElements.addAll(element.pragmaDeclList.map { it.tokenDecl })
+            }
+            is CocoParserSpecification -> {
+                treeElements.addAll(element.productionList)
+            }
+            is CocoDirectives -> {
+                treeElements.addAll(element.directiveList)
+            }
         }
         return treeElements.toTypedArray()
     }
 
-    private fun addToTreeElement(treeElements: MutableList<TreeElement>, element: PsiElement?) {
-        if (element != null) {
-            treeElements.add(CocoStructureViewElement(element))
+    private fun <T : PsiElement> MutableList<TreeElement>.addIfNotNull(psiElement: T?): MutableList<TreeElement> {
+        if (psiElement != null) {
+            add(CocoStructureViewElement(psiElement))
+        }
+        return this
+    }
+
+    private fun <T : PsiElement> MutableList<TreeElement>.addAll(psiElements: Collection<T>): MutableList<TreeElement> {
+        addAll(psiElements.map(::CocoStructureViewElement))
+        return this
+    }
+
+    private fun getPresentation(element: NavigationItem): ItemPresentation? {
+        val presentation = element.presentation
+        return if (presentation != null) {
+            when (element) {
+                is CocoFile -> presentation
+                is CocoDirectiveElement -> CocoItemPresentation(presentation.presentableText, "Directive")
+                is CocoSetDecl -> CocoItemPresentation(
+                    presentation.presentableText,
+                    when (element.parent) {
+                        is CocoCharacters -> "Character"
+                        is CocoPragmas -> "Pragma"
+                        else -> null
+                    }
+                )
+                is CocoTokenDecl -> CocoItemPresentation(presentation.presentableText, "Token")
+                is CocoProduction -> CocoItemPresentation(presentation.presentableText, "Production")
+                is CocoCompiler -> CocoItemPresentation(
+                    text = presentation.presentableText,
+                    type = "Compiler",
+                    icon = presentation.getIcon(false)
+                )
+                is CocoEnd -> CocoItemPresentation(presentation.presentableText, "End")
+                else -> presentation
+            }
+        } else {
+            null
         }
     }
 
-    private fun addToTreeElement(treeElements: MutableList<TreeElement>, elements: List<PsiElement>) {
-        for (psiElement in elements) {
-            addToTreeElement(treeElements, psiElement)
+    private data class CocoItemPresentation(
+        val text: String?,
+        val type: String? = null,
+        val icon: Icon? = null,
+    ) : ItemPresentation {
+        override fun getPresentableText(): String? {
+            return text
+        }
+
+        override fun getLocationString(): String? {
+            return type
+        }
+
+        override fun getIcon(unused: Boolean): Icon? {
+            return icon
         }
     }
 }

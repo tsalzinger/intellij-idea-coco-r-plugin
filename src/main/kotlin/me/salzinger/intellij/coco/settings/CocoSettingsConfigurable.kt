@@ -69,24 +69,29 @@ class CocoSettingsConfigurable(private val project: Project) : BaseConfigurable(
         injectionLevelCombo.selectedItem = CocoConfiguration.getSettings(project).injectionMode
         injectionLevelCombo.addActionListener {
             if ("comboBoxChanged" == it.actionCommand) {
-                when (getSelectedInjectionMode()!!) {
-                    CocoInjectionMode.DISABLED -> {
-                        noteComponent.text =
-                            XmlStringUtil.wrapInHtml("Java language injection is disabled and no editor support will be provided.")
-                    }
-                    CocoInjectionMode.SIMPLE -> {
-                        noteComponent.text =
-                            XmlStringUtil.wrapInHtml("Simple mode will allow code completion of generated Tokens, but is otherwise limited to a per element injection. This means no completion of other Java injected areas will be possible.")
-                    }
-                    CocoInjectionMode.ADVANCED -> {
-                        noteComponent.text =
-                            XmlStringUtil.wrapInHtml("Advanced mode will allow code completion of linked injection areas. For example Semantic Actions within a Production will have access to the declared attributes (parameters).")
-                    }
-                }
+                noteComponent.text = XmlStringUtil.wrapInHtml(getInjectionModeExplanation(getSelectedInjectionMode()!!))
             }
         }
 
         return myPanel
+    }
+
+    private fun getInjectionModeExplanation(selectedInjectionMode: CocoInjectionMode): String {
+        return when (selectedInjectionMode) {
+            CocoInjectionMode.DISABLED -> {
+                "Java language injection is disabled and no editor support will be provided."
+            }
+            CocoInjectionMode.SIMPLE -> {
+                "Simple mode will allow code completion of generated Tokens, " +
+                    "but is otherwise limited to a per element injection. " +
+                    "This means no completion of other Java injected areas will be possible."
+            }
+            CocoInjectionMode.ADVANCED -> {
+                "Advanced mode will allow code completion of linked injection areas. " +
+                    "For example Semantic Actions within a Production " +
+                    "will have access to the declared attributes (parameters)."
+            }
+        }
     }
 
     override fun reset() {

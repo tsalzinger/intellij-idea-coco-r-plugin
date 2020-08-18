@@ -4,18 +4,20 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
-import me.salzinger.intellij.coco.CocoUtil
+import me.salzinger.intellij.coco.findByName
+import me.salzinger.intellij.coco.findTokenDecls
 import me.salzinger.intellij.coco.psi.HasCocoTokenReference
 
 class CocoTokenReference(element: HasCocoTokenReference, textRange: TextRange) :
     AbstractRenamableReference<HasCocoTokenReference>(element, textRange), PsiReference {
 
     override fun resolve(): PsiElement? {
-        return CocoUtil.findTokenDecl(myElement.containingFile, myElement.name)
+        return findTokenDecls(myElement.containingFile)
+            .findByName(myElement.name)
     }
 
     override fun getVariants(): Array<Any> {
-        return CocoUtil.findTokenDecls(myElement.containingFile)
+        return findTokenDecls(myElement.containingFile)
             .map { it ->
                 val tokenExpr = it.tokenExpr
 

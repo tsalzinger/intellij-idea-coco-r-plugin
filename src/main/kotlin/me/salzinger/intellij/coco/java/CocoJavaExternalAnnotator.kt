@@ -8,10 +8,16 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import me.salzinger.intellij.coco.CocoUtil
+import me.salzinger.intellij.coco.findGlobalFieldsAndMethods
+import me.salzinger.intellij.coco.findProductions
+import me.salzinger.intellij.coco.findScannerSpecification
 import me.salzinger.intellij.coco.psi.CocoFile
+import me.salzinger.intellij.coco.psi.CocoGlobalFieldsAndMethods
+import me.salzinger.intellij.coco.psi.CocoPragmas
+import me.salzinger.intellij.coco.psi.CocoProduction
 
 class CocoJavaExternalAnnotator : ExternalAnnotator<CocoFile, List<HighlightInfo>>() {
     override fun collectInformation(file: PsiFile, editor: Editor, hasErrors: Boolean): CocoFile? {
@@ -28,81 +34,110 @@ class CocoJavaExternalAnnotator : ExternalAnnotator<CocoFile, List<HighlightInfo
         val virtualFile = parserClass.containingFile.virtualFile
         val document = FileDocumentManager.getInstance().getDocument(virtualFile) ?: return
 
-        val globalFieldsAndMethods = CocoUtil.findGlobalFieldsAndMethods(file)
+        findGlobalFieldsAndMethods(file)
+            ?.annotateGlobalFieldsAndMethods(document, annotationResult, holder)
 
-        if (globalFieldsAndMethods != null) {
-            val offset = document.text.indexOf(globalFieldsAndMethods.text)
-            if (offset != -1) {
-                val highlightInfos = findInRange(
-                    annotationResult,
-                    TextRange.from(offset, globalFieldsAndMethods.textLength)
-                )
-                for (highlightInfo in highlightInfos) {
-                    holder
-                        .newAnnotation(
-                            HighlightSeverity.ERROR,
-                            highlightInfo.description
-                        )
-                        .range(
-                            TextRange.from(
-                                globalFieldsAndMethods.textOffset + highlightInfo.startOffset - offset,
-                                highlightInfo.endOffset - highlightInfo.startOffset
-                            )
-                        )
-                        .create()
-                }
-            }
-        }
+        findScannerSpecification(file)
+            ?.pragmas
+            ?.annotatePragmas(
+                parserClass = parserClass,
+                annotationResult = annotationResult,
+                document = document,
+                holder = holder
+            )
 
-        val pragmas = CocoUtil.findScannerSpecification(file)?.pragmas
-        if (pragmas != null) {
-            val pragmaMethod = parserClass.findMethodsByName("Get", false).firstOrNull()
-            if (pragmaMethod != null) {
-                for (highlightInfo in findInRange(annotationResult, pragmaMethod.textRange)) {
-                    val offset = findOffset(highlightInfo, document, pragmas)
+        findProductions(file)
+            .annotateProductions(
+                parserClass = parserClass,
+                annotationResult = annotationResult,
+                document = document,
+                holder = holder
+            )
+    }
 
-                    holder
-                        .newAnnotation(
-                            HighlightSeverity.ERROR,
-                            highlightInfo.description
-                        )
-                        .range(offset ?: pragmas.firstChild.textRange)
-                        .create()
-                }
-            }
-        }
-
-        val productions = CocoUtil.findProductions(file)
-        productions.forEach {
-            val productionDeclaration = parserClass.findMethodsByName(it.name, false).firstOrNull()
+    private fun List<CocoProduction>.annotateProductions(
+        parserClass: PsiClass,
+        annotationResult: List<HighlightInfo>,
+        document: Document,
+        holder: AnnotationHolder,
+    ) {
+        forEach { production ->
+            val productionDeclaration = parserClass.findMethodsByName(production.name, false).firstOrNull()
 
             if (productionDeclaration != null) {
-                for (highlightInfo in findInRange(annotationResult, productionDeclaration.textRange)) {
-                    val offset = findOffset(highlightInfo, document, it)
+                for (highlightInfo in annotationResult.filterInRange(productionDeclaration.textRange)) {
+                    val offset = highlightInfo.findOffset(document, production)
 
                     holder
                         .newAnnotation(
                             HighlightSeverity.ERROR,
                             highlightInfo.description
                         )
-                        .range(offset ?: it.ident.textRange)
+                        .range(offset ?: production.ident.textRange)
                         .create()
                 }
             }
         }
     }
 
-    fun findInRange(highlightInfos: List<HighlightInfo>, textRange: TextRange): List<HighlightInfo> {
-        return highlightInfos
-            .filter { textRange.contains(it) }
+    private fun CocoPragmas.annotatePragmas(
+        parserClass: PsiClass,
+        annotationResult: List<HighlightInfo>,
+        document: Document,
+        holder: AnnotationHolder,
+    ) {
+        val pragmaMethod = parserClass.findMethodsByName("Get", false).firstOrNull()
+        if (pragmaMethod != null) {
+            for (highlightInfo in annotationResult.filterInRange(pragmaMethod.textRange)) {
+                val offset = highlightInfo.findOffset(document, this)
+
+                holder
+                    .newAnnotation(
+                        HighlightSeverity.ERROR,
+                        highlightInfo.description
+                    )
+                    .range(offset ?: firstChild.textRange)
+                    .create()
+            }
+        }
     }
 
-    private fun findOffset(
-        info: HighlightInfo,
+    private fun CocoGlobalFieldsAndMethods.annotateGlobalFieldsAndMethods(
         document: Document,
-        containingElement: PsiElement
+        annotationResult: List<HighlightInfo>,
+        holder: AnnotationHolder,
+    ) {
+        val offset = document.text.indexOf(text)
+        if (offset != -1) {
+            val highlightInfos = annotationResult.filterInRange(
+                TextRange.from(offset, textLength)
+            )
+            for (highlightInfo in highlightInfos) {
+                holder
+                    .newAnnotation(
+                        HighlightSeverity.ERROR,
+                        highlightInfo.description
+                    )
+                    .range(
+                        TextRange.from(
+                            textOffset + highlightInfo.startOffset - offset,
+                            highlightInfo.endOffset - highlightInfo.startOffset
+                        )
+                    )
+                    .create()
+            }
+        }
+    }
+
+    private fun List<HighlightInfo>.filterInRange(textRange: TextRange): List<HighlightInfo> {
+        return filter { textRange.contains(it) }
+    }
+
+    private fun HighlightInfo.findOffset(
+        document: Document,
+        containingElement: PsiElement,
     ): TextRange? {
-        val text = document.getText(TextRange.create(info)).trim()
+        val text = document.getText(TextRange.create(this)).trim()
         val searchParts = containingElement.text.split(text)
         val count = searchParts.count()
 

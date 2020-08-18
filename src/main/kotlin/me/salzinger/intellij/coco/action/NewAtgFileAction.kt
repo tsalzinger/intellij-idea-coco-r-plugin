@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
-import com.intellij.util.IncorrectOperationException
 import me.salzinger.intellij.coco.CocoIcons
 
 private val NEW_ATG_FILE_TEMPLATE =
@@ -79,31 +78,19 @@ class NewAtgFileAction : CreateFileAction("Cocol/R ATG File", "Create new Cocol/
 
     override fun invokeDialog(project: Project, psiDirectory: PsiDirectory): Array<PsiElement> {
         val validator = AtgEnsuringValidator(project, psiDirectory)
-        val createdElements: Array<PsiElement>
-        if (ApplicationManager.getApplication().isUnitTestMode) {
-            try {
-                createdElements = validator.create("test")
-            } catch (e: Exception) {
-                throw RuntimeException(e)
-            }
 
-            return createdElements
+        return if (ApplicationManager.getApplication().isUnitTestMode) {
+            validator.create("test")
         } else {
-            try {
-                Messages.showInputDialog(
-                    project,
-                    IdeBundle.message("prompt.enter.new.file.name"),
-                    IdeBundle.message("title.new.file"),
-                    templatePresentation.icon,
-                    null,
-                    validator
-                )
-                createdElements = validator.createdElements
-
-                return createdElements
-            } catch (e: Exception) {
-                throw IncorrectOperationException(e)
-            }
+            Messages.showInputDialog(
+                project,
+                IdeBundle.message("prompt.enter.new.file.name"),
+                IdeBundle.message("title.new.file"),
+                templatePresentation.icon,
+                null,
+                validator
+            )
+            validator.createdElements
         }
     }
 

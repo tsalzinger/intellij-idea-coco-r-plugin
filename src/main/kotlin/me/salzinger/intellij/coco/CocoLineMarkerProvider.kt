@@ -19,7 +19,7 @@ class CocoLineMarkerProvider : RelatedItemLineMarkerProvider() {
         element: me.salzinger.intellij.coco.psi.CocoProduction,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        val compiler = CocoUtil.findCompiler(element.containingFile, element.name)
+        val compiler = findCompilers(element.containingFile).findByName(element.name)
         if (compiler != null) {
             val builder = NavigationGutterIconBuilder
                 .create(CocoIcons.FILE)
