@@ -12,7 +12,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.util.IncorrectOperationException
 import me.salzinger.intellij.coco.CocoIcons
 
-private val NEW_ATG_FILE_TEMPLATE = """
+private val NEW_ATG_FILE_TEMPLATE =
+    """
 // Set the name of your grammar here (and at the end of this grammar):
 COMPILER ${'$'}NAME
 
@@ -72,7 +73,7 @@ ${'$'}NAME=
 // End of your compiler specification, make sure the name here matches
 // the grammar name at the start of this grammar.
 END ${'$'}NAME.
-""".trimIndent()
+    """.trimIndent()
 
 class NewAtgFileAction : CreateFileAction("Cocol/R ATG File", "Create new Cocol/R ATG File", CocoIcons.FILE) {
 
@@ -89,14 +90,20 @@ class NewAtgFileAction : CreateFileAction("Cocol/R ATG File", "Create new Cocol/
             return createdElements
         } else {
             try {
-                Messages.showInputDialog(project, IdeBundle.message("prompt.enter.new.file.name"), IdeBundle.message("title.new.file"), templatePresentation.icon, null, validator)
+                Messages.showInputDialog(
+                    project,
+                    IdeBundle.message("prompt.enter.new.file.name"),
+                    IdeBundle.message("title.new.file"),
+                    templatePresentation.icon,
+                    null,
+                    validator
+                )
                 createdElements = validator.createdElements
 
                 return createdElements
             } catch (e: Exception) {
                 throw IncorrectOperationException(e)
             }
-
         }
     }
 
@@ -104,7 +111,6 @@ class NewAtgFileAction : CreateFileAction("Cocol/R ATG File", "Create new Cocol/
         return if (fileName != null && !fileName.toLowerCase().endsWith(".atg")) {
             "$fileName.ATG"
         } else fileName
-
     }
 
     @Throws(Exception::class)
@@ -116,10 +122,19 @@ class NewAtgFileAction : CreateFileAction("Cocol/R ATG File", "Create new Cocol/
         customFileTemplate.text = NEW_ATG_FILE_TEMPLATE
 
         val properties = mutableMapOf<String?, Any>(Pair("NAME", compilerName))
-        return arrayOf(FileTemplateUtil.createFromTemplate(customFileTemplate, fileName, properties, psiDirectory, null))
+        return arrayOf(
+            FileTemplateUtil.createFromTemplate(
+                customFileTemplate,
+                fileName,
+                properties,
+                psiDirectory,
+                null
+            )
+        )
     }
 
-    private inner class AtgEnsuringValidator constructor(project: Project, psiDirectory: PsiDirectory) : CreateFileAction.MyValidator(project, psiDirectory) {
+    private inner class AtgEnsuringValidator constructor(project: Project, psiDirectory: PsiDirectory) :
+        CreateFileAction.MyValidator(project, psiDirectory) {
 
         @Throws(Exception::class)
         override fun create(fileName: String): Array<PsiElement> {

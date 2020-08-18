@@ -13,7 +13,6 @@ import javax.swing.Icon
  */
 object CocoPsiImplUtil {
 
-
     @JvmStatic
     fun getName(element: PsiNameIdentifierOwner): String? {
         val nameIdentifier = element.nameIdentifier
@@ -24,7 +23,8 @@ object CocoPsiImplUtil {
     fun setName(element: PsiNameIdentifierOwner, newName: String): PsiElement {
         val nameIdentifier = element.nameIdentifier
 
-        (nameIdentifier as? LeafPsiElement)?.replaceWithText(newName) ?: throw UnsupportedOperationException("Cannot rename element of type " + element.javaClass.simpleName)
+        (nameIdentifier as? LeafPsiElement)?.replaceWithText(newName)
+            ?: throw UnsupportedOperationException("Cannot rename element of type " + element.javaClass.simpleName)
 
         return element
     }

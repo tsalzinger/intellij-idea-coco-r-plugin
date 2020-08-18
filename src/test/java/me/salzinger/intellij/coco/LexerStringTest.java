@@ -16,6 +16,10 @@ import java.util.Collection;
 public class LexerStringTest extends AbstractLexerTest {
     private final String string;
 
+    public LexerStringTest(String string) {
+        this.string = string;
+    }
+
     @Parameterized.Parameters
     public static Collection<String[]> data() {
         String[][] strings = {
@@ -37,10 +41,6 @@ public class LexerStringTest extends AbstractLexerTest {
                 {"\"string with \\u0DF3 hex char value \""}
         };
         return Arrays.asList(strings);
-    }
-
-    public LexerStringTest(String string) {
-        this.string = string;
     }
 
     @Test

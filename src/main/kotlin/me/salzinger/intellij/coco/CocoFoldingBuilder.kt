@@ -14,30 +14,30 @@ class CocoFoldingBuilder : FoldingBuilderEx() {
 
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
         return listOf(
-                me.salzinger.intellij.coco.psi.CocoImports::class.java,
-                me.salzinger.intellij.coco.psi.CocoDirectives::class.java,
-                me.salzinger.intellij.coco.psi.CocoGlobalFieldsAndMethods::class.java,
-                me.salzinger.intellij.coco.psi.CocoCharacters::class.java,
-                me.salzinger.intellij.coco.psi.CocoTokens::class.java,
-                me.salzinger.intellij.coco.psi.CocoTokenDecl::class.java,
-                me.salzinger.intellij.coco.psi.CocoPragmas::class.java,
-                me.salzinger.intellij.coco.psi.CocoPragmaDecl::class.java,
-                me.salzinger.intellij.coco.psi.CocoComments::class.java,
-                me.salzinger.intellij.coco.psi.CocoArbitraryStatements::class.java,
-                me.salzinger.intellij.coco.psi.CocoEmbeddedBooleanExpression::class.java,
-                me.salzinger.intellij.coco.psi.CocoEmbeddedImports::class.java,
-                me.salzinger.intellij.coco.psi.CocoEmbeddedStatements::class.java,
-                me.salzinger.intellij.coco.psi.CocoProduction::class.java,
-                me.salzinger.intellij.coco.psi.CocoEnd::class.java,
-                me.salzinger.intellij.coco.psi.CocoParserSpecification::class.java,
-                PsiComment::class.java
+            me.salzinger.intellij.coco.psi.CocoImports::class.java,
+            me.salzinger.intellij.coco.psi.CocoDirectives::class.java,
+            me.salzinger.intellij.coco.psi.CocoGlobalFieldsAndMethods::class.java,
+            me.salzinger.intellij.coco.psi.CocoCharacters::class.java,
+            me.salzinger.intellij.coco.psi.CocoTokens::class.java,
+            me.salzinger.intellij.coco.psi.CocoTokenDecl::class.java,
+            me.salzinger.intellij.coco.psi.CocoPragmas::class.java,
+            me.salzinger.intellij.coco.psi.CocoPragmaDecl::class.java,
+            me.salzinger.intellij.coco.psi.CocoComments::class.java,
+            me.salzinger.intellij.coco.psi.CocoArbitraryStatements::class.java,
+            me.salzinger.intellij.coco.psi.CocoEmbeddedBooleanExpression::class.java,
+            me.salzinger.intellij.coco.psi.CocoEmbeddedImports::class.java,
+            me.salzinger.intellij.coco.psi.CocoEmbeddedStatements::class.java,
+            me.salzinger.intellij.coco.psi.CocoProduction::class.java,
+            me.salzinger.intellij.coco.psi.CocoEnd::class.java,
+            me.salzinger.intellij.coco.psi.CocoParserSpecification::class.java,
+            PsiComment::class.java
         )
-                .flatMap { PsiTreeUtil.findChildrenOfType(root, it) }
-                .filter { containsNewline(it.text) }
-                .mapNotNull {
-                    FoldingDescriptor(it.node, TextRange.from(it.textOffset, it.text.trimEnd().length))
-                }
-                .toTypedArray()
+            .flatMap { PsiTreeUtil.findChildrenOfType(root, it) }
+            .filter { containsNewline(it.text) }
+            .mapNotNull {
+                FoldingDescriptor(it.node, TextRange.from(it.textOffset, it.text.trimEnd().length))
+            }
+            .toTypedArray()
     }
 
     override fun getPlaceholderText(node: ASTNode): String? {

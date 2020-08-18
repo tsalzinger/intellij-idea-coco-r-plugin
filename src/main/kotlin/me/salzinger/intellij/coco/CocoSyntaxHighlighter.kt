@@ -68,9 +68,11 @@ class CocoSyntaxHighlighter : SyntaxHighlighter {
     }
 
     companion object {
-        val LINE_COMMENT = TextAttributesKey.createTextAttributesKey("LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
+        val LINE_COMMENT =
+            TextAttributesKey.createTextAttributesKey("LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
         private val LINE_COMMENT_KEYS = arrayOf(LINE_COMMENT)
-        val BLOCK_COMMENT = TextAttributesKey.createTextAttributesKey("BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT)
+        val BLOCK_COMMENT =
+            TextAttributesKey.createTextAttributesKey("BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT)
         private val BLOCK_COMMENT_KEYS = arrayOf(BLOCK_COMMENT)
         val KEYWORD = TextAttributesKey.createTextAttributesKey("KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
         private val KEYWORD_KEYS = arrayOf(KEYWORD)
@@ -80,17 +82,26 @@ class CocoSyntaxHighlighter : SyntaxHighlighter {
         private val CHAR_KEYS = arrayOf(CHAR)
         val NUMBER = TextAttributesKey.createTextAttributesKey("NUMBER", DefaultLanguageHighlighterColors.NUMBER)
         private val NUMBER_KEYS = arrayOf(NUMBER)
-        val MARKUP_TAG = TextAttributesKey.createTextAttributesKey("MARKUP_TAG", DefaultLanguageHighlighterColors.MARKUP_TAG)
+        val MARKUP_TAG =
+            TextAttributesKey.createTextAttributesKey("MARKUP_TAG", DefaultLanguageHighlighterColors.MARKUP_TAG)
         private val MARKUP_TAG_KEYS = arrayOf(MARKUP_TAG)
-        val SEM_ACTION = TextAttributesKey.createTextAttributesKey("SEM_ACTION", DefaultLanguageHighlighterColors.TEMPLATE_LANGUAGE_COLOR)
+        val SEM_ACTION = TextAttributesKey.createTextAttributesKey(
+            "SEM_ACTION",
+            DefaultLanguageHighlighterColors.TEMPLATE_LANGUAGE_COLOR
+        )
         private val SEM_ACTION_KEYS = arrayOf(SEM_ACTION)
-        val IDENTIFIER = TextAttributesKey.createTextAttributesKey("IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER)
+        val IDENTIFIER =
+            TextAttributesKey.createTextAttributesKey("IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER)
         private val IDENTIFIER_KEYS = arrayOf(IDENTIFIER)
         val TERMINATOR = TextAttributesKey.createTextAttributesKey("TERMINATOR", DefaultLanguageHighlighterColors.DOT)
         private val TERMINATOR_KEYS = arrayOf(TERMINATOR)
-        val OPERATION_SIGN = TextAttributesKey.createTextAttributesKey("OPERATIONS_SIGN", DefaultLanguageHighlighterColors.OPERATION_SIGN)
+        val OPERATION_SIGN = TextAttributesKey.createTextAttributesKey(
+            "OPERATIONS_SIGN",
+            DefaultLanguageHighlighterColors.OPERATION_SIGN
+        )
         private val OPERATION_SIGN_KEYS = arrayOf(OPERATION_SIGN)
-        val PARENTHESES = TextAttributesKey.createTextAttributesKey("PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES)
+        val PARENTHESES =
+            TextAttributesKey.createTextAttributesKey("PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES)
         private val PARENTHESES_KEYS = arrayOf(PARENTHESES)
         val BRACKETS = TextAttributesKey.createTextAttributesKey("BRACKETS", DefaultLanguageHighlighterColors.BRACKETS)
         private val BRACKETS_KEYS = arrayOf(BRACKETS)

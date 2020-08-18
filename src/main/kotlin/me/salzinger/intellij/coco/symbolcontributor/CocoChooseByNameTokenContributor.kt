@@ -11,11 +11,16 @@ import me.salzinger.intellij.coco.CocoUtil
 class CocoChooseByNameTokenContributor : ChooseByNameContributor {
     override fun getNames(project: Project, includeNonProjectItems: Boolean): Array<String> {
         return CocoUtil.findTokenDecls(project)
-                .mapNotNull { it.name }
-                .toTypedArray()
+            .mapNotNull { it.name }
+            .toTypedArray()
     }
 
-    override fun getItemsByName(name: String, pattern: String, project: Project, includeNonProjectItems: Boolean): Array<NavigationItem> {
+    override fun getItemsByName(
+        name: String,
+        pattern: String,
+        project: Project,
+        includeNonProjectItems: Boolean
+    ): Array<NavigationItem> {
         return CocoUtil.findTokenDecls(project, name).toTypedArray()
     }
 }

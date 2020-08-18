@@ -24,6 +24,5 @@ class CocoStructureViewFactory : PsiStructureViewFactory {
                 return false
             }
         }
-
     }
 }

@@ -15,6 +15,7 @@ public class LexerCommentTest extends AbstractLexerTest {
         init("//TEST");
         assertElementTypeStrict(CocoTypes.LINE_COMMENT);
     }
+
     @Test
     public void testLineCommentWithParenthesis() throws IOException {
         init("//TEST(some note) (some other note)");

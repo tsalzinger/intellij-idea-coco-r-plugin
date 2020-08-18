@@ -15,6 +15,14 @@ import java.util.Collection;
  */
 @RunWith(Parameterized.class)
 public class LexerKeywordTest extends AbstractLexerTest {
+    private final String token;
+    private final IElementType elementType;
+
+    public LexerKeywordTest(String token, IElementType elementType) {
+        this.token = token;
+        this.elementType = elementType;
+    }
+
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -37,14 +45,6 @@ public class LexerKeywordTest extends AbstractLexerTest {
                 {"TOKENS", CocoTypes.KEYWORD_TOKENS},
                 {"WEAK", CocoTypes.KEYWORD_WEAK}
         });
-    }
-
-    private final String token;
-    private final IElementType elementType;
-
-    public LexerKeywordTest(String token, IElementType elementType) {
-        this.token = token;
-        this.elementType = elementType;
     }
 
     @Test

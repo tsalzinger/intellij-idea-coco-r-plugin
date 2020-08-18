@@ -2,7 +2,12 @@ package me.salzinger.intellij.coco.reference
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
-import com.intellij.psi.*
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.PsiReference
+import com.intellij.psi.PsiReferenceContributor
+import com.intellij.psi.PsiReferenceProvider
+import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.util.ProcessingContext
 import org.apache.commons.lang.StringUtils
 
@@ -19,21 +24,29 @@ class CocoReferenceContributor : PsiReferenceContributor() {
         register(registrar, ::CocoTokenReference)
     }
 
-    private inline fun <reified T : PsiNameIdentifierOwner> register(registrar: PsiReferenceRegistrar, crossinline psiReferenceProvider: (T, TextRange) -> PsiReference) {
-        registrar.registerReferenceProvider(PlatformPatterns.psiElement(T::class.java),
-                object : PsiReferenceProvider() {
-                    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-                        val hasIdent = element as T
-                        val ident = hasIdent.nameIdentifier
+    private inline fun <reified T : PsiNameIdentifierOwner> register(
+        registrar: PsiReferenceRegistrar,
+        crossinline psiReferenceProvider: (T, TextRange) -> PsiReference
+    ) {
+        registrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(T::class.java),
+            object : PsiReferenceProvider() {
+                override fun getReferencesByElement(
+                    element: PsiElement,
+                    context: ProcessingContext
+                ): Array<PsiReference> {
+                    val hasIdent = element as T
+                    val ident = hasIdent.nameIdentifier
 
-                        if (ident != null) {
-                            if (StringUtils.isNotBlank(hasIdent.name)) {
-                                return arrayOf(psiReferenceProvider.invoke(hasIdent, getRelativeTextRange(ident)))
-                            }
+                    if (ident != null) {
+                        if (StringUtils.isNotBlank(hasIdent.name)) {
+                            return arrayOf(psiReferenceProvider.invoke(hasIdent, getRelativeTextRange(ident)))
                         }
-
-                        return PsiReference.EMPTY_ARRAY
                     }
-                })
+
+                    return PsiReference.EMPTY_ARRAY
+                }
+            }
+        )
     }
 }

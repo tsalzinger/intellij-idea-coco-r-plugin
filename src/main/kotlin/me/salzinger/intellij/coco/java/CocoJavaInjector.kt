@@ -10,7 +10,10 @@ import me.salzinger.intellij.coco.settings.CocoConfiguration
 import me.salzinger.intellij.coco.settings.CocoInjectionMode
 
 class CocoJavaInjector : LanguageInjector {
-    override fun getLanguagesToInject(psiLanguageInjectionHost: PsiLanguageInjectionHost, injectedLanguagePlaces: InjectedLanguagePlaces) {
+    override fun getLanguagesToInject(
+        psiLanguageInjectionHost: PsiLanguageInjectionHost,
+        injectedLanguagePlaces: InjectedLanguagePlaces
+    ) {
         if (CocoConfiguration.getSettings(psiLanguageInjectionHost.project).injectionMode != CocoInjectionMode.SIMPLE) {
             return
         }
@@ -18,10 +21,15 @@ class CocoJavaInjector : LanguageInjector {
         val prefixBuilder = StringBuilder()
 
         CocoJavaUtil.getTargetPackage(psiLanguageInjectionHost.containingFile.originalFile)
-                .ifPresent { prefixBuilder.append("package $it;") }
+            .ifPresent { prefixBuilder.append("package $it;") }
 
         if (psiLanguageInjectionHost is me.salzinger.intellij.coco.psi.CocoImports) {
-            injectedLanguagePlaces.addPlace(JavaLanguage.INSTANCE, TextRange(0, psiLanguageInjectionHost.getTextLength()), prefixBuilder.toString(), "")
+            injectedLanguagePlaces.addPlace(
+                JavaLanguage.INSTANCE,
+                TextRange(0, psiLanguageInjectionHost.getTextLength()),
+                prefixBuilder.toString(),
+                ""
+            )
         } else {
             prefixBuilder.append("class Parser {\n")
             prefixBuilder.append("\tpublic static final int _EOF = 0;\n")
@@ -29,9 +37,15 @@ class CocoJavaInjector : LanguageInjector {
             appendPragmas(prefixBuilder, psiLanguageInjectionHost)
 
             if (psiLanguageInjectionHost is me.salzinger.intellij.coco.psi.CocoGlobalFieldsAndMethods) {
-                injectedLanguagePlaces.addPlace(JavaLanguage.INSTANCE, TextRange(0, psiLanguageInjectionHost.getTextLength()), prefixBuilder.toString(), "}")
+                injectedLanguagePlaces.addPlace(
+                    JavaLanguage.INSTANCE,
+                    TextRange(0, psiLanguageInjectionHost.getTextLength()),
+                    prefixBuilder.toString(),
+                    "}"
+                )
             } else if (psiLanguageInjectionHost is me.salzinger.intellij.coco.psi.CocoArbitraryStatements) {
-                val globalFieldsAndMethods = CocoUtil.findGlobalFieldsAndMethods(psiLanguageInjectionHost.containingFile.originalFile)
+                val globalFieldsAndMethods =
+                    CocoUtil.findGlobalFieldsAndMethods(psiLanguageInjectionHost.containingFile.originalFile)
                 if (globalFieldsAndMethods != null) {
                     prefixBuilder.append(globalFieldsAndMethods.text)
                 }
@@ -39,13 +53,18 @@ class CocoJavaInjector : LanguageInjector {
                 val cocoNamedElement = CocoUtil.findNearestCocoNamedElement(psiLanguageInjectionHost)
 
                 if (cocoNamedElement is me.salzinger.intellij.coco.psi.CocoProduction) {
-                    prefixBuilder.append("\tvoid ${cocoNamedElement.name}(${cocoNamedElement.formalAttributes?.text?.trim('<', '>')
-                            ?: ""}) {\n")
+                    val formalAttributes = cocoNamedElement.formalAttributes?.text?.trim('<', '>').orEmpty()
+                    prefixBuilder.append("\tvoid ${cocoNamedElement.name}($formalAttributes) {\n")
                 } else {
                     prefixBuilder.append("\tvoid ${cocoNamedElement.name}() {\n")
                 }
 
-                injectedLanguagePlaces.addPlace(JavaLanguage.INSTANCE, TextRange(0, psiLanguageInjectionHost.getTextLength()), prefixBuilder.toString(), "}}")
+                injectedLanguagePlaces.addPlace(
+                    JavaLanguage.INSTANCE,
+                    TextRange(0, psiLanguageInjectionHost.getTextLength()),
+                    prefixBuilder.toString(),
+                    "}}"
+                )
             }
         }
     }
@@ -54,13 +73,22 @@ class CocoJavaInjector : LanguageInjector {
         appendTokenDecls(prefixBuilder, CocoUtil.findTokenDecls(psiLanguageInjectionHost.containingFile))
     }
 
-    private fun appendTokenDecls(prefixBuilder: StringBuilder, tokenDecls: List<me.salzinger.intellij.coco.psi.CocoTokenDecl>, offset: Int = 1) {
+    private fun appendTokenDecls(
+        prefixBuilder: StringBuilder,
+        tokenDecls: List<me.salzinger.intellij.coco.psi.CocoTokenDecl>,
+        offset: Int = 1
+    ) {
         tokenDecls.forEachIndexed { index, cocoTokenDecl ->
             prefixBuilder.append("\tpublic static final int _${cocoTokenDecl.name} = ${index + offset};\n")
         }
     }
 
     private fun appendPragmas(prefixBuilder: StringBuilder, psiLanguageInjectionHost: PsiLanguageInjectionHost) {
-        appendTokenDecls(prefixBuilder, CocoUtil.findPragmaDecls(psiLanguageInjectionHost.containingFile).map { cocoPragmaDecl -> cocoPragmaDecl.tokenDecl }, 102)
+        appendTokenDecls(
+            prefixBuilder,
+            CocoUtil.findPragmaDecls(psiLanguageInjectionHost.containingFile)
+                .map { cocoPragmaDecl -> cocoPragmaDecl.tokenDecl },
+            102
+        )
     }
 }

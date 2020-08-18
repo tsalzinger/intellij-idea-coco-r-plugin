@@ -83,8 +83,8 @@ intellij {
 //  https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_dependencies.html
 //
     setPlugins(
-            "java",
-            "PsiViewer:202-SNAPSHOT.3"
+        "java",
+        "PsiViewer:202-SNAPSHOT.3"
     )
 }
 
@@ -130,7 +130,7 @@ tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile> {
         dependsOn(
-                downloadCocoJar, generateCocoLexer
+            downloadCocoJar, generateCocoLexer
         )
 
         sourceCompatibility = "1.8"
@@ -139,7 +139,7 @@ tasks {
     listOf("compileKotlin", "compileTestKotlin").forEach {
         getByName<KotlinCompile>(it) {
             dependsOn(
-                    downloadCocoJar, generateCocoLexer
+                downloadCocoJar, generateCocoLexer
             )
 
             kotlinOptions.jvmTarget = "1.8"
@@ -157,24 +157,24 @@ tasks {
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription(
-                closure {
-                    File("./README.md").readText().lines().run {
-                        val start = "<!-- Plugin description -->"
-                        val end = "<!-- Plugin description end -->"
+            closure {
+                File("./README.md").readText().lines().run {
+                    val start = "<!-- Plugin description -->"
+                    val end = "<!-- Plugin description end -->"
 
-                        if (!containsAll(listOf(start, end))) {
-                            throw GradleException("Plugin description section not found in README.md file:\n$start ... $end")
-                        }
-                        subList(indexOf(start) + 1, indexOf(end))
-                    }.joinToString("\n").run { markdownToHTML(this) }
-                }
+                    if (!containsAll(listOf(start, end))) {
+                        throw GradleException("Plugin description section not found in README.md file:\n$start ... $end")
+                    }
+                    subList(indexOf(start) + 1, indexOf(end))
+                }.joinToString("\n").run { markdownToHTML(this) }
+            }
         )
 
         // Get the latest available change notes from the changelog file
         changeNotes(
-                closure {
-                    changelog.getLatest().toHTML()
-                }
+            closure {
+                changelog.getLatest().toHTML()
+            }
         )
     }
 

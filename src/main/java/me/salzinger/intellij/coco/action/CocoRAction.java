@@ -48,6 +48,18 @@ import java.util.*;
 public class CocoRAction extends AnAction {
     public static final NotificationGroup COCO_NOTIFICATION_GROUP = NotificationGroup.balloonGroup("Coco/R Compiler");
 
+    @NotNull
+    private static List<CocoFile> getFiles(@NotNull AnActionEvent e) {
+        final Project project = getEventProject(e);
+        final VirtualFile[] files = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
+        if (project == null || files == null) return Collections.emptyList();
+        final PsiManager manager = PsiManager.getInstance(project);
+        return ContainerUtil.mapNotNull(files, file -> {
+            final PsiFile psiFile = manager.findFile(file);
+            return psiFile instanceof CocoFile ? (CocoFile) psiFile : null;
+        });
+    }
+
     public void actionPerformed(AnActionEvent e) {
         final Project project = getEventProject(e);
         final List<CocoFile> bnfFiles = getFiles(e);
@@ -101,18 +113,6 @@ public class CocoRAction extends AnAction {
 
     private void markFileTreeAsDirtyAndReload(final VirtualFile virtualFile) {
         VfsUtil.markDirtyAndRefresh(false, true, true, virtualFile);
-    }
-
-    @NotNull
-    private static List<CocoFile> getFiles(@NotNull AnActionEvent e) {
-        final Project project = getEventProject(e);
-        final VirtualFile[] files = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
-        if (project == null || files == null) return Collections.emptyList();
-        final PsiManager manager = PsiManager.getInstance(project);
-        return ContainerUtil.mapNotNull(files, file -> {
-            final PsiFile psiFile = manager.findFile(file);
-            return psiFile instanceof CocoFile ? (CocoFile) psiFile : null;
-        });
     }
 
     @NotNull

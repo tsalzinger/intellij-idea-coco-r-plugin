@@ -7,7 +7,6 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 
-
 @State(name = "CocoSettings", storages = [(Storage("coco.xml"))])
 class CocoConfiguration(private val project: Project) : PersistentStateComponent<CocoConfiguration.State> {
     private val myState = CocoConfiguration.State()
@@ -26,6 +25,7 @@ class CocoConfiguration(private val project: Project) : PersistentStateComponent
         fun getSettings(project: Project): CocoConfiguration.State {
             return ServiceManager.getService(project, CocoConfiguration::class.java).state
         }
+
         fun saveSettings(project: Project, state: CocoConfiguration.State) {
             ServiceManager.getService(project, CocoConfiguration::class.java).loadState(state)
         }

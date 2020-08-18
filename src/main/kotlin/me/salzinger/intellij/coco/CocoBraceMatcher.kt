@@ -10,12 +10,36 @@ import com.intellij.psi.tree.IElementType
  */
 class CocoBraceMatcher : PairedBraceMatcher {
     private val pairs = arrayOf(
-            BracePair(me.salzinger.intellij.coco.psi.CocoTypes.PAR_OPEN, me.salzinger.intellij.coco.psi.CocoTypes.PAR_CLOSE, false),
-            BracePair(me.salzinger.intellij.coco.psi.CocoTypes.BRACK_OPEN, me.salzinger.intellij.coco.psi.CocoTypes.BRACK_CLOSE, false),
-            BracePair(me.salzinger.intellij.coco.psi.CocoTypes.CURL_OPEN, me.salzinger.intellij.coco.psi.CocoTypes.CURL_CLOSE, false),
-            BracePair(me.salzinger.intellij.coco.psi.CocoTypes.SMALLER_THEN, me.salzinger.intellij.coco.psi.CocoTypes.GREATER_THEN, false),
-            BracePair(me.salzinger.intellij.coco.psi.CocoTypes.SEM_ACTION_START, me.salzinger.intellij.coco.psi.CocoTypes.SEM_ACTION_END, false),
-            BracePair(me.salzinger.intellij.coco.psi.CocoTypes.ASSIGNMENT, me.salzinger.intellij.coco.psi.CocoTypes.TERMINATOR, false)
+        BracePair(
+            me.salzinger.intellij.coco.psi.CocoTypes.PAR_OPEN,
+            me.salzinger.intellij.coco.psi.CocoTypes.PAR_CLOSE,
+            false
+        ),
+        BracePair(
+            me.salzinger.intellij.coco.psi.CocoTypes.BRACK_OPEN,
+            me.salzinger.intellij.coco.psi.CocoTypes.BRACK_CLOSE,
+            false
+        ),
+        BracePair(
+            me.salzinger.intellij.coco.psi.CocoTypes.CURL_OPEN,
+            me.salzinger.intellij.coco.psi.CocoTypes.CURL_CLOSE,
+            false
+        ),
+        BracePair(
+            me.salzinger.intellij.coco.psi.CocoTypes.SMALLER_THEN,
+            me.salzinger.intellij.coco.psi.CocoTypes.GREATER_THEN,
+            false
+        ),
+        BracePair(
+            me.salzinger.intellij.coco.psi.CocoTypes.SEM_ACTION_START,
+            me.salzinger.intellij.coco.psi.CocoTypes.SEM_ACTION_END,
+            false
+        ),
+        BracePair(
+            me.salzinger.intellij.coco.psi.CocoTypes.ASSIGNMENT,
+            me.salzinger.intellij.coco.psi.CocoTypes.TERMINATOR,
+            false
+        )
     )
 
     override fun getPairs(): Array<BracePair> {

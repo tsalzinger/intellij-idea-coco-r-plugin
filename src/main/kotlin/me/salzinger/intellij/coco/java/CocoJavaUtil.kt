@@ -19,13 +19,17 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ex.ProgressIndicatorEx
-import com.intellij.psi.*
+import com.intellij.psi.JavaDirectoryService
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ExceptionUtil
 import me.salzinger.intellij.coco.CocoUtil
 import me.salzinger.intellij.coco.psi.CocoFile
-import java.util.*
+import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
@@ -39,7 +43,10 @@ private val javaErrorCache: ConcurrentMap<PsiFile, List<HighlightInfo>> = Concur
 object CocoJavaUtil {
 
     fun getDeclaredPackage(file: PsiFile): String? {
-        return PsiTreeUtil.findChildOfType(file, me.salzinger.intellij.coco.psi.CocoDirectives::class.java)?.directiveList?.find {
+        return PsiTreeUtil.findChildOfType(
+            file,
+            me.salzinger.intellij.coco.psi.CocoDirectives::class.java
+        )?.directiveList?.find {
             it.directiveName.text == "\$package"
         }?.directiveValue?.text
     }
@@ -61,7 +68,7 @@ object CocoJavaUtil {
     fun getParserClass(file: PsiFile): PsiClass? {
         val javaPsiFacade = ServiceManager.getService(file.project, JavaPsiFacade::class.java)
 
-        val parserClassName = "${getTargetPackage(file).map { if (it.isEmpty()) it else "${it}." }.orElse("")}Parser"
+        val parserClassName = "${getTargetPackage(file).map { if (it.isEmpty()) it else "$it." }.orElse("")}Parser"
         return javaPsiFacade.findClass(parserClassName, GlobalSearchScope.allScope(javaPsiFacade.project))
     }
 
@@ -94,7 +101,6 @@ object CocoJavaUtil {
                     LOG.error(e)
                     exception.set(e)
                 }
-
             }
         })
 
@@ -119,18 +125,22 @@ object CocoJavaUtil {
             })
         }
 
-        return ProgressManager.getInstance().runProcess(Computable<List<HighlightInfo>> outer@{
-            return@outer DumbService.getInstance(project).runReadActionInSmartMode(Computable<List<HighlightInfo>> {
-                val psiFile = PsiManager.getInstance(project).findFile(file)
-                val document = FileDocumentManager.getInstance().getDocument(file)
-                if (psiFile == null || document == null) {
-                    return@Computable emptyList()
-                }
-                return@Computable codeAnalyzer
-                        .runMainPasses(psiFile, document, daemonIndicator)
-                        .filter { it.severity == HighlightSeverity.ERROR }
-            })
-
-        }, daemonIndicator)
+        return ProgressManager.getInstance().runProcess(
+            Computable<List<HighlightInfo>> outer@{
+                return@outer DumbService.getInstance(project).runReadActionInSmartMode(
+                    Computable<List<HighlightInfo>> {
+                        val psiFile = PsiManager.getInstance(project).findFile(file)
+                        val document = FileDocumentManager.getInstance().getDocument(file)
+                        if (psiFile == null || document == null) {
+                            return@Computable emptyList()
+                        }
+                        return@Computable codeAnalyzer
+                            .runMainPasses(psiFile, document, daemonIndicator)
+                            .filter { it.severity == HighlightSeverity.ERROR }
+                    }
+                )
+            },
+            daemonIndicator
+        )
     }
 }

@@ -57,7 +57,10 @@ class CocoParserDefinition : ParserDefinition {
 
     companion object {
         val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
-        val COMMENTS = TokenSet.create(me.salzinger.intellij.coco.psi.CocoTypes.BLOCK_COMMENT, me.salzinger.intellij.coco.psi.CocoTypes.LINE_COMMENT)
+        val COMMENTS = TokenSet.create(
+            me.salzinger.intellij.coco.psi.CocoTypes.BLOCK_COMMENT,
+            me.salzinger.intellij.coco.psi.CocoTypes.LINE_COMMENT
+        )
         val STRING = TokenSet.create(me.salzinger.intellij.coco.psi.CocoTypes.STRING)
 
         val FILE = IFileElementType(Language.findInstance(CocoLanguage::class.java))

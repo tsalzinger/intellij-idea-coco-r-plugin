@@ -40,7 +40,6 @@ class CocoSettingsConfigurable(private val project: Project) : BaseConfigurable(
         CocoConfiguration.saveSettings(project, settings)
     }
 
-
     override fun createComponent(): JComponent? {
         val injectionLevelCombo = ComboBox(CocoInjectionMode.values())
         injectionLevelCombo.renderer = object : DefaultListCellRenderer() {
@@ -72,13 +71,16 @@ class CocoSettingsConfigurable(private val project: Project) : BaseConfigurable(
             if ("comboBoxChanged" == it.actionCommand) {
                 when (getSelectedInjectionMode()!!) {
                     CocoInjectionMode.DISABLED -> {
-                        noteComponent.text = XmlStringUtil.wrapInHtml("Java language injection is disabled and no editor support will be provided.")
+                        noteComponent.text =
+                            XmlStringUtil.wrapInHtml("Java language injection is disabled and no editor support will be provided.")
                     }
                     CocoInjectionMode.SIMPLE -> {
-                        noteComponent.text = XmlStringUtil.wrapInHtml("Simple mode will allow code completion of generated Tokens, but is otherwise limited to a per element injection. This means no completion of other Java injected areas will be possible.")
+                        noteComponent.text =
+                            XmlStringUtil.wrapInHtml("Simple mode will allow code completion of generated Tokens, but is otherwise limited to a per element injection. This means no completion of other Java injected areas will be possible.")
                     }
                     CocoInjectionMode.ADVANCED -> {
-                        noteComponent.text = XmlStringUtil.wrapInHtml("Advanced mode will allow code completion of linked injection areas. For example Semantic Actions within a Production will have access to the declared attributes (parameters).")
+                        noteComponent.text =
+                            XmlStringUtil.wrapInHtml("Advanced mode will allow code completion of linked injection areas. For example Semantic Actions within a Production will have access to the declared attributes (parameters).")
                     }
                 }
             }
@@ -86,7 +88,6 @@ class CocoSettingsConfigurable(private val project: Project) : BaseConfigurable(
 
         return myPanel
     }
-
 
     override fun reset() {
         injectionLevelCombo?.selectedItem = getSettings().injectionMode

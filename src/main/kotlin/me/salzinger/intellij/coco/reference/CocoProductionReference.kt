@@ -7,7 +7,8 @@ import com.intellij.psi.PsiReference
 import me.salzinger.intellij.coco.CocoUtil
 import me.salzinger.intellij.coco.psi.HasCocoProductionReference
 
-class CocoProductionReference(element: HasCocoProductionReference, textRange: TextRange) : AbstractRenamableReference<HasCocoProductionReference>(element, textRange), PsiReference {
+class CocoProductionReference(element: HasCocoProductionReference, textRange: TextRange) :
+    AbstractRenamableReference<HasCocoProductionReference>(element, textRange), PsiReference {
 
     override fun resolve(): PsiElement? {
         return CocoUtil.findProduction(myElement.containingFile, myElement.name)
@@ -15,17 +16,17 @@ class CocoProductionReference(element: HasCocoProductionReference, textRange: Te
 
     override fun getVariants(): Array<Any> {
         return CocoUtil.findProductions(myElement.containingFile)
-                .map { it ->
-                    val formalAttributes = it.formalAttributes
-                    val lookupElementBuilder = LookupElementBuilder.create(it)
-                            .withTypeText("Production")
+            .map { it ->
+                val formalAttributes = it.formalAttributes
+                val lookupElementBuilder = LookupElementBuilder.create(it)
+                    .withTypeText("Production")
 
-                    if (formalAttributes != null) {
-                        return@map lookupElementBuilder.withTailText(formalAttributes.text, true)
-                    }
-
-                    lookupElementBuilder
+                if (formalAttributes != null) {
+                    return@map lookupElementBuilder.withTailText(formalAttributes.text, true)
                 }
-                .toTypedArray()
+
+                lookupElementBuilder
+            }
+            .toTypedArray()
     }
 }

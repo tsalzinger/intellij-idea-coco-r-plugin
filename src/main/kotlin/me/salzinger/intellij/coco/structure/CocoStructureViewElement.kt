@@ -10,7 +10,7 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
 import me.salzinger.intellij.coco.psi.CocoDirectiveElement
 import me.salzinger.intellij.coco.psi.CocoFile
-import java.util.*
+import java.util.ArrayList
 import javax.swing.Icon
 
 /**
@@ -132,26 +132,40 @@ class CocoStructureViewElement(private val element: PsiElement) : StructureViewT
     override fun getChildren(): Array<TreeElement> {
         val treeElements = ArrayList<TreeElement>()
         if (element is CocoFile) {
-            val injectionHost = PsiTreeUtil.getChildOfType(element, me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java)
+            val injectionHost =
+                PsiTreeUtil.getChildOfType(element, me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java)
 
-            val cocoDirectives = PsiTreeUtil.getChildOfType(element, me.salzinger.intellij.coco.psi.CocoDirectives::class.java)
-            if (cocoDirectives != null && PsiTreeUtil.getChildrenOfType(cocoDirectives, CocoDirectiveElement::class.java) != null) {
+            val cocoDirectives =
+                PsiTreeUtil.getChildOfType(element, me.salzinger.intellij.coco.psi.CocoDirectives::class.java)
+            val cocoDirectiveElements = PsiTreeUtil.getChildrenOfType(
+                cocoDirectives,
+                CocoDirectiveElement::class.java
+            )
+            if (cocoDirectives != null && cocoDirectiveElements != null
+            ) {
                 treeElements.add(CocoStructureViewElement(cocoDirectives))
             }
 
-            val compilers = PsiTreeUtil.getChildrenOfType(injectionHost, me.salzinger.intellij.coco.psi.CocoCompiler::class.java)
+            val compilers =
+                PsiTreeUtil.getChildrenOfType(injectionHost, me.salzinger.intellij.coco.psi.CocoCompiler::class.java)
             if (compilers != null) {
                 for (compiler in compilers) {
                     treeElements.add(CocoStructureViewElement(compiler))
                 }
             }
-            val scannerSpecifications = PsiTreeUtil.getChildrenOfType(injectionHost, me.salzinger.intellij.coco.psi.CocoScannerSpecification::class.java)
+            val scannerSpecifications = PsiTreeUtil.getChildrenOfType(
+                injectionHost,
+                me.salzinger.intellij.coco.psi.CocoScannerSpecification::class.java
+            )
             if (scannerSpecifications != null) {
                 for (scannerSpecification in scannerSpecifications) {
                     treeElements.add(CocoStructureViewElement(scannerSpecification))
                 }
             }
-            val parserSpecifications = PsiTreeUtil.getChildrenOfType(injectionHost, me.salzinger.intellij.coco.psi.CocoParserSpecification::class.java)
+            val parserSpecifications = PsiTreeUtil.getChildrenOfType(
+                injectionHost,
+                me.salzinger.intellij.coco.psi.CocoParserSpecification::class.java
+            )
             if (parserSpecifications != null) {
                 for (parserSpecification in parserSpecifications) {
                     treeElements.add(CocoStructureViewElement(parserSpecification))

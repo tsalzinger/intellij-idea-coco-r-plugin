@@ -6,7 +6,7 @@ import com.intellij.openapi.compiler.CompilerMessageCategory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import me.salzinger.intellij.coco.psi.CocoFile
-import java.util.*
+import java.util.UUID
 
 class CocoCompilerContext(cocoFile: CocoFile, val outputDir: VirtualFile, val executionId: UUID) {
     val inputFile: VirtualFile

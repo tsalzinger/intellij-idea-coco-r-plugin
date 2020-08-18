@@ -33,10 +33,11 @@ class CocoJavaExternalAnnotator : ExternalAnnotator<CocoFile, List<HighlightInfo
         if (globalFieldsAndMethods != null) {
             val offset = document.text.indexOf(globalFieldsAndMethods.text)
             if (offset != -1) {
-                for (highlightInfo in findInRange(
+                val highlightInfos = findInRange(
                     annotationResult,
                     TextRange.from(offset, globalFieldsAndMethods.textLength)
-                )) {
+                )
+                for (highlightInfo in highlightInfos) {
                     holder
                         .newAnnotation(
                             HighlightSeverity.ERROR,

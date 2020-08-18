@@ -10,7 +10,8 @@ import me.salzinger.intellij.coco.psi.impl.CocoPsiImplUtil
 /**
  * Created by Thomas on 29/03/2015.
  */
-abstract class AbstractRenamableReference<T : PsiNameIdentifierOwner>(element: T, rangeInElement: TextRange) : PsiReferenceBase<T>(element, rangeInElement) {
+abstract class AbstractRenamableReference<T : PsiNameIdentifierOwner>(element: T, rangeInElement: TextRange) :
+    PsiReferenceBase<T>(element, rangeInElement) {
 
     @Throws(IncorrectOperationException::class)
     override fun handleElementRename(newElementName: String): PsiElement {

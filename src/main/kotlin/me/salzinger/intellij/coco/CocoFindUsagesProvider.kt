@@ -14,10 +14,15 @@ import me.salzinger.intellij.coco.psi.CocoNamedElement
 class CocoFindUsagesProvider : FindUsagesProvider {
 
     override fun getWordsScanner(): WordsScanner {
-        return DefaultWordsScanner(FlexAdapter(me.salzinger.intellij.coco.CocoLexer()),
-                TokenSet.create(me.salzinger.intellij.coco.psi.CocoTypes.IDENT),
-                TokenSet.create(me.salzinger.intellij.coco.psi.CocoTypes.LINE_COMMENT, me.salzinger.intellij.coco.psi.CocoTypes.BLOCK_COMMENT),
-                TokenSet.EMPTY)
+        return DefaultWordsScanner(
+            FlexAdapter(me.salzinger.intellij.coco.CocoLexer()),
+            TokenSet.create(me.salzinger.intellij.coco.psi.CocoTypes.IDENT),
+            TokenSet.create(
+                me.salzinger.intellij.coco.psi.CocoTypes.LINE_COMMENT,
+                me.salzinger.intellij.coco.psi.CocoTypes.BLOCK_COMMENT
+            ),
+            TokenSet.EMPTY
+        )
     }
 
     override fun canFindUsagesFor(psiElement: PsiElement): Boolean {
@@ -44,7 +49,6 @@ class CocoFindUsagesProvider : FindUsagesProvider {
         return if (element is me.salzinger.intellij.coco.psi.CocoCompiler) {
             "compiler"
         } else ""
-
     }
 
     override fun getDescriptiveName(element: PsiElement): String {

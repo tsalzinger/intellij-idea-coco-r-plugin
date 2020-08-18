@@ -16,6 +16,10 @@ import java.util.Collection;
 public class LexerCharTest extends AbstractLexerTest {
     private final String string;
 
+    public LexerCharTest(String string) {
+        this.string = string;
+    }
+
     @Parameterized.Parameters
     public static Collection<String[]> data() {
         String[][] strings = {
@@ -23,7 +27,7 @@ public class LexerCharTest extends AbstractLexerTest {
                 {"'B'"},
                 {"' '"},
                 {"'*'"},
-                {"'\\\''"},
+                {"'\\''"},
                 {"'\"'"},
                 {"'\\\"'"},
                 {"'\\n'"},
@@ -38,10 +42,6 @@ public class LexerCharTest extends AbstractLexerTest {
                 {"'\\u0DF3'"}
         };
         return Arrays.asList(strings);
-    }
-
-    public LexerCharTest(String string) {
-        this.string = string;
     }
 
     @Test

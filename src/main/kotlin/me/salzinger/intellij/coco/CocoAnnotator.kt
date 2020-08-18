@@ -165,7 +165,6 @@ class CocoAnnotator : Annotator {
                             .create()
                     }
                 }
-
             }
             is PsiNameIdentifierOwner -> {
                 val ident = element.nameIdentifier

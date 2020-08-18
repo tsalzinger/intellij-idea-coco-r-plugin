@@ -11,7 +11,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import me.salzinger.intellij.coco.psi.CocoNamedElement
 import org.apache.commons.lang.StringUtils
 import org.jetbrains.annotations.Contract
-import java.util.*
+import java.util.ArrayList
 
 /**
  * @author Thomas Salzinger [tsalzinger@gmail.com](mailto:tsalzinger@gmail.com)
@@ -47,11 +47,17 @@ object CocoUtil {
     }
 
     fun findScannerSpecification(file: PsiFile): me.salzinger.intellij.coco.psi.CocoScannerSpecification? {
-        return PsiTreeUtil.getChildOfType(file, me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java)?.scannerSpecification
+        return PsiTreeUtil.getChildOfType(
+            file,
+            me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java
+        )?.scannerSpecification
     }
 
     fun findParserSpecification(file: PsiFile): me.salzinger.intellij.coco.psi.CocoParserSpecification? {
-        return PsiTreeUtil.getChildOfType(file, me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java)?.parserSpecification
+        return PsiTreeUtil.getChildOfType(
+            file,
+            me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java
+        )?.parserSpecification
     }
 
     @Contract("_, null -> null")
@@ -122,7 +128,7 @@ object CocoUtil {
         val psiManager = PsiManager.getInstance(project)
 
         return FileTypeIndex.getFiles(CocoFileType.INSTANCE, GlobalSearchScope.allScope(project))
-                .mapNotNull(psiManager::findFile)
+            .mapNotNull(psiManager::findFile)
     }
 
     fun findTokenDecls(project: Project?, name: String?): List<me.salzinger.intellij.coco.psi.CocoTokenDecl> {
@@ -155,11 +161,13 @@ object CocoUtil {
         return if (StringUtils.isBlank(name)) {
             collection
         } else collection
-                .filter { item -> name == item.name }
-
+            .filter { item -> name == item.name }
     }
 
     fun findGlobalFieldsAndMethods(file: PsiFile): me.salzinger.intellij.coco.psi.CocoGlobalFieldsAndMethods? {
-        return PsiTreeUtil.getChildOfType(file, me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java)?.globalFieldsAndMethods
+        return PsiTreeUtil.getChildOfType(
+            file,
+            me.salzinger.intellij.coco.psi.CocoCocoInjectorHost::class.java
+        )?.globalFieldsAndMethods
     }
 }

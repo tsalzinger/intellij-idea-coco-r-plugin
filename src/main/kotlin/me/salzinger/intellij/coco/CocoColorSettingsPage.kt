@@ -42,9 +42,24 @@ class CocoColorSettingsPage : ColorSettingsPage {
     }
 
     companion object {
-        private val DESCRIPTORS = arrayOf(AttributesDescriptor("Block Comment", CocoSyntaxHighlighter.BLOCK_COMMENT), AttributesDescriptor("Line Comment", CocoSyntaxHighlighter.LINE_COMMENT), AttributesDescriptor("Keyword", CocoSyntaxHighlighter.KEYWORD), AttributesDescriptor("Identifier", CocoSyntaxHighlighter.IDENTIFIER), AttributesDescriptor("Markup Tags", CocoSyntaxHighlighter.MARKUP_TAG), AttributesDescriptor("Char", CocoSyntaxHighlighter.CHAR), AttributesDescriptor("String", CocoSyntaxHighlighter.STRING), AttributesDescriptor("Braces", CocoSyntaxHighlighter.BRACES), AttributesDescriptor("Brackets", CocoSyntaxHighlighter.BRACKETS), AttributesDescriptor("Parentheses", CocoSyntaxHighlighter.PARENTHESES), AttributesDescriptor("Operations ( + | - | .. | = )", CocoSyntaxHighlighter.OPERATION_SIGN), AttributesDescriptor("Terminal Symbol", CocoSyntaxHighlighter.TERMINATOR))
+        private val DESCRIPTORS = arrayOf(
+            AttributesDescriptor("Block Comment", CocoSyntaxHighlighter.BLOCK_COMMENT),
+            AttributesDescriptor("Line Comment", CocoSyntaxHighlighter.LINE_COMMENT),
+            AttributesDescriptor("Keyword", CocoSyntaxHighlighter.KEYWORD),
+            AttributesDescriptor("Identifier", CocoSyntaxHighlighter.IDENTIFIER),
+            AttributesDescriptor("Markup Tags", CocoSyntaxHighlighter.MARKUP_TAG),
+            AttributesDescriptor("Char", CocoSyntaxHighlighter.CHAR),
+            AttributesDescriptor("String", CocoSyntaxHighlighter.STRING),
+            AttributesDescriptor("Braces", CocoSyntaxHighlighter.BRACES),
+            AttributesDescriptor("Brackets", CocoSyntaxHighlighter.BRACKETS),
+            AttributesDescriptor("Parentheses", CocoSyntaxHighlighter.PARENTHESES),
+            AttributesDescriptor("Operations ( + | - | .. | = )", CocoSyntaxHighlighter.OPERATION_SIGN),
+            AttributesDescriptor("Terminal Symbol", CocoSyntaxHighlighter.TERMINATOR)
+        )
+
         @Language("Cocol/R")
-        private val COLOR_SETTINGS_ATG_CONTENT = """COMPILER Taste
+        private val COLOR_SETTINGS_ATG_CONTENT =
+            """COMPILER Taste
 
 Proc curProc;  // current program unit (procedure or main program)
 

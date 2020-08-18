@@ -7,7 +7,8 @@ import com.intellij.psi.PsiReference
 import me.salzinger.intellij.coco.CocoUtil
 import me.salzinger.intellij.coco.psi.HasCocoTokenReference
 
-class CocoTokenReference(element: HasCocoTokenReference, textRange: TextRange) : AbstractRenamableReference<HasCocoTokenReference>(element, textRange), PsiReference {
+class CocoTokenReference(element: HasCocoTokenReference, textRange: TextRange) :
+    AbstractRenamableReference<HasCocoTokenReference>(element, textRange), PsiReference {
 
     override fun resolve(): PsiElement? {
         return CocoUtil.findTokenDecl(myElement.containingFile, myElement.name)
@@ -15,18 +16,18 @@ class CocoTokenReference(element: HasCocoTokenReference, textRange: TextRange) :
 
     override fun getVariants(): Array<Any> {
         return CocoUtil.findTokenDecls(myElement.containingFile)
-                .map { it ->
-                    val tokenExpr = it.tokenExpr
+            .map { it ->
+                val tokenExpr = it.tokenExpr
 
-                    val lookupElementBuilder = LookupElementBuilder.create(it)
-                            .withTypeText("Token")
+                val lookupElementBuilder = LookupElementBuilder.create(it)
+                    .withTypeText("Token")
 
-                    if (tokenExpr != null) {
-                        return@map lookupElementBuilder.withTailText(" = " + tokenExpr.text, true)
-                    }
-
-                    lookupElementBuilder
+                if (tokenExpr != null) {
+                    return@map lookupElementBuilder.withTailText(" = " + tokenExpr.text, true)
                 }
-                .toTypedArray()
+
+                lookupElementBuilder
+            }
+            .toTypedArray()
     }
 }
