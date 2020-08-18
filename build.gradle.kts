@@ -1,38 +1,103 @@
 import de.undercouch.gradle.tasks.download.Download
+import io.gitlab.arturbosch.detekt.Detekt
+import org.jetbrains.changelog.closure
+import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
-import org.jetbrains.intellij.tasks.PatchPluginXmlTask
-import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    // IntelliJ IDEA configuration plugin
     idea
-    java
-    kotlin("jvm") version "1.3.61"
-    id("org.jetbrains.intellij") version "0.4.16"
-    id("org.jetbrains.grammarkit") version "2020.1"
+    // Java support
+    id("java")
+    // Kotlin support
+    id("org.jetbrains.kotlin.jvm") version "1.4.0"
+    // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
+    id("org.jetbrains.intellij") version "0.4.21"
+    // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
+    id("org.jetbrains.changelog") version "0.4.0"
+    // detekt linter - read more: https://detekt.github.io/detekt/kotlindsl.html
+    id("io.gitlab.arturbosch.detekt") version "1.11.0"
+    // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
+    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
+    // gradle-grammar-kit-plugin - read more: https://github.com/JetBrains/gradle-grammar-kit-plugin
+    id("org.jetbrains.grammarkit") version "2020.2.1"
+    // gradle-download-task - read more: https://github.com/michel-kraemer/gradle-download-task
     id("de.undercouch.download") version "4.0.4"
 }
 
-group = "me.salzinger.intellij"
-version = "1.5.0-SNAPSHOT"
+// Import variables from gradle.properties file
+val pluginGroup: String by project
+val pluginName: String by project
+val pluginVersion: String by project
+val pluginSinceBuild: String by project
+val pluginUntilBuild: String by project
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+val platformType: String by project
+val platformVersion: String by project
+val platformDownloadSources: String by project
+val grammmarKitOutputDirectory = "$buildDir/gen"
+
+group = pluginGroup
+version = pluginVersion
+
+// Configure project's dependencies
+repositories {
+    mavenCentral()
+    jcenter()
+}
+dependencies {
+    compile("org.jetbrains.kotlin:kotlin-stdlib")
+    compile(fileTree("$buildDir/external-libs"))
+    testCompile("junit:junit:4.12")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.11.0")
 }
 
 sourceSets {
     main {
         java {
-            srcDirs("$buildDir/gen")
+            // mark the generated files from the grammar kit plugin as sources
+            srcDirs(grammmarKitOutputDirectory)
         }
     }
 }
 
 idea {
     module {
-        generatedSourceDirs.add(file("$buildDir/gen"))
+        // ensure IDEA correctly marks the source folder as generated
+        generatedSourceDirs.add(file(grammmarKitOutputDirectory))
+    }
+}
+
+// Configure gradle-intellij-plugin plugin.
+// Read more: https://github.com/JetBrains/gradle-intellij-plugin
+intellij {
+    pluginName = pluginName
+    version = platformVersion
+    type = platformType
+    downloadSources = platformDownloadSources.toBoolean()
+    updateSinceUntilBuild = true
+
+//  Plugin Dependencies:
+//  https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_dependencies.html
+//
+    setPlugins(
+            "java",
+            "PsiViewer:202-SNAPSHOT.3"
+    )
+}
+
+// Configure detekt plugin.
+// Read more: https://detekt.github.io/detekt/kotlindsl.html
+detekt {
+    config = files("./detekt-config.yml")
+    buildUponDefaultConfig = true
+
+    reports {
+        html.enabled = false
+        xml.enabled = false
+        txt.enabled = false
     }
 }
 
@@ -46,64 +111,76 @@ val downloadCocoJar = task<Download>("downloadCocoJar") {
 
 val generateCocoParser = task<GenerateParser>("generateCocoParser") {
     source = "src/main/resources/me/salzinger/intellij/coco/Coco.bnf"
-    targetRoot = "$buildDir/gen"
+    targetRoot = grammmarKitOutputDirectory
     pathToParser = "/me/salzinger/intellij/coco/parser/CocoParser.java"
     pathToPsiRoot = "/me/salzinger/intellij/coco/psi"
+    purgeOldFiles = true
 }
 
 val generateCocoLexer = task<GenerateLexer>("generateCocoLexer") {
-    source = "src/main/kotlin/me/salzinger/intellij/coco/Coco.flex"
-    targetDir = "$buildDir/gen/me/salzinger/intellij/coco/"
-    targetClass = "CocoLexer"
     dependsOn(generateCocoParser)
+
+    source = "src/main/kotlin/me/salzinger/intellij/coco/Coco.flex"
+    targetDir = "$grammmarKitOutputDirectory/me/salzinger/intellij/coco/"
+    targetClass = "CocoLexer"
+    purgeOldFiles = true
 }
 
-repositories {
-    mavenCentral()
-}
+tasks {
+    // Set the compatibility versions to 1.8
+    withType<JavaCompile> {
+        dependsOn(
+                downloadCocoJar, generateCocoLexer
+        )
 
-dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib")
-    compile(fileTree("$buildDir/external-libs"))
-    testCompile("junit:junit:4.12")
-}
+        sourceCompatibility = "1.8"
+        targetCompatibility = "1.8"
+    }
+    listOf("compileKotlin", "compileTestKotlin").forEach {
+        getByName<KotlinCompile>(it) {
+            dependsOn(
+                    downloadCocoJar, generateCocoLexer
+            )
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
+            kotlinOptions.jvmTarget = "1.8"
+        }
+    }
+
+    withType<Detekt> {
         jvmTarget = "1.8"
-        languageVersion = "1.3"
-        apiVersion = "1.3"
     }
-}
 
-intellij {
-    version = "IC-LATEST-EAP-SNAPSHOT"
-    type = "IC"
-    downloadSources = true
-    setPlugins("java", "PsiViewer:201.3803.71-EAP-SNAPSHOT.1")
-}
+    patchPluginXml {
+        version(pluginVersion)
+        sinceBuild(pluginSinceBuild)
+        untilBuild(pluginUntilBuild)
 
-tasks.withType<PatchPluginXmlTask> {
-    version(project.version)
-    untilBuild(null)
-}
+        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
+        pluginDescription(
+                closure {
+                    File("./README.md").readText().lines().run {
+                        val start = "<!-- Plugin description -->"
+                        val end = "<!-- Plugin description end -->"
 
-tasks.withType<JavaCompile> {
-    dependsOn(
-            downloadCocoJar, generateCocoLexer
-    )
-}
+                        if (!containsAll(listOf(start, end))) {
+                            throw GradleException("Plugin description section not found in README.md file:\n$start ... $end")
+                        }
+                        subList(indexOf(start) + 1, indexOf(end))
+                    }.joinToString("\n").run { markdownToHTML(this) }
+                }
+        )
 
-tasks.withType<KotlinCompile> {
-    dependsOn(
-            downloadCocoJar, generateCocoLexer
-    )
-}
-
-tasks.withType<PublishTask> {
-    val projectVersionString = "${project.version}"
-    if (projectVersionString.contains("-SNAPSHOT")) {
-        channels("SNAPSHOT")
+        // Get the latest available change notes from the changelog file
+        changeNotes(
+                closure {
+                    changelog.getLatest().toHTML()
+                }
+        )
     }
-    token(project.findProperty("publishToken"))
+
+    publishPlugin {
+        dependsOn("patchChangelog")
+        token(System.getenv("PUBLISH_TOKEN"))
+        channels(pluginVersion.split('-').getOrElse(1) { "default" }.split('.').first())
+    }
 }

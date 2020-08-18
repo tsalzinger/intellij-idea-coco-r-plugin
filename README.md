@@ -1,8 +1,10 @@
 # Coco/R Plugin for IntelliJ IDEA
 
+<!-- Plugin description -->
 This plugin adds support for [Coco/R](http://ssw.jku.at/coco) to the IntelliJ IDEA Platform.
 The initial version was developed as part of a bachelor theses and the first public release was on 2018-01-25.
 Maintenance will be performed on a best effort basis.
+<!-- Plugin description end -->
 
 ## Plugin Installation
 
