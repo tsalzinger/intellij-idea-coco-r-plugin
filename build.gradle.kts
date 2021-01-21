@@ -132,7 +132,8 @@ tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile> {
         dependsOn(
-            downloadCocoJar, generateCocoLexer
+            downloadCocoJar,
+            generateCocoLexer
         )
 
         sourceCompatibility = "1.8"
@@ -141,7 +142,8 @@ tasks {
     listOf("compileKotlin", "compileTestKotlin").forEach {
         getByName<KotlinCompile>(it) {
             dependsOn(
-                downloadCocoJar, generateCocoLexer
+                downloadCocoJar,
+                generateCocoLexer
             )
 
             kotlinOptions.jvmTarget = "1.8"

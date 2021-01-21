@@ -101,12 +101,14 @@ object CocoJavaUtil {
         val daemonIndicator = DaemonProgressIndicator()
 
         if (progress is ProgressIndicatorEx) {
-            progress.addStateDelegate(object : AbstractProgressIndicatorExBase() {
-                override fun cancel() {
-                    super.cancel()
-                    daemonIndicator.cancel()
+            progress.addStateDelegate(
+                object : AbstractProgressIndicatorExBase() {
+                    override fun cancel() {
+                        super.cancel()
+                        daemonIndicator.cancel()
+                    }
                 }
-            })
+            )
         }
 
         return ProgressManager.getInstance().runProcess(
