@@ -99,7 +99,7 @@ intellij {
 
 changelog {
     version = pluginVersion
-    groups = listOf("Compatibility\n", "Development\n")
+    keepUnreleasedSection = false
 }
 
 // Configure detekt plugin.
