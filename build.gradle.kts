@@ -97,6 +97,11 @@ intellij {
     )
 }
 
+changelog {
+    version = pluginVersion
+    groups = listOf("Compatibility\n", "Development\n")
+}
+
 // Configure detekt plugin.
 // Read more: https://detekt.github.io/detekt/kotlindsl.html
 detekt {
