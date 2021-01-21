@@ -3,7 +3,7 @@
 ## [Unreleased]
 ### Changed
 - Development - Adapt build to be based on [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
-  - Update gradle wrapper to 6.6
+  - Update gradle wrapper to 6.8
   - Update kotlin to 1.4.0
   - Introduce ktlint and detekt
   - Utilize GitHub Actions for build/release
