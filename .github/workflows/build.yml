@@ -143,6 +143,7 @@ jobs:
             ideaIC:2019.3
             ideaIC:2020.1
             ideaIC:2020.2
+            ideaIC:2020.3
 
       # Print the output of the verify step
       - name: Print Logs

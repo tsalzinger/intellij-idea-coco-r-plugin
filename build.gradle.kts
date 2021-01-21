@@ -12,19 +12,19 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.4.0"
+    id("org.jetbrains.kotlin.jvm") version "1.4.21-2"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "0.4.21"
+    id("org.jetbrains.intellij") version "0.6.5"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "0.4.0"
+    id("org.jetbrains.changelog") version "1.0.1"
     // detekt linter - read more: https://detekt.github.io/detekt/kotlindsl.html
-    id("io.gitlab.arturbosch.detekt") version "1.11.0"
+    id("io.gitlab.arturbosch.detekt") version "1.15.0"
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
-    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     // gradle-grammar-kit-plugin - read more: https://github.com/JetBrains/gradle-grammar-kit-plugin
-    id("org.jetbrains.grammarkit") version "2020.2.1"
+    id("org.jetbrains.grammarkit") version "2020.3.2"
     // gradle-download-task - read more: https://github.com/michel-kraemer/gradle-download-task
-    id("de.undercouch.download") version "4.0.4"
+    id("de.undercouch.download") version "4.1.1"
 }
 
 // Import variables from gradle.properties file
@@ -33,6 +33,7 @@ val pluginName: String by project
 val pluginVersion: String by project
 val pluginSinceBuild: String by project
 val pluginUntilBuild: String by project
+val pluginVerifierIdeVersions: String by project
 
 val platformType: String by project
 val platformVersion: String by project
@@ -48,10 +49,9 @@ repositories {
     jcenter()
 }
 dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib")
-    compile(fileTree("$buildDir/external-libs"))
-    testCompile("junit:junit:4.12")
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.11.0")
+    implementation(fileTree("$buildDir/external-libs"))
+    testImplementation("junit:junit:4.12")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
 }
 
 sourceSets {
@@ -73,7 +73,8 @@ idea {
 // Configure gradle-intellij-plugin plugin.
 // Read more: https://github.com/JetBrains/gradle-intellij-plugin
 intellij {
-    pluginName = pluginName
+    // see https://github.com/JetBrains/intellij-platform-plugin-template/issues/29 for details regarding "this@Build_gradle"
+    pluginName = this@Build_gradle.pluginName.replace("/", "-")
     version = platformVersion
     type = platformType
     downloadSources = platformDownloadSources.toBoolean()
@@ -84,7 +85,8 @@ intellij {
 //
     setPlugins(
         "java",
-        "PsiViewer:202-SNAPSHOT.3"
+        // https://plugins.jetbrains.com/plugin/227-psiviewer/versions
+        "PsiViewer:203-SNAPSHOT"
     )
 }
 
@@ -176,6 +178,10 @@ tasks {
                 changelog.getLatest().toHTML()
             }
         )
+    }
+
+    runPluginVerifier {
+        ideVersions(pluginVerifierIdeVersions)
     }
 
     publishPlugin {
