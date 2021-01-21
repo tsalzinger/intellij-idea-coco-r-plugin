@@ -104,7 +104,7 @@ detekt {
 val downloadCocoJar = task<Download>("downloadCocoJar") {
     val cocoVersion = "2017-02-02"
     val cocoLib = file("$buildDir/external-libs/Coco-$cocoVersion.jar")
-    src("http://ssw.jku.at/coco/Java/Coco.jar")
+    src("https://ssw.jku.at/Research/Projects/Coco/Java/Coco.jar")
     dest(cocoLib)
     onlyIf { !cocoLib.exists() }
 }
