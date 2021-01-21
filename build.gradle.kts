@@ -48,10 +48,17 @@ repositories {
     mavenCentral()
     jcenter()
 }
+
 dependencies {
     implementation(fileTree("$buildDir/external-libs"))
     testImplementation("junit:junit:4.12")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
 }
 
 sourceSets {
@@ -104,7 +111,7 @@ detekt {
 }
 
 val downloadCocoJar = task<Download>("downloadCocoJar") {
-    val cocoVersion = "2017-02-02"
+    val cocoVersion = "2021-01-21"
     val cocoLib = file("$buildDir/external-libs/Coco-$cocoVersion.jar")
     src("https://ssw.jku.at/Research/Projects/Coco/Java/Coco.jar")
     dest(cocoLib)
@@ -135,9 +142,6 @@ tasks {
             downloadCocoJar,
             generateCocoLexer
         )
-
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
     }
     listOf("compileKotlin", "compileTestKotlin").forEach {
         getByName<KotlinCompile>(it) {
@@ -146,7 +150,7 @@ tasks {
                 generateCocoLexer
             )
 
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "11"
         }
     }
 
