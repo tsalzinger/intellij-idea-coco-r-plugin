@@ -1,6 +1,6 @@
 # Coco/R Plugin for IntelliJ IDEA Changelog
 
-## [Unreleased]
+## [1.5.0]
 ### Compatibility
 - Ensure compatibility with 2020.3
 
